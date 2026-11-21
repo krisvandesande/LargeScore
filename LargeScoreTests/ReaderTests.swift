@@ -88,13 +88,33 @@ struct ReaderSettingsTests {
         #expect(settings.pageColour == .light)
         #expect(!settings.onboardingDone)
         settings.sizeStep = 6
-        settings.instrument = .viola
+        settings.instruments = [.viola, .cello]
         settings.pageColour = .dark
+        settings.lineSpacing = .more
         let again = ReaderSettings(store: suite)
         #expect(again.sizeStep == 6)
+        #expect(again.instruments == [.viola, .cello])
         #expect(again.instrument == .viola)
         #expect(again.pageColour == .dark)
+        #expect(again.lineSpacing == .more)
+        #expect(again.layoutRequest(for: CGSize(width: 900, height: 1200)).lineGap == LineSpacing.more.gap)
         #expect(again.staffHeight == 88)
+    }
+
+    @Test func buildOnesSingleInstrumentCarriesOver() throws {
+        let suite = try #require(UserDefaults(suiteName: "settings-migrate"))
+        suite.removePersistentDomain(forName: "settings-migrate")
+        suite.set("bassoon", forKey: "instrument")
+        #expect(ReaderSettings(store: suite).instruments == [.bassoon])
+    }
+
+    @Test func boldThickensGlyphs() throws {
+        let suite = try #require(UserDefaults(suiteName: "settings-bold"))
+        suite.removePersistentDomain(forName: "settings-bold")
+        let settings = ReaderSettings(store: suite)
+        #expect(settings.glyphWeight > 0)
+        settings.boldLines = false
+        #expect(settings.glyphWeight == 0)
     }
 
     @Test func sampleClefFollowsTheInstrument() {
@@ -109,7 +129,7 @@ struct ReaderSettingsTests {
 
 struct LaidOutPieceTests {
     @Test func barsPerPageAddUp() async throws {
-        let loader = await ScoreLoader()
+        let loader = ScoreLoader()
         let piece = Piece.sample(for: .bassoon)
         let laidOut = try await loader.layOut(piece, request: LayoutRequest(pageSize: CGSize(width: 1248, height: 820), staffHeight: 72))
         let total = laidOut.pages.reduce(0) { $0 + $1.measureCount }

@@ -16,6 +16,11 @@ struct SettingsView: View {
                             Text("Size \(settings.sizeStep + 1) of \(ReaderSettings.staffHeights.count)")
                         }
                     }
+                    FittingPicker(String(localized: "Space Between Lines"), value: String(localized: settings.lineSpacing.title), selection: $settings.lineSpacing) {
+                        ForEach(LineSpacing.allCases) { spacing in
+                            Text(spacing.title).tag(spacing)
+                        }
+                    }
                     FittingPicker(String(localized: "Lines"), value: settings.boldLines ? String(localized: "Bold") : String(localized: "Thin"), selection: $settings.boldLines) {
                         Text("Thin").tag(false)
                         Text("Bold").tag(true)
@@ -33,8 +38,8 @@ struct SettingsView: View {
                     NavigationLink {
                         InstrumentSettingsView()
                     } label: {
-                        LabeledContent("Instrument") {
-                            if let instrument = settings.instrument { Text(instrument.title) }
+                        LabeledContent("Instruments") {
+                            Text(settings.instruments.map { String(localized: $0.title) }.joined(separator: ", "))
                         }
                     }
                     Button("Language") {
@@ -76,7 +81,7 @@ struct InstrumentSettingsView: View {
                 .air(.all, 32)
         }
         .background(Palette.ground)
-        .navigationTitle("Instrument")
+        .navigationTitle("Instruments")
     }
 }
 

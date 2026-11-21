@@ -9,6 +9,9 @@ nonisolated struct LayoutRequest: Hashable, Sendable {
     var staffHeight: CGFloat
     /// Heavier lines than print, for low vision.
     var bold: Bool = true
+    /// Room between lines of music, in half staff spaces on top of what Verovio
+    /// already leaves for slurs and dynamics.
+    var lineGap: Int = 4
 }
 
 /// One engraved page.

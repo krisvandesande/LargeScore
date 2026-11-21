@@ -9,13 +9,16 @@ struct ScoreCanvas: View {
     var upper: SVGScene? = nil
     var split: CGFloat? = nil
     var ink: Color = .black
+    /// Extra weight on note heads, clefs and other glyphs, in page units: an outline
+    /// in the ink around every filled shape. Zero draws them as engraved.
+    var glyphWeight: CGFloat = 0
 
     var body: some View {
         Canvas { context, size in
             let cgInk = ink.resolve(in: context.environment).cgColor
             context.withCGContext { cg in
                 guard let upper, let split else {
-                    Self.draw(scene, in: cg, size: size, ink: cgInk)
+                    Self.draw(scene, in: cg, size: size, ink: cgInk, glyphWeight: glyphWeight)
                     return
                 }
                 let box = scene.viewBox
@@ -23,11 +26,11 @@ struct ScoreCanvas: View {
                 let y = (split - box.minY) * scale
                 cg.saveGState()
                 cg.clip(to: CGRect(x: -size.width, y: -size.height, width: size.width * 3, height: size.height + y))
-                Self.draw(upper, in: cg, size: size, ink: cgInk)
+                Self.draw(upper, in: cg, size: size, ink: cgInk, glyphWeight: glyphWeight)
                 cg.restoreGState()
                 cg.saveGState()
                 cg.clip(to: CGRect(x: -size.width, y: y, width: size.width * 3, height: size.height * 2))
-                Self.draw(scene, in: cg, size: size, ink: cgInk)
+                Self.draw(scene, in: cg, size: size, ink: cgInk, glyphWeight: glyphWeight)
                 cg.restoreGState()
                 cg.setFillColor(cgInk)
                 cg.fill(CGRect(x: 0, y: y - 2, width: size.width, height: 4))
@@ -37,7 +40,7 @@ struct ScoreCanvas: View {
     }
 
     /// Draws the page fitted into `size`, in one colour.
-    static func draw(_ scene: SVGScene, in cg: CGContext, size: CGSize, ink: CGColor, text: Bool = true) {
+    static func draw(_ scene: SVGScene, in cg: CGContext, size: CGSize, ink: CGColor, text: Bool = true, glyphWeight: CGFloat = 0) {
         let box = scene.viewBox
         let scale = min(size.width / box.width, size.height / box.height)
         cg.saveGState()
@@ -49,7 +52,13 @@ struct ScoreCanvas: View {
             switch item {
             case .fill(let path):
                 cg.addPath(path)
-                cg.fillPath()
+                if glyphWeight > 0 {
+                    cg.setLineWidth(glyphWeight)
+                    cg.setLineJoin(.round)
+                    cg.drawPath(using: .fillStroke)
+                } else {
+                    cg.fillPath()
+                }
             case .stroke(let path, let width, let round):
                 cg.setLineWidth(width)
                 cg.setLineCap(round ? .round : .butt)

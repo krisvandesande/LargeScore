@@ -1,23 +1,51 @@
 import Foundation
 import CoreGraphics
 
-/// A piece the app can open. Until adding music arrives, the bundled sample.
+/// A piece the app can open: the bundled sample, or a score from the library with
+/// the part to show.
 nonisolated struct Piece: Identifiable, Hashable, Sendable {
+    enum Source: Sendable {
+        case bundled(String)
+        case stored(Data)
+    }
+
     var id: String
     var title: String
     var composer: String?
-    var resource: String
+    var partIDs: [String] = []
+    var source: Source
+    /// Changes whenever the music or the part changes.
+    var version: Date = .distantPast
 
+    static func == (a: Piece, b: Piece) -> Bool {
+        a.id == b.id && a.partIDs == b.partIDs && a.version == b.version
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+        hasher.combine(partIDs)
+        hasher.combine(version)
+    }
+
+    /// The score as the engraver gets it: one part only.
     func musicXML() throws -> String {
-        guard let url = Bundle.main.url(forResource: resource, withExtension: "musicxml") else {
-            throw EngravingError.unreadable
+        let xml: String
+        switch source {
+        case .bundled(let resource):
+            guard let url = Bundle.main.url(forResource: resource, withExtension: "musicxml") else {
+                throw EngravingError.unreadable
+            }
+            xml = try String(contentsOf: url, encoding: .utf8)
+        case .stored(let data):
+            xml = String(decoding: data, as: UTF8.self)
         }
-        return try String(contentsOf: url, encoding: .utf8)
+        guard !partIDs.isEmpty else { return xml }
+        return PartSplitter.keeping(partIDs: partIDs, in: xml) ?? xml
     }
 
     static func sample(for instrument: Instrument?) -> Piece {
-        Piece(id: "sample", title: "Evening Air", composer: nil,
-              resource: (instrument ?? .flute).sampleName)
+        Piece(id: "sample", title: "Evening Air", composer: nil, partIDs: [],
+              source: .bundled((instrument ?? .flute).sampleName))
     }
 }
 
@@ -42,9 +70,15 @@ final class ScoreLoader {
     private let engraver = VerovioEngraver()
 
     func layOut(_ piece: Piece, request: LayoutRequest) async throws -> LaidOutPiece {
-        let xml = try piece.musicXML()
+        let xml = try await Self.prepare(piece)
         let score = try await engraver.engrave(musicXML: xml, request: request)
         return await Self.read(score)
+    }
+
+    /// Splitting out one part reads the whole file: kept off the main thread.
+    @concurrent
+    nonisolated private static func prepare(_ piece: Piece) async throws -> String {
+        try piece.musicXML()
     }
 
     @concurrent

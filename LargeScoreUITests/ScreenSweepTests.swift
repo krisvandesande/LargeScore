@@ -18,11 +18,12 @@ final class ScreenSweepTests: XCTestCase {
         ProcessInfo.processInfo.environment["SIMULATOR_DEVICE_NAME"]?.replacingOccurrences(of: " ", with: "-") ?? "device"
     }
 
-    private func launch(size: String, dark: Bool, onboarding: Bool) -> XCUIApplication {
+    private func launch(size: String, dark: Bool, onboarding: Bool, importing: Bool = false) -> XCUIApplication {
         let app = XCUIApplication()
         app.launchArguments = ["-resetSettings", "-UIPreferredContentSizeCategoryName", size,
                                "-AppleLanguages", "(en)", "-AppleLocale", "en_GB"]
         if !onboarding { app.launchArguments.append("-skipOnboarding") }
+        if importing { app.launchArguments.append("-importSamples") }
         app.launchEnvironment["UITEST_DARK"] = dark ? "1" : "0"
         XCUIDevice.shared.appearance = dark ? .dark : .light
         app.launch()
@@ -58,6 +59,26 @@ final class ScreenSweepTests: XCTestCase {
         }
     }
 
+    /// A library card: its spoken name starts with the title and goes on with the composer.
+    private func card(_ app: XCUIApplication) -> XCUIElement {
+        app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Evening Air for Four")).firstMatch
+    }
+
+    /// The 160-bar piece, for turning pages.
+    private func longCard(_ app: XCUIApplication) -> XCUIElement {
+        app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Long Evening Air")).firstMatch
+    }
+
+    /// Launches with the bundled four-part piece added through the import sheet.
+    private func launchWithLibrary(size: String = "UICTContentSizeCategoryL", dark: Bool = false) -> XCUIApplication {
+        let app = launch(size: size, dark: dark, onboarding: false, importing: true)
+        let add = app.buttons["Add 3 Pieces"]
+        XCTAssertTrue(add.waitForExistence(timeout: 15))
+        add.tap()
+        XCTAssertTrue(card(app).waitForExistence(timeout: 10))
+        return app
+    }
+
     private let sizes = [("standard", "UICTContentSizeCategoryL"), ("ax5", "UICTContentSizeCategoryAccessibilityXXXL")]
 
     func testOnboarding() {
@@ -65,7 +86,7 @@ final class ScreenSweepTests: XCTestCase {
             for dark in [false, true] {
                 let variant = "\(sizeName)-\(dark ? "dark" : "light")"
                 let app = launch(size: size, dark: dark, onboarding: true)
-                XCTAssertTrue(app.staticTexts["Which instrument do you play?"].waitForExistence(timeout: 10))
+                XCTAssertTrue(app.staticTexts["Which instruments do you play?"].waitForExistence(timeout: 10))
                 shot(app, "01-instrument", variant: variant)
                 if !dark { audit(app, "onboarding-instrument-\(sizeName)") }
                 app.buttons["Bassoon"].firstMatch.tap()
@@ -74,6 +95,11 @@ final class ScreenSweepTests: XCTestCase {
                 sleep(1)
                 shot(app, "02-size", variant: variant)
                 if !dark { audit(app, "onboarding-size-\(sizeName)") }
+                app.buttons["Continue"].tap()
+                XCTAssertTrue(app.staticTexts["Choose the space between lines"].waitForExistence(timeout: 5))
+                sleep(1)
+                shot(app, "025-spacing", variant: variant)
+                if !dark { audit(app, "onboarding-spacing-\(sizeName)") }
                 app.buttons["Continue"].tap()
                 XCTAssertTrue(app.staticTexts["Choose the line thickness"].waitForExistence(timeout: 5))
                 sleep(1)
@@ -89,8 +115,22 @@ final class ScreenSweepTests: XCTestCase {
         for (sizeName, size) in sizes {
             for dark in [false, true] {
                 let variant = "\(sizeName)-\(dark ? "dark" : "light")"
-                let app = launch(size: size, dark: dark, onboarding: false)
-                XCTAssertTrue(app.navigationBars["Library"].waitForExistence(timeout: 10))
+                let empty = launch(size: size, dark: dark, onboarding: false)
+                XCTAssertTrue(empty.staticTexts["No music yet"].waitForExistence(timeout: 10))
+                shot(empty, "09-library-empty", variant: variant)
+                empty.terminate()
+
+                let app = launch(size: size, dark: dark, onboarding: false, importing: true)
+                XCTAssertTrue(app.buttons["Add 3 Pieces"].waitForExistence(timeout: 15))
+                shot(app, "05-import-list", variant: variant)
+                if !dark { audit(app, "import-list-\(sizeName)") }
+                app.cells.firstMatch.tap()
+                sleep(2)
+                shot(app, "06-import-detail", variant: variant)
+                if !dark { audit(app, "import-detail-\(sizeName)") }
+                app.navigationBars.buttons.firstMatch.tap()
+                app.buttons["Add 3 Pieces"].tap()
+                XCTAssertTrue(card(app).waitForExistence(timeout: 10))
                 shot(app, "10-library", variant: variant)
                 if !dark { audit(app, "library-\(sizeName)") }
 
@@ -108,7 +148,7 @@ final class ScreenSweepTests: XCTestCase {
                 app.navigationBars.buttons.firstMatch.tap()
 
                 app.buttons["Library"].firstMatch.tap()
-                app.buttons["Evening Air"].firstMatch.tap()
+                card(app).tap()
                 let page = app.otherElements["page"]
                 XCTAssertTrue(page.waitForExistence(timeout: 10))
                 sleep(2)
@@ -128,13 +168,12 @@ final class ScreenSweepTests: XCTestCase {
     }
 
     func testHalfPageTurn() {
-        let app = launch(size: "UICTContentSizeCategoryL", dark: false, onboarding: false)
-        XCTAssertTrue(app.navigationBars["Library"].waitForExistence(timeout: 10))
+        let app = launchWithLibrary()
         app.buttons["Settings"].firstMatch.tap()
         let toggle = app.switches["Half-Page Turns"].firstMatch
         (toggle.switches.firstMatch.exists ? toggle.switches.firstMatch : toggle).tap()
         app.buttons["Library"].firstMatch.tap()
-        app.buttons["Evening Air"].firstMatch.tap()
+        longCard(app).tap()
         let page = app.otherElements["page"]
         XCTAssertTrue(page.waitForExistence(timeout: 10))
         sleep(2)
@@ -144,10 +183,32 @@ final class ScreenSweepTests: XCTestCase {
         XCTAssertTrue((page.value as? String ?? "").contains("top shows page 2"))
     }
 
+    func testImportedPartIsShown() {
+        let app = launchWithLibrary()
+        card(app).tap()
+        let page = app.otherElements["page"]
+        XCTAssertTrue(page.waitForExistence(timeout: 10))
+        sleep(2)
+        shot(app, "40-imported-bassoon-part", variant: "standard-light")
+        app.buttons["Back to Library"].firstMatch.tap()
+        // Change the part from the card's menu.
+        card(app).press(forDuration: 1.2)
+        sleep(1)
+        shot(app, "41-card-menu", variant: "standard-light")
+        let change = app.descendants(matching: .any)["Change Parts"].firstMatch
+        XCTAssertTrue(change.waitForExistence(timeout: 5))
+        change.tap()
+        app.buttons["Flute"].firstMatch.tap()
+        app.buttons["Done"].firstMatch.tap()
+        card(app).tap()
+        XCTAssertTrue(page.waitForExistence(timeout: 10))
+        sleep(2)
+        shot(app, "42-flute-part", variant: "standard-light")
+    }
+
     func testPedalKeysTurnPages() {
-        let app = launch(size: "UICTContentSizeCategoryL", dark: false, onboarding: false)
-        XCTAssertTrue(app.navigationBars["Library"].waitForExistence(timeout: 10))
-        app.buttons["Evening Air"].firstMatch.tap()
+        let app = launchWithLibrary()
+        longCard(app).tap()
         let page = app.otherElements["page"]
         XCTAssertTrue(page.waitForExistence(timeout: 10))
         sleep(2)

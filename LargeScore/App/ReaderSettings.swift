@@ -21,10 +21,15 @@ final class ReaderSettings {
     }
 
     var sizeStep: Int { didSet { store.set(sizeStep, forKey: Key.sizeStep) } }
+    var lineSpacing: LineSpacing { didSet { store.set(lineSpacing.rawValue, forKey: Key.lineSpacing) } }
     var boldLines: Bool { didSet { store.set(boldLines, forKey: Key.boldLines) } }
     var pageColour: PageColour { didSet { store.set(pageColour.rawValue, forKey: Key.pageColour) } }
     var halfPageTurns: Bool { didSet { store.set(halfPageTurns, forKey: Key.halfPageTurns) } }
-    var instrument: Instrument? { didSet { store.set(instrument?.rawValue, forKey: Key.instrument) } }
+    /// Everything the player plays, in the order chosen. The first sets the sample's clef.
+    var instruments: [Instrument] {
+        didSet { store.set(instruments.map(\.rawValue).joined(separator: " "), forKey: Key.instruments) }
+    }
+    var instrument: Instrument? { instruments.first }
     var onboardingDone: Bool { didSet { store.set(onboardingDone, forKey: Key.onboardingDone) } }
 
     var staffHeight: CGFloat { Self.staffHeights[sizeStep] }
@@ -33,10 +38,12 @@ final class ReaderSettings {
 
     private enum Key {
         static let sizeStep = "sizeStep"
+        static let lineSpacing = "lineSpacing"
         static let boldLines = "boldLines"
         static let pageColour = "pageColour"
         static let halfPageTurns = "halfPageTurns"
         static let instrument = "instrument"
+        static let instruments = "instruments"
         static let onboardingDone = "onboardingDone"
     }
 
@@ -45,15 +52,24 @@ final class ReaderSettings {
         let step = store.object(forKey: Key.sizeStep) as? Int ?? Self.defaultSizeStep
         sizeStep = min(max(step, 0), Self.staffHeights.count - 1)
         boldLines = store.object(forKey: Key.boldLines) as? Bool ?? true
+        lineSpacing = store.string(forKey: Key.lineSpacing).flatMap(LineSpacing.init) ?? .normal
         pageColour = store.string(forKey: Key.pageColour).flatMap(PageColour.init) ?? .light
         halfPageTurns = store.bool(forKey: Key.halfPageTurns)
-        instrument = store.string(forKey: Key.instrument).flatMap(Instrument.init)
+        if let list = store.string(forKey: Key.instruments) {
+            instruments = list.split(separator: " ").compactMap { Instrument(rawValue: String($0)) }
+        } else {
+            // Build 1 kept one instrument.
+            instruments = store.string(forKey: Key.instrument).flatMap(Instrument.init).map { [$0] } ?? []
+        }
         onboardingDone = store.bool(forKey: Key.onboardingDone)
     }
 
     func layoutRequest(for area: CGSize) -> LayoutRequest {
-        LayoutRequest(pageSize: area, staffHeight: staffHeight, bold: boldLines)
+        LayoutRequest(pageSize: area, staffHeight: staffHeight, bold: boldLines, lineGap: lineSpacing.gap)
     }
+
+    /// Bold also thickens the glyphs a little: 7% of a staff space all round.
+    var glyphWeight: CGFloat { boldLines ? staffHeight / 4 * 0.07 : 0 }
 
     /// The scheme the page is drawn in, given the iPad's own.
     func pageScheme(system: ColorScheme) -> ColorScheme {
@@ -61,6 +77,29 @@ final class ReaderSettings {
         case .light: .light
         case .dark: .dark
         case .system: system
+        }
+    }
+}
+
+/// The room between lines of music.
+nonisolated enum LineSpacing: String, CaseIterable, Identifiable {
+    case less, normal, more
+    var id: String { rawValue }
+
+    var title: LocalizedStringResource {
+        switch self {
+        case .less: "Less"
+        case .normal: "Normal"
+        case .more: "More"
+        }
+    }
+
+    /// Half staff spaces added between lines.
+    var gap: Int {
+        switch self {
+        case .less: 1
+        case .normal: 4
+        case .more: 10
         }
     }
 }

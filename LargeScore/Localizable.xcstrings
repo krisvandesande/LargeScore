@@ -4,6 +4,16 @@
     "": {
       "shouldTranslate": false
     },
+    "%@ is already in the library": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ staat al in de bibliotheek"
+          }
+        }
+      }
+    },
     "%@, %@%@": {
       "localizations": {
         "en": {
@@ -50,6 +60,56 @@
         }
       }
     },
+    "Add": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voeg toe"
+          }
+        }
+      }
+    },
+    "Add %lld Pieces": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voeg %lld stukken toe"
+          }
+        }
+      }
+    },
+    "Add Music": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voeg muziek toe"
+          }
+        }
+      }
+    },
+    "Add MusicXML files from Files, iCloud Drive or Google Drive, or send them to this iPad with AirDrop.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voeg MusicXML-bestanden toe uit Bestanden, iCloud Drive of Google Drive, of stuur ze met AirDrop naar deze iPad."
+          }
+        }
+      }
+    },
+    "Add as a New Piece": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voeg toe als nieuw stuk"
+          }
+        }
+      }
+    },
     "Back": {
       "localizations": {
         "nl": {
@@ -90,12 +150,62 @@
         }
       }
     },
+    "Cancel": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Annuleer"
+          }
+        }
+      }
+    },
     "Cello": {
       "localizations": {
         "nl": {
           "stringUnit": {
             "state": "translated",
             "value": "Cello"
+          }
+        }
+      }
+    },
+    "Change Parts": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wijzig partijen"
+          }
+        }
+      }
+    },
+    "Choose a part": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kies een partij"
+          }
+        }
+      }
+    },
+    "Choose every instrument you play.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kies elk instrument dat je speelt."
+          }
+        }
+      }
+    },
+    "Choose more than one to read several lines together.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kies er meer dan één om meerdere partijen samen te lezen."
           }
         }
       }
@@ -130,6 +240,16 @@
         }
       }
     },
+    "Choose the space between lines": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kies de ruimte tussen de regels"
+          }
+        }
+      }
+    },
     "Clarinet": {
       "localizations": {
         "nl": {
@@ -140,12 +260,32 @@
         }
       }
     },
+    "Close": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sluit"
+          }
+        }
+      }
+    },
     "Collapsed": {
       "localizations": {
         "nl": {
           "stringUnit": {
             "state": "translated",
             "value": "Ingeklapt"
+          }
+        }
+      }
+    },
+    "Composer": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Componist"
           }
         }
       }
@@ -166,6 +306,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "Donker"
+          }
+        }
+      }
+    },
+    "Delete": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verwijder"
+          }
+        }
+      }
+    },
+    "Delete %@?": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ verwijderen?"
           }
         }
       }
@@ -250,12 +410,12 @@
         }
       }
     },
-    "Instrument": {
+    "Instruments": {
       "localizations": {
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Instrument"
+            "value": "Instrumenten"
           }
         }
       }
@@ -276,6 +436,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Groter"
+          }
+        }
+      }
+    },
+    "Less": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Minder"
           }
         }
       }
@@ -340,6 +510,16 @@
         }
       }
     },
+    "More": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meer"
+          }
+        }
+      }
+    },
     "Music Size": {
       "localizations": {
         "nl": {
@@ -356,6 +536,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "Muziekgrootte"
+          }
+        }
+      }
+    },
+    "Next Page": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volgende pagina"
+          }
+        }
+      }
+    },
+    "No music yet": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nog geen muziek"
           }
         }
       }
@@ -380,6 +580,36 @@
         }
       }
     },
+    "Normal": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Normaal"
+          }
+        }
+      }
+    },
+    "Not Added": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Niet toegevoegd"
+          }
+        }
+      }
+    },
+    "Nothing found": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Niets gevonden"
+          }
+        }
+      }
+    },
     "Oboe": {
       "localizations": {
         "nl": {
@@ -396,6 +626,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Opent Large Score in de app Instellingen, waar je de taal kiest."
+          }
+        }
+      }
+    },
+    "Optional": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Optioneel"
           }
         }
       }
@@ -446,12 +686,52 @@
         }
       }
     },
+    "Parts": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Partijen"
+          }
+        }
+      }
+    },
     "Piano": {
       "localizations": {
         "nl": {
           "stringUnit": {
             "state": "translated",
             "value": "Piano"
+          }
+        }
+      }
+    },
+    "Preview": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voorbeeld"
+          }
+        }
+      }
+    },
+    "Preview of the first page": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voorbeeld van de eerste pagina"
+          }
+        }
+      }
+    },
+    "Previous Page": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vorige pagina"
           }
         }
       }
@@ -472,6 +752,46 @@
           "stringUnit": {
             "state": "translated",
             "value": "Zet de iPad op je lessenaar en kies de grootte die je zonder moeite leest."
+          }
+        }
+      }
+    },
+    "Recently Played": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Laatst gespeeld"
+          }
+        }
+      }
+    },
+    "Replace the Music": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vervang de muziek"
+          }
+        }
+      }
+    },
+    "Restore Previous Version": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zet vorige versie terug"
+          }
+        }
+      }
+    },
+    "Restore the previous version of %@?": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De vorige versie van %@ terugzetten?"
           }
         }
       }
@@ -562,12 +882,52 @@
         }
       }
     },
+    "Sort": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sorteer"
+          }
+        }
+      }
+    },
+    "Sort: %@": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sorteer: %@"
+          }
+        }
+      }
+    },
     "Source Code": {
       "localizations": {
         "nl": {
           "stringUnit": {
             "state": "translated",
             "value": "Broncode"
+          }
+        }
+      }
+    },
+    "Space Between Lines": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ruimte tussen regels"
+          }
+        }
+      }
+    },
+    "Space between lines": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ruimte tussen de regels"
           }
         }
       }
@@ -592,6 +952,26 @@
         }
       }
     },
+    "The music you added last is replaced by the version before it.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De muziek die je het laatst toevoegde, wordt vervangen door de versie ervoor."
+          }
+        }
+      }
+    },
+    "The piece and your notes on it are removed from this iPad.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Het stuk en je notities erbij worden van deze iPad verwijderd."
+          }
+        }
+      }
+    },
     "Thin": {
       "localizations": {
         "nl": {
@@ -602,12 +982,62 @@
         }
       }
     },
+    "This MusicXML is written bar by bar instead of part by part. Export it again as a standard MusicXML file.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deze MusicXML is per maat geschreven in plaats van per partij. Exporteer het opnieuw als standaard MusicXML-bestand."
+          }
+        }
+      }
+    },
+    "This compressed MusicXML file can't be opened. Export it again.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dit gecomprimeerde MusicXML-bestand kan niet worden geopend. Exporteer het opnieuw."
+          }
+        }
+      }
+    },
+    "This isn't a MusicXML file.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dit is geen MusicXML-bestand."
+          }
+        }
+      }
+    },
     "This music could not be read.": {
       "localizations": {
         "nl": {
           "stringUnit": {
             "state": "translated",
             "value": "Deze muziek kon niet worden gelezen."
+          }
+        }
+      }
+    },
+    "Title": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Titel"
+          }
+        }
+      }
+    },
+    "Title or Composer": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Titel of componist"
           }
         }
       }
@@ -692,12 +1122,22 @@
         }
       }
     },
-    "Which instrument do you play?": {
+    "Which instruments do you play?": {
       "localizations": {
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Welk instrument speel je?"
+            "value": "Welke instrumenten speel je?"
+          }
+        }
+      }
+    },
+    "Your notes and programmes stay. The previous version can be restored from the library.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Je notities en programma’s blijven. De vorige versie kun je terugzetten vanuit de bibliotheek."
           }
         }
       }

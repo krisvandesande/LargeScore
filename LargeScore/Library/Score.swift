@@ -1,0 +1,108 @@
+import Foundation
+import SwiftData
+
+/// A piece in the library: the whole MusicXML file as it arrived, and the part shown.
+/// Shaped for CloudKit (every property optional or defaulted, no unique constraints),
+/// so syncing can be switched on later without a migration.
+@Model
+final class Score {
+    var id: UUID = UUID()
+    var title: String = ""
+    var composer: String?
+    var arranger: String?
+    /// The part ids shown, separated by spaces (XML ids hold none).
+    var partID: String = ""
+    /// Their names, for the card and VoiceOver.
+    var partName: String = ""
+    /// Parts in the file, kept so the library never parses music to draw a menu.
+    var partCount: Int = 1
+    @Attribute(.externalStorage) var musicXML: Data?
+    var addedAt: Date = Date.now
+    var changedAt: Date = Date.now
+    var lastOpenedAt: Date?
+    /// The music before the last Replace, kept so a wrong replace can be undone.
+    @Attribute(.externalStorage) var previousMusicXML: Data?
+    var previousPartID: String?
+    var replacedAt: Date?
+
+    var partIDs: [String] { partID.split(separator: " ").map(String.init) }
+
+    private func show(_ parts: [ScorePart]) {
+        partID = parts.map(\.id).joined(separator: " ")
+        partName = parts.map(\.name).joined(separator: ", ")
+    }
+
+    init(file: MusicFile, parts: [ScorePart]) {
+        title = file.title
+        composer = file.composer
+        arranger = file.arranger
+        partID = parts.map(\.id).joined(separator: " ")
+        partName = parts.map(\.name).joined(separator: ", ")
+        partCount = file.parts.count
+        musicXML = Data(file.xml.utf8)
+    }
+
+    /// Takes the new version's music, keeping the old one for Restore. Parts chosen in
+    /// the sheet win; otherwise the parts stay where the new file still has them (by
+    /// id, else by name).
+    func replaceMusic(with file: MusicFile, parts chosen: [ScorePart]) {
+        let oldNames = partName.components(separatedBy: ", ")
+        let oldIDs = partIDs
+        previousMusicXML = musicXML
+        previousPartID = partID
+        replacedAt = .now
+        musicXML = Data(file.xml.utf8)
+        partCount = file.parts.count
+        composer = file.composer ?? composer
+        arranger = file.arranger ?? arranger
+        let kept = file.parts.filter { oldIDs.contains($0.id) }
+        let byName = file.parts.filter { oldNames.contains($0.name) }
+        let parts = !chosen.isEmpty ? chosen : !kept.isEmpty ? kept : !byName.isEmpty ? byName : Array(file.parts.prefix(1))
+        show(parts)
+        changedAt = .now
+    }
+
+    func restorePrevious() {
+        guard let previous = previousMusicXML else { return }
+        musicXML = previous
+        let parts = PartSplitter.parts(in: String(decoding: previous, as: UTF8.self))
+        partCount = parts.count
+        if let ids = previousPartID {
+            let restored = ids.split(separator: " ").map(String.init)
+            show(parts.filter { restored.contains($0.id) })
+        }
+        previousMusicXML = nil
+        previousPartID = nil
+        replacedAt = nil
+        changedAt = .now
+    }
+
+    func chooseParts(_ parts: [ScorePart]) {
+        guard !parts.isEmpty else { return }
+        show(parts)
+        changedAt = .now
+    }
+
+    var parts: [ScorePart] {
+        guard let musicXML else { return [] }
+        return PartSplitter.parts(in: String(decoding: musicXML, as: UTF8.self))
+    }
+
+    /// What the reader opens.
+    var piece: Piece {
+        Piece(id: id.uuidString, title: title, composer: composer, partIDs: partIDs,
+              source: .stored(musicXML ?? Data()), version: changedAt)
+    }
+
+    /// Same piece if the title and composer match, ignoring case and spacing.
+    func isSamePiece(as file: MusicFile) -> Bool {
+        Self.key(title, composer) == Self.key(file.title, file.composer)
+    }
+
+    nonisolated static func key(_ title: String, _ composer: String?) -> String {
+        let clean: (String) -> String = {
+            $0.lowercased().split(whereSeparator: \.isWhitespace).joined(separator: " ")
+        }
+        return clean(title) + "|" + clean(composer ?? "")
+    }
+}

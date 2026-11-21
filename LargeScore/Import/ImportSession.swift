@@ -1,0 +1,166 @@
+import Foundation
+import SwiftData
+import UniformTypeIdentifiers
+import CoreTransferable
+
+/// Files on their way into the library: each with the part to show and, when the
+/// piece is already there, whether to replace its music or add it as a new piece.
+@Observable
+final class ImportSession: Identifiable {
+    struct Candidate: Identifiable {
+        var id: UUID { file.id }
+        var file: MusicFile
+        var title: String
+        var composer: String
+        /// The parts to show, in the file's order. More than one reads as a small score.
+        var parts: [ScorePart]
+        var existing: Score?
+        var replace = true
+    }
+
+    struct Failure: Identifiable {
+        var id = UUID()
+        var fileName: String
+        var reason: MusicFile.Failure
+    }
+
+    let id = UUID()
+    var candidates: [Candidate] = []
+    var failures: [Failure] = []
+
+    var isReady: Bool { !candidates.isEmpty && candidates.allSatisfy { !$0.parts.isEmpty } }
+
+    init(files: [MusicFile], failures: [Failure], instruments: [Instrument], library: [Score]) {
+        self.failures = failures
+        candidates = files.map { file in
+            let existing = library.first { $0.isSamePiece(as: file) }
+            // A new version keeps the parts already chosen for the piece.
+            let kept = existing.map { score in
+                file.parts.filter { score.partIDs.contains($0.id) }
+            } ?? []
+            let suggested = file.suggestedPart(for: instruments).map { [$0] } ?? []
+            return Candidate(file: file, title: file.title, composer: file.composer ?? "",
+                             parts: kept.isEmpty ? suggested : kept, existing: existing)
+        }
+    }
+
+    /// Adds or replaces every piece, then saves. Returns how many were added or replaced.
+    @discardableResult
+    func apply(to context: ModelContext) -> Int {
+        var count = 0
+        for candidate in candidates {
+            guard !candidate.parts.isEmpty else { continue }
+            var file = candidate.file
+            file.title = candidate.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                ? file.title : candidate.title.trimmingCharacters(in: .whitespacesAndNewlines)
+            let composer = candidate.composer.trimmingCharacters(in: .whitespacesAndNewlines)
+            file.composer = composer.isEmpty ? nil : composer
+            if let existing = candidate.existing, candidate.replace {
+                existing.replaceMusic(with: file, parts: candidate.parts)
+            } else {
+                context.insert(Score(file: file, parts: candidate.parts))
+            }
+            count += 1
+        }
+        try? context.save()
+        return count
+    }
+
+    /// Reads files from wherever they come from: the Files picker (iCloud Drive,
+    /// Google Drive and other providers, which may need a download first), AirDrop,
+    /// Open In and drag and drop.
+    @concurrent
+    nonisolated static func read(_ urls: [URL]) async -> (files: [MusicFile], failures: [Failure]) {
+        var files: [MusicFile] = []
+        var failures: [Failure] = []
+        for url in urls {
+            let name = url.lastPathComponent
+            let scoped = url.startAccessingSecurityScopedResource()
+            defer { if scoped { url.stopAccessingSecurityScopedResource() } }
+            var data: Data?
+            var coordinationError: NSError?
+            // Coordinated reading makes file providers download the file first.
+            NSFileCoordinator().coordinate(readingItemAt: url, options: .withoutChanges, error: &coordinationError) { readURL in
+                data = try? Data(contentsOf: readURL)
+            }
+            guard let data else {
+                failures.append(Failure(fileName: name, reason: .notMusicXML))
+                continue
+            }
+            do {
+                files.append(try MusicFile.read(data, fileName: name))
+            } catch let failure as MusicFile.Failure {
+                failures.append(Failure(fileName: name, reason: failure))
+            } catch {
+                failures.append(Failure(fileName: name, reason: .notMusicXML))
+            }
+        }
+        return (files, failures)
+    }
+}
+
+/// Where files arriving from outside (AirDrop, Open In, drops) wait for the sheet.
+@Observable
+final class ImportCoordinator {
+    var session: ImportSession?
+    private(set) var isReading = false
+
+    func receive(_ urls: [URL], instruments: [Instrument], context: ModelContext) async {
+        guard !urls.isEmpty else { return }
+        isReading = true
+        let (files, failures) = await ImportSession.read(urls)
+        isReading = false
+        Self.removeInboxCopies(urls)
+        let library = (try? context.fetch(FetchDescriptor<Score>())) ?? []
+        session = ImportSession(files: files, failures: failures, instruments: instruments, library: library)
+    }
+
+    /// Files given to the app by AirDrop or Open In are copied into its Inbox; once
+    /// read they're in the library and the copies can go.
+    private static func removeInboxCopies(_ urls: [URL]) {
+        guard let documents = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else { return }
+        let inbox = documents.appendingPathComponent("Inbox").standardizedFileURL.path
+        for url in urls where url.standardizedFileURL.path.hasPrefix(inbox + "/") {
+            try? FileManager.default.removeItem(at: url)
+        }
+    }
+}
+
+/// A MusicXML file dropped onto the library from another app.
+nonisolated struct DroppedMusic: Transferable {
+    let url: URL
+
+    static var transferRepresentation: some TransferRepresentation {
+        FileRepresentation(importedContentType: .compressedMusicXML) { received in
+            DroppedMusic(url: try copy(received.file))
+        }
+        FileRepresentation(importedContentType: .musicXML) { received in
+            DroppedMusic(url: try copy(received.file))
+        }
+        FileRepresentation(importedContentType: .xml) { received in
+            DroppedMusic(url: try copy(received.file))
+        }
+        FileRepresentation(importedContentType: .data) { received in
+            DroppedMusic(url: try copy(received.file))
+        }
+    }
+
+    /// A dropped file is only lent for the call; keep a copy to read.
+    private static func copy(_ url: URL) throws -> URL {
+        let folder = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        let target = folder.appendingPathComponent(url.lastPathComponent)
+        try FileManager.default.copyItem(at: url, to: target)
+        return target
+    }
+}
+
+extension MusicFile.Failure {
+    var message: LocalizedStringResource {
+        switch self {
+        case .notMusicXML: "This isn't a MusicXML file."
+        case .timewise: "This MusicXML is written bar by bar instead of part by part. Export it again as a standard MusicXML file."
+        case .damaged: "This compressed MusicXML file can't be opened. Export it again."
+        }
+    }
+}

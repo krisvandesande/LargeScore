@@ -20,12 +20,13 @@ private let twoParts = """
 struct PartSplitterTests {
     @Test func listsPartsInOrder() {
         let parts = PartSplitter.parts(in: twoParts)
-        #expect(parts == [ScorePart(id: "P1", name: "Flute"), ScorePart(id: "P2", name: "Bassoon & Contra")])
+        #expect(parts.map(\.id) == ["P1", "P2"])
+        #expect(parts.map(\.name) == ["Flute", "Bassoon & Contra"])
     }
 
     @Test func keepsOnlyTheChosenPart() throws {
         let one = try #require(PartSplitter.keeping(partID: "P2", in: twoParts))
-        #expect(PartSplitter.parts(in: one) == [ScorePart(id: "P2", name: "Bassoon & Contra")])
+        #expect(PartSplitter.parts(in: one).map(\.id) == ["P2"])
         #expect(!one.contains("Flute"))
         #expect(!one.contains("<step>C</step>"))
         #expect(one.contains("<step>F</step>"))
@@ -87,7 +88,7 @@ struct EngravingSpeedTests {
 extension EngravingSpeedTests {
     /// 160 bars: the test piece ten times over, with a rehearsal mark every 8 bars.
     @Test func longPieceAtTheLargestSize() async throws {
-        let url = try #require(Bundle(for: BundleMarker.self).url(forResource: "long-piece", withExtension: "musicxml"))
+        let url = try #require(Bundle.main.url(forResource: "long-piece", withExtension: "musicxml"))
         let xml = try String(contentsOf: url, encoding: .utf8)
         let engraver = VerovioEngraver()
         let request = LayoutRequest(pageSize: CGSize(width: 1248, height: 888), staffHeight: 72)

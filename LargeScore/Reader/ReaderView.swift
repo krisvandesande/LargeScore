@@ -17,7 +17,9 @@ struct ReaderView: View {
     @State private var failed = false
     @State private var choosingSize = false
 
-    private let margins = EdgeInsets(top: 40, leading: 64, bottom: 24, trailing: 64)
+    /// Even and small at the sides: the staff runs from one margin to the other, so
+    /// the music gets every point of the width the eye can use.
+    private let margins = EdgeInsets(top: 16, leading: 12, bottom: 12, trailing: 12)
 
     var body: some View {
         let scheme = settings.pageScheme(system: systemScheme)
@@ -76,10 +78,10 @@ struct ReaderView: View {
                let split = HalfPageSplit.split(current: current.systems,
                                                next: laidOut.pages[turner.page + 1].systems,
                                                pageHeight: current.viewBox.height) {
-                ScoreCanvas(scene: current, upper: laidOut.pages[turner.page + 1], split: split, ink: ink)
+                ScoreCanvas(scene: current, upper: laidOut.pages[turner.page + 1], split: split, ink: ink, glyphWeight: settings.glyphWeight)
                     .frame(width: area.width, height: area.height)
             } else {
-                ScoreCanvas(scene: current, ink: ink)
+                ScoreCanvas(scene: current, ink: ink, glyphWeight: settings.glyphWeight)
                     .frame(width: area.width, height: area.height)
             }
         } else if failed {
@@ -287,6 +289,7 @@ struct SizeSheet: View {
                 SampleCard(piece: piece, description: "The music at this size")
                     .frame(minHeight: 280)
                 SizeStepper()
+                SpacingChoice()
                 LineChoice()
             }
             .air(.all, 32)

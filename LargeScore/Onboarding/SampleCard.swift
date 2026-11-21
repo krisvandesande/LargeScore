@@ -11,7 +11,7 @@ struct SampleCard: View {
     @Environment(\.colorScheme) private var systemScheme
     @State private var page: SVGScene?
 
-    private let inset: CGFloat = 32
+    private let inset: CGFloat = 20
 
     var body: some View {
         GeometryReader { proxy in
@@ -21,7 +21,7 @@ struct SampleCard: View {
             ZStack(alignment: .topLeading) {
                 dark ? Color.black : Color.white
                 if let page {
-                    ScoreCanvas(scene: page, ink: dark ? .white : .black)
+                    ScoreCanvas(scene: page, ink: dark ? .white : .black, glyphWeight: settings.glyphWeight)
                         .frame(width: area.width, height: area.height)
                         .padding(inset)
                 }
@@ -110,5 +110,35 @@ struct LineChoice: View {
         }
         .buttonStyle(LargeButtonStyle(prominent: selected))
         .accessibilityAddTraits(selected ? .isSelected : [])
+    }
+}
+
+/// Less, Normal or More room between lines, as three large choices.
+struct SpacingChoice: View {
+    @Environment(ReaderSettings.self) private var settings
+
+    var body: some View {
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 16) { options }
+            VStack(spacing: 12) { options }
+        }
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel("Space between lines")
+    }
+
+    @ViewBuilder
+    private var options: some View {
+        ForEach(LineSpacing.allCases) { spacing in
+            let selected = settings.lineSpacing == spacing
+            Button { settings.lineSpacing = spacing } label: {
+                HStack(spacing: 12) {
+                    if selected { Image(systemName: "checkmark").accessibilityHidden(true) }
+                    Text(spacing.title)
+                }
+                .frame(minWidth: 120)
+            }
+            .buttonStyle(LargeButtonStyle(prominent: selected))
+            .accessibilityAddTraits(selected ? .isSelected : [])
+        }
     }
 }

@@ -22,10 +22,12 @@ actor VerovioEngraver: Engraver {
         var options: [String: Any] = [
             "pageWidth": Int((Double(request.pageSize.width) * unitsPerPoint).rounded()),
             "pageHeight": Int((Double(request.pageSize.height) * unitsPerPoint).rounded()),
-            "pageMarginLeft": 50,
-            "pageMarginRight": 0,
-            "pageMarginTop": 60,
-            "pageMarginBottom": 300,
+            // Equal on both sides, so the staff sits in the middle; just enough for a
+            // three-digit bar number, which Verovio centres on the staff's left edge.
+            "pageMarginLeft": 25,
+            "pageMarginRight": 25,
+            "pageMarginTop": 40,
+            "pageMarginBottom": 150,
             "scale": 100,
             "breaks": "auto",
             "adjustPageHeight": false,
@@ -34,12 +36,21 @@ actor VerovioEngraver: Engraver {
             "header": "none",
             "footer": "none",
             "font": "Leipzig",
-            "spacingSystem": 14,
+            "spacingSystem": request.lineGap,
         ]
+        // Thin is Verovio's own, close to print. Bold takes every line to near the
+        // top of what Verovio allows, so the difference is plain at a glance.
         if request.bold {
-            options["staffLineWidth"] = 0.25
-            options["stemWidth"] = 0.3
-            options["barLineWidth"] = 0.4
+            options["staffLineWidth"] = 0.30
+            options["stemWidth"] = 0.40
+            options["barLineWidth"] = 0.60
+            options["thickBarlineThickness"] = 1.4
+            options["ledgerLineThickness"] = 0.40
+            options["hairpinThickness"] = 0.35
+            options["slurMidpointThickness"] = 0.9
+            options["slurEndpointThickness"] = 0.18
+            options["tieMidpointThickness"] = 0.75
+            options["tupletBracketThickness"] = 0.35
         }
         return options
     }
