@@ -145,6 +145,7 @@ struct NotesPalette: View {
                         }
                     }
                     .buttonStyle(LargeButtonStyle(prominent: selected))
+                    .accessibilityShowsLargeContentViewer()
                     .accessibilityLabel(Text(item.spokenTitle))
                     .accessibilityAddTraits(selected ? .isSelected : [])
                 }
@@ -152,13 +153,17 @@ struct NotesPalette: View {
             FlowLayout(spacing: 10, lineSpacing: 10) {
                 Button("Undo", action: undo)
                     .buttonStyle(.large)
+                    .accessibilityShowsLargeContentViewer()
                     .disabled(!canUndo)
                 Button("Written Note", action: writtenNote)
                     .buttonStyle(.large)
+                    .accessibilityShowsLargeContentViewer()
                 Button("Previous Page", action: previousPage)
                     .buttonStyle(.large)
+                    .accessibilityShowsLargeContentViewer()
                 Button("Next Page", action: nextPage)
                     .buttonStyle(.large)
+                    .accessibilityShowsLargeContentViewer()
                 if let pageText {
                     pageText
                         .font(.title3.weight(.semibold))
@@ -167,11 +172,14 @@ struct NotesPalette: View {
                 }
                 Button("Done", action: done)
                     .buttonStyle(.largeProminent)
+                    .accessibilityShowsLargeContentViewer()
             }
         }
         .air(.horizontal, 24)
         .air(.vertical, 14)
         .frame(maxWidth: .infinity, alignment: .leading)
+        // Capped like the reader's strip, so the music keeps the screen; every button
+        // shows large in the Large Content Viewer (touch and hold).
         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
         .background(Color(.secondarySystemBackground))
         .overlay(alignment: .top) { Divider() }
@@ -190,7 +198,7 @@ struct WrittenNoteSheet: View {
             VStack(alignment: .leading, spacing: 12) {
                 Text("Note on This Piece")
                     .font(.headline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Palette.quiet)
                     .accessibilityHidden(true)
                 TextEditor(text: $text)
                     .font(.title2)

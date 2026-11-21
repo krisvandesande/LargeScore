@@ -23,7 +23,7 @@ adding music, making a programme and writing notes.
 | Sufficient Contrast | Yes | Text 4.5:1 or more, the accent 9.5:1 (light) and 10:1 (dark); the contrast audit's two flags measured and explained in docs/accessibility-findings.md. |
 | Reduced Motion | Yes | No animations beyond the system's own; page turns are instant. |
 | Voice Control | Yes, after the hand check | Every control has a spoken name containing its words (checked by AccessibilityTreeTests). |
-| VoiceOver | Not yet | Opening, turning, adding music and programmes work by ear in the tree; writing notes needs sight, so this waits for the hand check and for deciding whether notes count as a common task. |
+| VoiceOver | No | Large Score is for reading sheet music, which needs sight (Kris, 2026-11-21). Controls still have spoken names, which Voice Control and Switch Control use. |
 | Captions, Audio Descriptions | Not applicable | No audio or video. |
 
 ## Notes for App Review

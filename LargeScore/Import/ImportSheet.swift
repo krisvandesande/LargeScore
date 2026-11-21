@@ -60,7 +60,7 @@ struct ImportSheet: View {
                 }
             }
             if !session.failures.isEmpty {
-                Section("Not Added") {
+                Section {
                     ForEach(session.failures) { failure in
                         VStack(alignment: .leading, spacing: 4) {
                             Text(verbatim: failure.fileName).font(.title3.weight(.semibold))
@@ -69,6 +69,8 @@ struct ImportSheet: View {
                         .accessibilityElement(children: .combine)
                         .air(.vertical, 6)
                     }
+                } header: {
+                    Text("Not Added").formHeading()
                 }
             }
         }
@@ -90,7 +92,7 @@ struct ImportDetail: View {
                     choice(Text("Replace the Music"), selected: candidate.replace) { candidate.replace = true }
                     choice(Text("Add as a New Piece"), selected: !candidate.replace) { candidate.replace = false }
                 } header: {
-                    Text("\(existing.title) is already in the library")
+                    Text("\(existing.title) is already in the library").formHeading()
                 } footer: {
                     if candidate.replace {
                         VStack(alignment: .leading, spacing: 8) {
@@ -101,6 +103,7 @@ struct ImportDetail: View {
                             }
                             Text("Your notes and programmes stay. The previous version can be restored from the library.")
                         }
+                        .formNote()
                     }
                 }
             }
@@ -112,19 +115,21 @@ struct ImportDetail: View {
                     }
                 }
             } header: {
-                Text("Parts")
+                Text("Parts").formHeading()
             } footer: {
                 if candidate.file.parts.count > 1 {
-                    Text("Choose more than one to read several lines together.")
+                    Text("Choose more than one to read several lines together.").formNote()
                 }
             }
             if !candidate.parts.isEmpty {
-                Section("Preview") {
+                Section {
                     SampleCard(piece: Piece(id: "import-\(candidate.id)", title: candidate.title, composer: nil,
                                             partIDs: candidate.parts.map(\.id), source: .stored(Data(candidate.file.xml.utf8))),
                                description: "Preview of the first page")
                         .frame(height: 320)
                         .listRowInsets(EdgeInsets())
+                } header: {
+                    Text("Preview").formHeading()
                 }
             }
         }
@@ -138,7 +143,7 @@ struct ImportDetail: View {
         VStack(alignment: .leading, spacing: 6) {
             Text(name)
                 .font(.headline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Palette.quiet)
                 .accessibilityHidden(true)
             TextField(text: text, prompt: prompt.map { Text($0) }) { Text(name) }
                 .font(.title3)

@@ -183,7 +183,7 @@ struct ProgrammePieces: View {
                     .font(.title3)
                     .air(.vertical, 6)
             } footer: {
-                Text("Today’s programme is what Large Score opens on.")
+                Text("Today’s programme is what Large Score opens on.").formNote()
             }
             Section {
                 if entries.isEmpty {

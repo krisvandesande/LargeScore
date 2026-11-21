@@ -15,6 +15,26 @@ enum Palette {
     static let buttonFill = Color(.tertiarySystemFill)
     static let card = Color(.secondarySystemGroupedBackground)
     static let ground = Color(.systemGroupedBackground)
+    /// Quieter text that still reads at any size: 6.6:1 on the grouped background in
+    /// light, 10:1 on a dark card. The system's secondary grey is 3.3:1 in light,
+    /// enough only for large text.
+    static let quiet = Color(UIColor { traits in
+        traits.userInterfaceStyle == .dark
+            ? UIColor(red: 0xC7 / 255, green: 0xC7 / 255, blue: 0xCC / 255, alpha: 1)
+            : UIColor(red: 0x55 / 255, green: 0x55 / 255, blue: 0x5A / 255, alpha: 1)
+    })
+}
+
+extension View {
+    /// A form section's footer: body size, in the quiet colour.
+    func formNote() -> some View {
+        font(.body).foregroundStyle(Palette.quiet)
+    }
+
+    /// A form section's header: headline size, in the quiet colour, as written.
+    func formHeading() -> some View {
+        font(.headline).foregroundStyle(Palette.quiet).textCase(nil)
+    }
 }
 
 /// A large capsule button with words: at least 64 pt tall, growing with the text.

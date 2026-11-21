@@ -37,6 +37,7 @@ struct SettingsView: View {
                     Toggle("Half-Page Turns", isOn: $settings.halfPageTurns)
                 } footer: {
                     Text("A half-page turn shows the top of the next page first, so you can read ahead while you finish the bottom.")
+                        .formNote()
                 }
                 Section {
                     NavigationLink {
@@ -61,13 +62,12 @@ struct SettingsView: View {
                     if folder.isSet {
                         Button("Stop Using This Folder", role: .destructive) { folder.forget() }
                     }
-                } header: {
-                    Text("Music Folder")
                 } footer: {
                     VStack(alignment: .leading, spacing: 6) {
                         Text("New and changed MusicXML files in this folder are added to the library whenever Large Score comes to the front. A new version replaces the music of the piece and keeps your notes.")
                         if let result = folder.lastResult { Text(result) }
                     }
+                    .formNote()
                 }
                 .fileImporter(isPresented: $choosingFolder, allowedContentTypes: [.folder]) { result in
                     guard case .success(let url) = result else { return }
@@ -124,7 +124,7 @@ struct AboutView: View {
                 LabeledContent("Version", value: version)
                 Link("Source Code", destination: URL(string: "https://github.com/krisvandesande/LargeScore")!)
             }
-            Section("Licences") {
+            Section {
                 VStack(alignment: .leading, spacing: 8) {
                     Text(verbatim: "Large Score").font(.headline)
                     Text("MIT License")
@@ -140,6 +140,8 @@ struct AboutView: View {
                     Text(verbatim: "Leipzig, Bravura").font(.headline)
                     Text("SIL Open Font License 1.1")
                 }
+            } header: {
+                Text("Licences").formHeading()
             }
         }
         .font(.title3)

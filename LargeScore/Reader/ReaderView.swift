@@ -377,7 +377,8 @@ struct ReaderStrip: View {
         .air(.vertical, 18)
         .frame(maxWidth: .infinity)
         // The music is what is read here, at its own size; past the largest standard
-        // text size the strip stops growing, or it would leave one line of music.
+        // text size the strip stops growing, or it would leave one line of music. Its
+        // controls show large in the Large Content Viewer (touch and hold).
         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
         .background(Color(.secondarySystemBackground))
         .overlay(alignment: .top) { Divider() }
@@ -406,6 +407,7 @@ struct ReaderStrip: View {
         if let notes {
             Button("Notes", action: notes)
                 .buttonStyle(.large)
+                .accessibilityShowsLargeContentViewer()
                 .fixedSize()
         }
     }
@@ -414,11 +416,12 @@ struct ReaderStrip: View {
     private var nextButton: some View {
         if let nextTitle {
             Button(action: next) {
-                Label { Text("Next: \(nextTitle)").lineLimit(1) } icon: { Image(systemName: "chevron.forward") }
+                Label { Text("Next: \(nextTitle)").lineLimit(1).fixedSize() } icon: { Image(systemName: "chevron.forward") }
                     .labelStyle(TrailingIcon())
             }
             .buttonStyle(.large)
             .accessibilityLabel(Text("Next piece: \(nextTitle)"))
+            .accessibilityShowsLargeContentViewer()
             .accessibilityInputLabels([Text("Next"), Text("Next Piece")])
         }
     }
@@ -430,6 +433,7 @@ struct ReaderStrip: View {
         }
         .buttonStyle(.large)
         .accessibilityLabel(Text("Back to \(Text(backTitle))"))
+        .accessibilityShowsLargeContentViewer()
         .accessibilityInputLabels([Text(backTitle), Text("Back")])
     }
 
@@ -438,6 +442,7 @@ struct ReaderStrip: View {
             .buttonStyle(.large)
             .fixedSize()
             .accessibilityLabel("Music Size")
+            .accessibilityShowsLargeContentViewer()
             .accessibilityInputLabels([Text("Size"), Text("Music Size")])
     }
 

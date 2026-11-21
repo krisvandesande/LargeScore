@@ -56,3 +56,14 @@ Changes from Kris's first look at build 1:
 - **Spoken names:** every button, switch and field has one; the check counts the outermost control only, since a menu or switch shows as a named control around an unnamed inner one (Sort, Half-Page Turns). Tab buttons carry system icon ids ("music.note.list") as identifiers, but VoiceOver reads their labels ("Today").
 - **Contrast, audited on its own:** two flags, both kept. Undo in the notes palette is disabled until there is something to undo (40% opacity; WCAG exempts disabled controls). Add Music in the library toolbar was flagged in light and dark; measured on the screenshots it is 8.4:1 (light) and 8.1:1 (dark) against the toolbar's glass, so the audit misreads the glass.
 - **Still for a real iPad, by hand:** VoiceOver gestures on the page (swipe up and down to turn), Voice Control ("Tap Notes", "Tap Next Piece"), and how a piece reached by pedal is announced.
+
+## VoiceOver, 2026-11-21
+
+Not claimed on the App Store: reading sheet music needs sight, so someone using VoiceOver can't play from Large Score (Kris). Spoken names, the reading order and the page's spoken value stay, since Voice Control, Switch Control and Full Keyboard Access use them; the by-hand VoiceOver check is dropped from the release list.
+
+## Apple's audits (Xcode plugin), 2026-11-21
+
+Run with Apple's `accessibility-dynamic-type-specialist` and `accessibility-sufficient-contrast-specialist` skills over the source; VoiceOver skipped (not claimed).
+
+- **Dynamic Type: PASS after two fixes.** Every text uses a text style; the one fixed `.system(size:)` (LayoutKit's disclosure triangle) is driven by `@ScaledMetric`; the fixed frames hold engraved music, which has its own size setting. Fixed: the reader's strip and the notes palette, capped at xxxLarge so the music keeps the screen, now show every control in the Large Content Viewer (touch and hold), as Apple's criteria ask of capped bars; "Next: title" keeps the whole title (`fixedSize`) so the strip switches layout instead of cutting it.
+- **Contrast: PASS after two fixes.** Computed: accent on button fill 7.3:1 light, 8.4:1 dark; chosen buttons 9.4:1 and 10.4:1; notes colour 6.5:1 on white, 9.2:1 on black; music on a highlight 17.9:1 and 8.6:1. Fixed: the bar highlight (1.2:1 on white, 2.4:1 on black as a fill alone) has an outline in the notes colour; section headers and footers, in the system's secondary grey at 13 pt (3.3:1 in light, enough only for large text), are now body and headline size in a quiet grey of their own (#55555A light, 6.6:1; #C7C7CC dark, 10:1). The audit tests' two remaining flags are unchanged: disabled Undo, and Add Music on the toolbar glass (measured 8.4:1 and 8.1:1).

@@ -125,9 +125,14 @@ extension ScoreCanvas {
                 cg.strokeEllipse(in: box.insetBy(dx: -space * 1.2, dy: -space * 2.2))
             case .highlight:
                 cg.saveGState()
+                // A pale fill keeps the music readable on it; the outline in the notes'
+                // colour gives the mark itself enough contrast (6.5:1 light, 9.2:1 dark).
+                let area = box.insetBy(dx: -space * 0.4, dy: -space * 1.2)
                 cg.setFillColor(UIColor.systemYellow.withAlphaComponent(0.35).cgColor)
-                cg.fill(box.insetBy(dx: -space * 0.4, dy: -space * 1.2))
+                cg.fill(area)
                 cg.restoreGState()
+                cg.setLineWidth(space * 0.15)
+                cg.stroke(area)
             case .watch:
                 let at = geometry.place(mark.position, in: box)
                 let side = space * 3

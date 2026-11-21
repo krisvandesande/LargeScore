@@ -8,8 +8,8 @@
             Button: Lines, Bold
             Text: Bold
             Text: Lines
-            Button: Page, Light
-            Text: Light
+            Button: Page, Match iPad
+            Text: Match iPad
             Text: Page
             Switch: Half-Page Turns = 0
             Text: Half-Page Turns
