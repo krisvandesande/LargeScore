@@ -1,0 +1,50 @@
+#!/bin/bash
+# Runs the screen sweep on fresh simulators made for the run: iPad mini upright and
+# iPad Pro 13-inch. Screenshots land in build/sweep/<date>/, audit lines in the log.
+# Crash reports from the simulators' own processes are checked after each run.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+export DEVELOPER_DIR=${DEVELOPER_DIR:-/Applications/Xcode.app/Contents/Developer}
+RUNTIME=com.apple.CoreSimulator.SimRuntime.iOS-27-2
+OUT="build/sweep/$(date +%Y-%m-%d-%H%M)"
+mkdir -p "$OUT"
+
+fresh_simulator() { # name type
+  local name="$1" type="$2" udid
+  udid=$(xcrun simctl list devices | grep "LS $name (" | grep -oE '[0-9A-F-]{36}' | head -1 || true)
+  if [ -z "$udid" ]; then
+    udid=$(xcrun simctl create "LS $name" "$type" "$RUNTIME")
+    xcrun simctl boot "$udid"; xcrun simctl bootstatus "$udid" -b >/dev/null
+    xcrun simctl shutdown "$udid" # warm-up boot: first-boot service crashes don't count
+  fi
+  echo "$udid"
+}
+
+check_crashes() { # udid since
+  local udid="$1" since="$2" bad=0
+  for f in $(find ~/Library/Logs/DiagnosticReports -name "*.ips" -newer "$since" 2>/dev/null); do
+    grep -q "SimDevice.$udid" "$f" || continue
+    proc=$(head -c 600 "$f" | grep -oE '"(app_name|procName)":"[^"]*"' | head -1)
+    case "$proc" in
+      *LargeScore*) echo "app crash: $f";;
+      *PosterBoard*|*SpringBoard*) echo "simulator broken ($proc): replace it"; bad=1;;
+      *) echo "runtime service crash, noted: $proc";;
+    esac
+  done
+  return $bad
+}
+
+MINI=$(fresh_simulator "iPad mini" com.apple.CoreSimulator.SimDeviceType.iPad-mini-A17-Pro)
+PRO=$(fresh_simulator "iPad Pro 13" com.apple.CoreSimulator.SimDeviceType.iPad-Pro-13-inch-M5-12GB)
+STAMP=$(mktemp); touch "$STAMP"
+
+for UDID in $MINI $PRO; do
+  xcrun simctl boot "$UDID" 2>/dev/null || true
+  xcrun simctl bootstatus "$UDID" -b >/dev/null
+  TEST_RUNNER_SWEEP_DIR="$PWD/$OUT" xcodebuild -project LargeScore.xcodeproj -scheme LargeScore \
+    -destination "id=$UDID" -derivedDataPath build/dd \
+    -only-testing:LargeScoreUITests test 2>&1 | tee "$OUT/log-$UDID.txt" | grep -E "AUDIT|✘|passed|failed|error:" || true
+  check_crashes "$UDID" "$STAMP" || true
+  xcrun simctl shutdown "$UDID"
+done
+echo "screenshots: $OUT"

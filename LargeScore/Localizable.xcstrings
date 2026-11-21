@@ -1,0 +1,733 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "": {
+      "shouldTranslate": false
+    },
+    "%@, %@%@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$@, %2$@%3$@"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@, %@%@"
+          }
+        }
+      }
+    },
+    ", top shows page %lld": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": ", bovenaan pagina %lld"
+          }
+        }
+      }
+    },
+    "A half-page turn shows the top of the next page first, so you can read ahead while you finish the bottom.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bij een halve paginaomslag zie je eerst de bovenkant van de volgende pagina, zodat je vooruit kunt lezen terwijl je onderaan verder speelt."
+          }
+        }
+      }
+    },
+    "About": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Over"
+          }
+        }
+      }
+    },
+    "Back": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Terug"
+          }
+        }
+      }
+    },
+    "Back to %@": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Terug naar %@"
+          }
+        }
+      }
+    },
+    "Bassoon": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fagot"
+          }
+        }
+      }
+    },
+    "Bold": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dik"
+          }
+        }
+      }
+    },
+    "Cello": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cello"
+          }
+        }
+      }
+    },
+    "Choose one in Programmes.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kies er een in Programma’s."
+          }
+        }
+      }
+    },
+    "Choose the line thickness": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kies de lijndikte"
+          }
+        }
+      }
+    },
+    "Choose the music size": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kies de grootte van de muziek"
+          }
+        }
+      }
+    },
+    "Clarinet": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Klarinet"
+          }
+        }
+      }
+    },
+    "Collapsed": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ingeklapt"
+          }
+        }
+      }
+    },
+    "Continue": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ga verder"
+          }
+        }
+      }
+    },
+    "Dark": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Donker"
+          }
+        }
+      }
+    },
+    "Done": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gereed"
+          }
+        }
+      }
+    },
+    "Double Bass": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Contrabas"
+          }
+        }
+      }
+    },
+    "Expanded": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uitgeklapt"
+          }
+        }
+      }
+    },
+    "Flute": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fluit"
+          }
+        }
+      }
+    },
+    "GNU Lesser General Public License 3.0. Large Score uses Verovio unchanged; its source and Large Score's own let you build the app with another version.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GNU Lesser General Public License 3.0. Large Score gebruikt Verovio ongewijzigd; met de broncode daarvan en die van Large Score kun je de app met een andere versie bouwen."
+          }
+        }
+      }
+    },
+    "Half-Page Turns": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Halve paginaomslag"
+          }
+        }
+      }
+    },
+    "Hide details": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verberg details"
+          }
+        }
+      }
+    },
+    "Horn": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hoorn"
+          }
+        }
+      }
+    },
+    "Instrument": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Instrument"
+          }
+        }
+      }
+    },
+    "Language": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Taal"
+          }
+        }
+      }
+    },
+    "Larger": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Groter"
+          }
+        }
+      }
+    },
+    "Library": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bibliotheek"
+          }
+        }
+      }
+    },
+    "Licences": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Licenties"
+          }
+        }
+      }
+    },
+    "Light": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Licht"
+          }
+        }
+      }
+    },
+    "Lines": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lijnen"
+          }
+        }
+      }
+    },
+    "MIT License": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MIT-licentie"
+          }
+        }
+      }
+    },
+    "Match iPad": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zoals iPad"
+          }
+        }
+      }
+    },
+    "Music Size": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Muziekgrootte"
+          }
+        }
+      }
+    },
+    "Music size": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Muziekgrootte"
+          }
+        }
+      }
+    },
+    "No programme for today": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geen programma voor vandaag"
+          }
+        }
+      }
+    },
+    "No programmes yet": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nog geen programma’s"
+          }
+        }
+      }
+    },
+    "Oboe": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hobo"
+          }
+        }
+      }
+    },
+    "Opens Large Score in the Settings app, where the language is chosen.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Opent Large Score in de app Instellingen, waar je de taal kiest."
+          }
+        }
+      }
+    },
+    "Organ": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Orgel"
+          }
+        }
+      }
+    },
+    "Other": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Overig"
+          }
+        }
+      }
+    },
+    "Page": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pagina"
+          }
+        }
+      }
+    },
+    "Page %lld of %lld": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Page %1$lld of %2$lld"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pagina %lld van %lld"
+          }
+        }
+      }
+    },
+    "Piano": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Piano"
+          }
+        }
+      }
+    },
+    "Programmes": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Programma’s"
+          }
+        }
+      }
+    },
+    "Put the iPad on your stand and pick the size you read without effort.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zet de iPad op je lessenaar en kies de grootte die je zonder moeite leest."
+          }
+        }
+      }
+    },
+    "SIL Open Font License 1.1": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SIL Open Font License 1.1"
+          }
+        }
+      }
+    },
+    "Sample music": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voorbeeldmuziek"
+          }
+        }
+      }
+    },
+    "Saxophone": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saxofoon"
+          }
+        }
+      }
+    },
+    "Settings": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Instellingen"
+          }
+        }
+      }
+    },
+    "Show details": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toon details"
+          }
+        }
+      }
+    },
+    "Size": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grootte"
+          }
+        }
+      }
+    },
+    "Size %lld of %lld": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Size %1$lld of %2$lld"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grootte %lld van %lld"
+          }
+        }
+      }
+    },
+    "Smaller": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kleiner"
+          }
+        }
+      }
+    },
+    "Source Code": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Broncode"
+          }
+        }
+      }
+    },
+    "Start": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Begin"
+          }
+        }
+      }
+    },
+    "The music at this size": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De muziek op deze grootte"
+          }
+        }
+      }
+    },
+    "Thin": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dun"
+          }
+        }
+      }
+    },
+    "This music could not be read.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deze muziek kon niet worden gelezen."
+          }
+        }
+      }
+    },
+    "Today": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vandaag"
+          }
+        }
+      }
+    },
+    "Trombone": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trombone"
+          }
+        }
+      }
+    },
+    "Trumpet": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trompet"
+          }
+        }
+      }
+    },
+    "Tuba": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tuba"
+          }
+        }
+      }
+    },
+    "Version": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Versie"
+          }
+        }
+      }
+    },
+    "Viola": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Altviool"
+          }
+        }
+      }
+    },
+    "Violin": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Viool"
+          }
+        }
+      }
+    },
+    "Voice": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zang"
+          }
+        }
+      }
+    },
+    "Which instrument do you play?": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Welk instrument speel je?"
+          }
+        }
+      }
+    },
+    "bar %lld": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "maat %lld"
+          }
+        }
+      }
+    },
+    "bars %lld to %lld": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "bars %1$lld to %2$lld"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "maten %lld tot %lld"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

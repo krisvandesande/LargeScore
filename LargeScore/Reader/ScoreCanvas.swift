@@ -1,16 +1,36 @@
 import SwiftUI
 import CoreText
 
-/// Draws one engraved page in a single colour, filling the view's width.
+/// Draws one engraved page in a single colour, fitted to the view. For a half-page
+/// turn, `upper` is the next page, drawn above `split` (in page units) with this page
+/// below it and a rule between.
 struct ScoreCanvas: View {
     let scene: SVGScene
+    var upper: SVGScene? = nil
+    var split: CGFloat? = nil
     var ink: Color = .black
 
     var body: some View {
         Canvas { context, size in
             let cgInk = ink.resolve(in: context.environment).cgColor
             context.withCGContext { cg in
+                guard let upper, let split else {
+                    Self.draw(scene, in: cg, size: size, ink: cgInk)
+                    return
+                }
+                let box = scene.viewBox
+                let scale = min(size.width / box.width, size.height / box.height)
+                let y = (split - box.minY) * scale
+                cg.saveGState()
+                cg.clip(to: CGRect(x: -size.width, y: -size.height, width: size.width * 3, height: size.height + y))
+                Self.draw(upper, in: cg, size: size, ink: cgInk)
+                cg.restoreGState()
+                cg.saveGState()
+                cg.clip(to: CGRect(x: -size.width, y: y, width: size.width * 3, height: size.height * 2))
                 Self.draw(scene, in: cg, size: size, ink: cgInk)
+                cg.restoreGState()
+                cg.setFillColor(cgInk)
+                cg.fill(CGRect(x: 0, y: y - 2, width: size.width, height: 4))
             }
         }
         .accessibilityHidden(true)

@@ -1,6 +1,6 @@
 name: LargeScore
 options:
-  bundleIdPrefix: be.kvds
+  bundleIdPrefix: com.kvds
   deploymentTarget:
     iOS: "26.0"
   createIntermediateGroups: true
@@ -9,7 +9,7 @@ settings:
     SWIFT_VERSION: "6.0"
     SWIFT_DEFAULT_ACTOR_ISOLATION: MainActor
     SWIFT_APPROACHABLE_CONCURRENCY: YES
-    DEVELOPMENT_TEAM: ""
+    DEVELOPMENT_TEAM: UJJPJ9ZHNN
     TARGETED_DEVICE_FAMILY: "2"
     SUPPORTS_MACCATALYST: NO
     SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD: NO
@@ -44,10 +44,10 @@ targets:
         ITSAppUsesNonExemptEncryption: false
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: be.kvds.largescore
+        PRODUCT_BUNDLE_IDENTIFIER: com.kvds.LargeScore
         MARKETING_VERSION: "0.1"
         CURRENT_PROJECT_VERSION: "1"
-        ASSETCATALOG_COMPILER_APPICON_NAME: ""
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
   LargeScoreTests:
     type: bundle.unit-test
     platform: iOS
@@ -56,13 +56,27 @@ targets:
       - target: LargeScore
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: be.kvds.largescore.tests
+        PRODUCT_BUNDLE_IDENTIFIER: com.kvds.LargeScore.Tests
         GENERATE_INFOPLIST_FILE: YES
+  LargeScoreUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources: [LargeScoreUITests]
+    dependencies:
+      - target: LargeScore
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.kvds.LargeScore.UITests
+        GENERATE_INFOPLIST_FILE: YES
+        SWIFT_DEFAULT_ACTOR_ISOLATION: nonisolated
+        SWIFT_VERSION: "5.0"
+        TEST_TARGET_NAME: LargeScore
 schemes:
   LargeScore:
     build:
       targets:
         LargeScore: all
         LargeScoreTests: [test]
+        LargeScoreUITests: [test]
     test:
-      targets: [LargeScoreTests]
+      targets: [LargeScoreTests, LargeScoreUITests]

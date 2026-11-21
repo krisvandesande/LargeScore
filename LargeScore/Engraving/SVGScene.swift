@@ -23,6 +23,10 @@ nonisolated struct SVGScene: @unchecked Sendable {
 
     var viewBox: CGRect
     var items: [Item]
+    /// The area each line of music covers, top to bottom, in viewBox units.
+    var systems: [CGRect]
+    /// Bars on this page.
+    var measureCount: Int
 
     init?(svg: String) {
         let builder = SceneBuilder()
@@ -31,6 +35,8 @@ nonisolated struct SVGScene: @unchecked Sendable {
         guard parser.parse(), let box = builder.viewBox else { return nil }
         viewBox = box
         items = builder.items
+        systems = builder.systems
+        measureCount = builder.measureCount
     }
 }
 
@@ -39,12 +45,15 @@ nonisolated struct SVGScene: @unchecked Sendable {
 nonisolated private final class SceneBuilder: NSObject, XMLParserDelegate {
     var viewBox: CGRect?
     var items: [SVGScene.Item] = []
+    var systems: [CGRect] = []
+    var measureCount = 0
 
     private struct Frame {
         var transform: CGAffineTransform
         var classes: Set<String>
         var bold: Bool
         var defID: String?
+        var system: Int?
     }
 
     private var stack: [Frame] = []
@@ -65,9 +74,17 @@ nonisolated private final class SceneBuilder: NSObject, XMLParserDelegate {
     private var classes: Set<String> { stack.last?.classes ?? [] }
 
     func parser(_ parser: XMLParser, didStartElement element: String, namespaceURI: String?, qualifiedName: String?, attributes a: [String: String] = [:]) {
-        var frame = stack.last ?? Frame(transform: .identity, classes: [], bold: false, defID: nil)
+        var frame = stack.last ?? Frame(transform: .identity, classes: [], bold: false, defID: nil, system: nil)
         if let t = a["transform"] { frame.transform = Self.transform(t).concatenating(frame.transform) }
-        if let c = a["class"] { frame.classes.formUnion(c.split(separator: " ").map(String.init)) }
+        if let c = a["class"] {
+            let names = c.split(separator: " ").map(String.init)
+            frame.classes.formUnion(names)
+            if element == "g", inDefs == 0, names.contains("system") {
+                frame.system = systems.count
+                systems.append(.null)
+            }
+            if element == "g", inDefs == 0, names.contains("measure") { measureCount += 1 }
+        }
         if a["font-weight"] == "bold" { frame.bold = true }
         // Verovio marks editing placeholders with a circle that browsers hide with CSS.
         if frame.classes.contains("placeholder") {
@@ -118,7 +135,10 @@ nonisolated private final class SceneBuilder: NSObject, XMLParserDelegate {
             if let glyph = defs[ref] {
                 let offset = CGAffineTransform(translationX: num(a["x"]), y: num(a["y"]))
                 var t = offset.concatenating(frame.transform)
-                if let copy = glyph.copy(using: &t) { items.append(.fill(copy)) }
+                if let copy = glyph.copy(using: &t) {
+                    items.append(.fill(copy))
+                    cover(copy.boundingBoxOfPath, in: frame)
+                }
             }
         case "text":
             textOrigin = CGPoint(x: num(a["x"]), y: num(a["y"])).applying(frame.transform)
@@ -157,6 +177,11 @@ nonisolated private final class SceneBuilder: NSObject, XMLParserDelegate {
             if let origin = textOrigin, !words.isEmpty, textSize > 0 {
                 items.append(.text(.init(string: words, position: origin, size: textSize,
                                          bold: textBold, italic: textItalic, anchor: textAnchor)))
+                if let frame {
+                    let width = textSize * 0.6 * CGFloat(words.count)
+                    let x = textAnchor == .start ? origin.x : textAnchor == .middle ? origin.x - width / 2 : origin.x - width
+                    cover(CGRect(x: x, y: origin.y - textSize * 0.8, width: width, height: textSize), in: frame)
+                }
             }
             textOrigin = nil
         default:
@@ -177,10 +202,20 @@ nonisolated private final class SceneBuilder: NSObject, XMLParserDelegate {
         if strokeWidth == nil || (isClosed && !hidden) {
             items.append(.fill(placed))
         }
+        var bounds = placed.boundingBoxOfPath
         if let w = strokeWidth {
             let scale = sqrt(abs(t.a * t.d))
-            items.append(.stroke(placed, width: CGFloat(w) * scale, round: a["stroke-linecap"] == "round"))
+            let width = CGFloat(w) * scale
+            items.append(.stroke(placed, width: width, round: a["stroke-linecap"] == "round"))
+            bounds = bounds.insetBy(dx: -width / 2, dy: -width / 2)
         }
+        cover(bounds, in: frame)
+    }
+
+    /// Grows the bounds of the line of music the item belongs to.
+    private func cover(_ rect: CGRect, in frame: Frame) {
+        guard let index = frame.system, systems.indices.contains(index) else { return }
+        systems[index] = systems[index].union(rect)
     }
 
     private func num(_ s: String?) -> CGFloat { CGFloat(Double(s ?? "") ?? 0) }

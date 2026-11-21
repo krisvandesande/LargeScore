@@ -36,6 +36,20 @@
                ReferencedContainer = "container:LargeScore.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "00EECD53BD0928324982685F"
+               BuildableName = "LargeScoreUITests.xctest"
+               BlueprintName = "LargeScoreUITests"
+               ReferencedContainer = "container:LargeScore.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -62,6 +76,17 @@
                BlueprintIdentifier = "11CAC36B8FD72792445847AF"
                BuildableName = "LargeScoreTests.xctest"
                BlueprintName = "LargeScoreTests"
+               ReferencedContainer = "container:LargeScore.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "00EECD53BD0928324982685F"
+               BuildableName = "LargeScoreUITests.xctest"
+               BlueprintName = "LargeScoreUITests"
                ReferencedContainer = "container:LargeScore.xcodeproj">
             </BuildableReference>
          </TestableReference>

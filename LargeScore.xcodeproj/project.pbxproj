@@ -8,19 +8,41 @@
 
 /* Begin PBXBuildFile section */
 		0177389474DFC4FA754E83EC /* VerovioEngraver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22EE9AB0CE94FA8966AD7CBA /* VerovioEngraver.swift */; };
+		121D807792E20C06A68C05CF /* Style.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88BC77D691F165C1D798BE95 /* Style.swift */; };
+		15518B7968D3DD9DC0A07FCE /* evening-air-alto.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = 70789DA4CC8E4B5CFF85F2F5 /* evening-air-alto.musicxml */; };
+		1E3E694D612E7296C55AA653 /* LayoutKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = A64C9C1F5D246BD26E7EB0ED /* LayoutKit.swift */; };
+		224DA9E13A57C61C072D5DC8 /* LibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17268AD31FC953CCF78E7F0A /* LibraryView.swift */; };
+		2BDABFE1171DE6A0406AC014 /* PageTurner.swift in Sources */ = {isa = PBXBuildFile; fileRef = F44D8CA440E27E7D7D2037D8 /* PageTurner.swift */; };
 		3753B5939D0C165FE98888C9 /* Engraver.swift in Sources */ = {isa = PBXBuildFile; fileRef = B770B7CA621635E8184DEDB0 /* Engraver.swift */; };
+		3A65A92834C34B9459BEC7C8 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 21FCDEC6F400623C55EC368B /* Localizable.xcstrings */; };
+		3BA5A283ABCA62CF09902A13 /* ScreenSweepTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F3D4B823D53D688EADE29A3 /* ScreenSweepTests.swift */; };
+		3C1FD0409376A0D1D08E716B /* evening-air-treble.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = FEDAB8FE7CB3DC5664A5D395 /* evening-air-treble.musicxml */; };
 		3CE2F4743A48725594979F2D /* VerovioToolkit in Frameworks */ = {isa = PBXBuildFile; productRef = EE43E473F512BA74095E135B /* VerovioToolkit */; };
 		4B55282274225FC6D37EF85D /* EngravingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 619AF0CC40BEA89874498859 /* EngravingTests.swift */; };
+		57635CA06508C611ADC0212C /* ReaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D849716F934CBA7A3FD4D00 /* ReaderView.swift */; };
 		7B4E87776861141FEC3495C0 /* ScoreCanvas.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF478BA8ECBAAE9FED7D8264 /* ScoreCanvas.swift */; };
 		7D1319FD90D71337F5CBCAD0 /* PartSplitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6571A2CA874D68B485A827E6 /* PartSplitter.swift */; };
-		83752A35C6A930749E128C75 /* SpikeReaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 678A35DFBE45EE0B024B09A1 /* SpikeReaderView.swift */; };
+		96CCF458D90D562983B458EE /* ScoreLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4C3345DCD65C0A8E77FDBF9 /* ScoreLoader.swift */; };
+		AAB105C83CD709E37C2A54B1 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F84B9B4A9ECB304F011F2454 /* SettingsView.swift */; };
+		C01B1F925B264F392B764D52 /* ReaderSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FF77D829CA58D403A3BE0DC /* ReaderSettings.swift */; };
+		D24D2E3EF301948729023D3F /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3A2F17269B7472AF6CFD6 /* OnboardingView.swift */; };
+		DA6568EEFDA2DDBC640DE381 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 72E33B44B559B76024D3E0EB /* Assets.xcassets */; };
+		DAB61FEF895146F62463F30B /* SampleCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 713D748931CE744279E773B4 /* SampleCard.swift */; };
 		E6E7DAF75C872D89F7292D88 /* LargeScoreApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 608E66C49927979E3843786B /* LargeScoreApp.swift */; };
 		E78147419B69271BDDC75854 /* SVGScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = C38FABE19590F985BF6CD2A6 /* SVGScene.swift */; };
 		ED294601DA4AD99B5FA233A5 /* evening-air.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = F30C6972272BBECB99A21250 /* evening-air.musicxml */; };
+		FA5AF9ED6A3C5BAEB3764FB4 /* ReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93DCD83E23A8A9966544EF13 /* ReaderTests.swift */; };
 		FBD1B36E028B2C52EA17DB80 /* long-piece.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = 0EC63E18FD383F0E1E6BE72D /* long-piece.musicxml */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		0CCF384EB0C8CA3797744177 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6F984EC1099F46D615619096 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0B7ACDFB3C1C54F07B2AA689;
+			remoteInfo = LargeScore;
+		};
 		171A350FAF4CAF085AAFE396 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 6F984EC1099F46D615619096 /* Project object */;
@@ -32,19 +54,35 @@
 
 /* Begin PBXFileReference section */
 		0EC63E18FD383F0E1E6BE72D /* long-piece.musicxml */ = {isa = PBXFileReference; path = "long-piece.musicxml"; sourceTree = "<group>"; };
+		17268AD31FC953CCF78E7F0A /* LibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryView.swift; sourceTree = "<group>"; };
+		21FCDEC6F400623C55EC368B /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		22EE9AB0CE94FA8966AD7CBA /* VerovioEngraver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerovioEngraver.swift; sourceTree = "<group>"; };
+		2D849716F934CBA7A3FD4D00 /* ReaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderView.swift; sourceTree = "<group>"; };
+		2FF77D829CA58D403A3BE0DC /* ReaderSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderSettings.swift; sourceTree = "<group>"; };
 		4AC98224E7EA271BAF679320 /* LargeScore.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = LargeScore.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		608E66C49927979E3843786B /* LargeScoreApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LargeScoreApp.swift; sourceTree = "<group>"; };
 		619AF0CC40BEA89874498859 /* EngravingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngravingTests.swift; sourceTree = "<group>"; };
 		6571A2CA874D68B485A827E6 /* PartSplitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PartSplitter.swift; sourceTree = "<group>"; };
-		678A35DFBE45EE0B024B09A1 /* SpikeReaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpikeReaderView.swift; sourceTree = "<group>"; };
+		6F3D4B823D53D688EADE29A3 /* ScreenSweepTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenSweepTests.swift; sourceTree = "<group>"; };
+		70789DA4CC8E4B5CFF85F2F5 /* evening-air-alto.musicxml */ = {isa = PBXFileReference; path = "evening-air-alto.musicxml"; sourceTree = "<group>"; };
+		713D748931CE744279E773B4 /* SampleCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleCard.swift; sourceTree = "<group>"; };
+		72E33B44B559B76024D3E0EB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		88BC77D691F165C1D798BE95 /* Style.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Style.swift; sourceTree = "<group>"; };
+		93DCD83E23A8A9966544EF13 /* ReaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderTests.swift; sourceTree = "<group>"; };
+		A64C9C1F5D246BD26E7EB0ED /* LayoutKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayoutKit.swift; sourceTree = "<group>"; };
 		AA8AEE0316D267D3D6F31DEA /* VerovioKit */ = {isa = PBXFileReference; lastKnownFileType = folder; name = VerovioKit; path = Packages/VerovioKit; sourceTree = SOURCE_ROOT; };
 		AF478BA8ECBAAE9FED7D8264 /* ScoreCanvas.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreCanvas.swift; sourceTree = "<group>"; };
 		B770B7CA621635E8184DEDB0 /* Engraver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Engraver.swift; sourceTree = "<group>"; };
 		C38FABE19590F985BF6CD2A6 /* SVGScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SVGScene.swift; sourceTree = "<group>"; };
+		C59890C33E6B1A7D558DEC5B /* LargeScoreUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = LargeScoreUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D70C85A52005056D240202DE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		F30C6972272BBECB99A21250 /* evening-air.musicxml */ = {isa = PBXFileReference; path = "evening-air.musicxml"; sourceTree = "<group>"; };
+		F44D8CA440E27E7D7D2037D8 /* PageTurner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageTurner.swift; sourceTree = "<group>"; };
+		F4C3345DCD65C0A8E77FDBF9 /* ScoreLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreLoader.swift; sourceTree = "<group>"; };
+		F84B9B4A9ECB304F011F2454 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		FAB3A2F17269B7472AF6CFD6 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		FDE7041B4B6767A23CD8453C /* LargeScoreTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = LargeScoreTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		FEDAB8FE7CB3DC5664A5D395 /* evening-air-treble.musicxml */ = {isa = PBXFileReference; path = "evening-air-treble.musicxml"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,8 +101,20 @@
 			isa = PBXGroup;
 			children = (
 				608E66C49927979E3843786B /* LargeScoreApp.swift */,
+				A64C9C1F5D246BD26E7EB0ED /* LayoutKit.swift */,
+				2FF77D829CA58D403A3BE0DC /* ReaderSettings.swift */,
+				88BC77D691F165C1D798BE95 /* Style.swift */,
 			);
 			path = App;
+			sourceTree = "<group>";
+		};
+		42A80176588A19DF1C8D2E50 /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				FAB3A2F17269B7472AF6CFD6 /* OnboardingView.swift */,
+				713D748931CE744279E773B4 /* SampleCard.swift */,
+			);
+			path = Onboarding;
 			sourceTree = "<group>";
 		};
 		46CE44231CD53138FDF3818F /* Resources */ = {
@@ -80,6 +130,7 @@
 			children = (
 				4AC98224E7EA271BAF679320 /* LargeScore.app */,
 				FDE7041B4B6767A23CD8453C /* LargeScoreTests.xctest */,
+				C59890C33E6B1A7D558DEC5B /* LargeScoreUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -87,8 +138,9 @@
 		6EFBA28764B3C2479222DF5E /* Reader */ = {
 			isa = PBXGroup;
 			children = (
+				F44D8CA440E27E7D7D2037D8 /* PageTurner.swift */,
+				2D849716F934CBA7A3FD4D00 /* ReaderView.swift */,
 				AF478BA8ECBAAE9FED7D8264 /* ScoreCanvas.swift */,
-				678A35DFBE45EE0B024B09A1 /* SpikeReaderView.swift */,
 			);
 			path = Reader;
 			sourceTree = "<group>";
@@ -98,6 +150,7 @@
 			children = (
 				B770B7CA621635E8184DEDB0 /* Engraver.swift */,
 				6571A2CA874D68B485A827E6 /* PartSplitter.swift */,
+				F4C3345DCD65C0A8E77FDBF9 /* ScoreLoader.swift */,
 				C38FABE19590F985BF6CD2A6 /* SVGScene.swift */,
 				22EE9AB0CE94FA8966AD7CBA /* VerovioEngraver.swift */,
 			);
@@ -109,6 +162,7 @@
 			children = (
 				619AF0CC40BEA89874498859 /* EngravingTests.swift */,
 				0EC63E18FD383F0E1E6BE72D /* long-piece.musicxml */,
+				93DCD83E23A8A9966544EF13 /* ReaderTests.swift */,
 			);
 			path = LargeScoreTests;
 			sourceTree = "<group>";
@@ -118,6 +172,7 @@
 			children = (
 				8C17AB0D8AF23DEC3C3B034B /* LargeScore */,
 				7E7B944B14B0783FCB1687F9 /* LargeScoreTests */,
+				BB7F17FACAEEC70C0FF6B2C7 /* LargeScoreUITests */,
 				AD3AAF38391E31BFE5D3DB77 /* Packages */,
 				6588254F01B8CCCCDFE3ADBE /* Products */,
 			);
@@ -126,11 +181,16 @@
 		8C17AB0D8AF23DEC3C3B034B /* LargeScore */ = {
 			isa = PBXGroup;
 			children = (
+				72E33B44B559B76024D3E0EB /* Assets.xcassets */,
 				D70C85A52005056D240202DE /* Info.plist */,
+				21FCDEC6F400623C55EC368B /* Localizable.xcstrings */,
 				28661CD864A83CFCE84FF1EA /* App */,
 				6F11285E53C1AF4CC79B682F /* Engraving */,
+				FCEBBB55A1D059515D8A2405 /* Library */,
+				42A80176588A19DF1C8D2E50 /* Onboarding */,
 				6EFBA28764B3C2479222DF5E /* Reader */,
 				46CE44231CD53138FDF3818F /* Resources */,
+				E9B5F463633220B7C8A46E60 /* Settings */,
 			);
 			path = LargeScore;
 			sourceTree = "<group>";
@@ -138,6 +198,8 @@
 		8DD8C198346B5DD5D85792D1 /* Samples */ = {
 			isa = PBXGroup;
 			children = (
+				70789DA4CC8E4B5CFF85F2F5 /* evening-air-alto.musicxml */,
+				FEDAB8FE7CB3DC5664A5D395 /* evening-air-treble.musicxml */,
 				F30C6972272BBECB99A21250 /* evening-air.musicxml */,
 			);
 			path = Samples;
@@ -151,9 +213,51 @@
 			path = Packages;
 			sourceTree = "<group>";
 		};
+		BB7F17FACAEEC70C0FF6B2C7 /* LargeScoreUITests */ = {
+			isa = PBXGroup;
+			children = (
+				6F3D4B823D53D688EADE29A3 /* ScreenSweepTests.swift */,
+			);
+			path = LargeScoreUITests;
+			sourceTree = "<group>";
+		};
+		E9B5F463633220B7C8A46E60 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				F84B9B4A9ECB304F011F2454 /* SettingsView.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		FCEBBB55A1D059515D8A2405 /* Library */ = {
+			isa = PBXGroup;
+			children = (
+				17268AD31FC953CCF78E7F0A /* LibraryView.swift */,
+			);
+			path = Library;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		00EECD53BD0928324982685F /* LargeScoreUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 873B436550801A9B07C16C19 /* Build configuration list for PBXNativeTarget "LargeScoreUITests" */;
+			buildPhases = (
+				FA34FB192947487313E6D716 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A98208E208134FF40337E44F /* PBXTargetDependency */,
+			);
+			name = LargeScoreUITests;
+			packageProductDependencies = (
+			);
+			productName = LargeScoreUITests;
+			productReference = C59890C33E6B1A7D558DEC5B /* LargeScoreUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 		0B7ACDFB3C1C54F07B2AA689 /* LargeScore */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 1D76051445D996BECA6B9F28 /* Build configuration list for PBXNativeTarget "LargeScore" */;
@@ -202,11 +306,15 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1600;
 				TargetAttributes = {
+					00EECD53BD0928324982685F = {
+						DevelopmentTeam = UJJPJ9ZHNN;
+						TestTargetID = 0B7ACDFB3C1C54F07B2AA689;
+					};
 					0B7ACDFB3C1C54F07B2AA689 = {
-						DevelopmentTeam = "";
+						DevelopmentTeam = UJJPJ9ZHNN;
 					};
 					11CAC36B8FD72792445847AF = {
-						DevelopmentTeam = "";
+						DevelopmentTeam = UJJPJ9ZHNN;
 					};
 				};
 			};
@@ -216,6 +324,7 @@
 			knownRegions = (
 				Base,
 				en,
+				nl,
 			);
 			mainGroup = 84A083FD701D41F1769987D4;
 			minimizedProjectReferenceProxies = 1;
@@ -229,6 +338,7 @@
 			targets = (
 				0B7ACDFB3C1C54F07B2AA689 /* LargeScore */,
 				11CAC36B8FD72792445847AF /* LargeScoreTests */,
+				00EECD53BD0928324982685F /* LargeScoreUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -246,6 +356,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DA6568EEFDA2DDBC640DE381 /* Assets.xcassets in Resources */,
+				3A65A92834C34B9459BEC7C8 /* Localizable.xcstrings in Resources */,
+				15518B7968D3DD9DC0A07FCE /* evening-air-alto.musicxml in Resources */,
+				3C1FD0409376A0D1D08E716B /* evening-air-treble.musicxml in Resources */,
 				ED294601DA4AD99B5FA233A5 /* evening-air.musicxml in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -259,10 +373,19 @@
 			files = (
 				3753B5939D0C165FE98888C9 /* Engraver.swift in Sources */,
 				E6E7DAF75C872D89F7292D88 /* LargeScoreApp.swift in Sources */,
+				1E3E694D612E7296C55AA653 /* LayoutKit.swift in Sources */,
+				224DA9E13A57C61C072D5DC8 /* LibraryView.swift in Sources */,
+				D24D2E3EF301948729023D3F /* OnboardingView.swift in Sources */,
+				2BDABFE1171DE6A0406AC014 /* PageTurner.swift in Sources */,
 				7D1319FD90D71337F5CBCAD0 /* PartSplitter.swift in Sources */,
+				C01B1F925B264F392B764D52 /* ReaderSettings.swift in Sources */,
+				57635CA06508C611ADC0212C /* ReaderView.swift in Sources */,
 				E78147419B69271BDDC75854 /* SVGScene.swift in Sources */,
+				DAB61FEF895146F62463F30B /* SampleCard.swift in Sources */,
 				7B4E87776861141FEC3495C0 /* ScoreCanvas.swift in Sources */,
-				83752A35C6A930749E128C75 /* SpikeReaderView.swift in Sources */,
+				96CCF458D90D562983B458EE /* ScoreLoader.swift in Sources */,
+				AAB105C83CD709E37C2A54B1 /* SettingsView.swift in Sources */,
+				121D807792E20C06A68C05CF /* Style.swift in Sources */,
 				0177389474DFC4FA754E83EC /* VerovioEngraver.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -272,12 +395,26 @@
 			buildActionMask = 2147483647;
 			files = (
 				4B55282274225FC6D37EF85D /* EngravingTests.swift in Sources */,
+				FA5AF9ED6A3C5BAEB3764FB4 /* ReaderTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FA34FB192947487313E6D716 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3BA5A283ABCA62CF09902A13 /* ScreenSweepTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		A98208E208134FF40337E44F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0B7ACDFB3C1C54F07B2AA689 /* LargeScore */;
+			targetProxy = 0CCF384EB0C8CA3797744177 /* PBXContainerItemProxy */;
+		};
 		D9222636148DB8495BEDF01E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 0B7ACDFB3C1C54F07B2AA689 /* LargeScore */;
@@ -296,7 +433,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = be.kvds.largescore.tests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kvds.LargeScore.Tests;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LargeScore.app/LargeScore";
@@ -313,17 +450,55 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = be.kvds.largescore.tests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kvds.LargeScore.Tests;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LargeScore.app/LargeScore";
 			};
 			name = Debug;
 		};
+		5702F593A6F00334E8CF16D4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.kvds.LargeScore.UITests;
+				SDKROOT = iphoneos;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = LargeScore;
+			};
+			name = Release;
+		};
+		6D0E9C86D6B3F79F48F3D44D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.kvds.LargeScore.UITests;
+				SDKROOT = iphoneos;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = LargeScore;
+			};
+			name = Debug;
+		};
 		9D2F0BDE045B66B5E15624C9 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = "";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				INFOPLIST_FILE = LargeScore/Info.plist;
@@ -332,7 +507,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 0.1;
-				PRODUCT_BUNDLE_IDENTIFIER = be.kvds.largescore;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kvds.LargeScore;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -373,7 +548,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = UJJPJ9ZHNN;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -438,7 +613,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = UJJPJ9ZHNN;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -478,7 +653,7 @@
 		F0BF70078A761E9EC6722EDF /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = "";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				INFOPLIST_FILE = LargeScore/Info.plist;
@@ -487,7 +662,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 0.1;
-				PRODUCT_BUNDLE_IDENTIFIER = be.kvds.largescore;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kvds.LargeScore;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -501,6 +676,15 @@
 			buildConfigurations = (
 				9D2F0BDE045B66B5E15624C9 /* Debug */,
 				F0BF70078A761E9EC6722EDF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		873B436550801A9B07C16C19 /* Build configuration list for PBXNativeTarget "LargeScoreUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6D0E9C86D6B3F79F48F3D44D /* Debug */,
+				5702F593A6F00334E8CF16D4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
