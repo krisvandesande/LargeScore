@@ -1,0 +1,543 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0177389474DFC4FA754E83EC /* VerovioEngraver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22EE9AB0CE94FA8966AD7CBA /* VerovioEngraver.swift */; };
+		3753B5939D0C165FE98888C9 /* Engraver.swift in Sources */ = {isa = PBXBuildFile; fileRef = B770B7CA621635E8184DEDB0 /* Engraver.swift */; };
+		3CE2F4743A48725594979F2D /* VerovioToolkit in Frameworks */ = {isa = PBXBuildFile; productRef = EE43E473F512BA74095E135B /* VerovioToolkit */; };
+		4B55282274225FC6D37EF85D /* EngravingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 619AF0CC40BEA89874498859 /* EngravingTests.swift */; };
+		7B4E87776861141FEC3495C0 /* ScoreCanvas.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF478BA8ECBAAE9FED7D8264 /* ScoreCanvas.swift */; };
+		7D1319FD90D71337F5CBCAD0 /* PartSplitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6571A2CA874D68B485A827E6 /* PartSplitter.swift */; };
+		83752A35C6A930749E128C75 /* SpikeReaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 678A35DFBE45EE0B024B09A1 /* SpikeReaderView.swift */; };
+		E6E7DAF75C872D89F7292D88 /* LargeScoreApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 608E66C49927979E3843786B /* LargeScoreApp.swift */; };
+		E78147419B69271BDDC75854 /* SVGScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = C38FABE19590F985BF6CD2A6 /* SVGScene.swift */; };
+		ED294601DA4AD99B5FA233A5 /* evening-air.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = F30C6972272BBECB99A21250 /* evening-air.musicxml */; };
+		FBD1B36E028B2C52EA17DB80 /* long-piece.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = 0EC63E18FD383F0E1E6BE72D /* long-piece.musicxml */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		171A350FAF4CAF085AAFE396 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6F984EC1099F46D615619096 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0B7ACDFB3C1C54F07B2AA689;
+			remoteInfo = LargeScore;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		0EC63E18FD383F0E1E6BE72D /* long-piece.musicxml */ = {isa = PBXFileReference; path = "long-piece.musicxml"; sourceTree = "<group>"; };
+		22EE9AB0CE94FA8966AD7CBA /* VerovioEngraver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerovioEngraver.swift; sourceTree = "<group>"; };
+		4AC98224E7EA271BAF679320 /* LargeScore.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = LargeScore.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		608E66C49927979E3843786B /* LargeScoreApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LargeScoreApp.swift; sourceTree = "<group>"; };
+		619AF0CC40BEA89874498859 /* EngravingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngravingTests.swift; sourceTree = "<group>"; };
+		6571A2CA874D68B485A827E6 /* PartSplitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PartSplitter.swift; sourceTree = "<group>"; };
+		678A35DFBE45EE0B024B09A1 /* SpikeReaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpikeReaderView.swift; sourceTree = "<group>"; };
+		AA8AEE0316D267D3D6F31DEA /* VerovioKit */ = {isa = PBXFileReference; lastKnownFileType = folder; name = VerovioKit; path = Packages/VerovioKit; sourceTree = SOURCE_ROOT; };
+		AF478BA8ECBAAE9FED7D8264 /* ScoreCanvas.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreCanvas.swift; sourceTree = "<group>"; };
+		B770B7CA621635E8184DEDB0 /* Engraver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Engraver.swift; sourceTree = "<group>"; };
+		C38FABE19590F985BF6CD2A6 /* SVGScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SVGScene.swift; sourceTree = "<group>"; };
+		D70C85A52005056D240202DE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		F30C6972272BBECB99A21250 /* evening-air.musicxml */ = {isa = PBXFileReference; path = "evening-air.musicxml"; sourceTree = "<group>"; };
+		FDE7041B4B6767A23CD8453C /* LargeScoreTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = LargeScoreTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		0C7064C09D82A29BB64F0C04 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3CE2F4743A48725594979F2D /* VerovioToolkit in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		28661CD864A83CFCE84FF1EA /* App */ = {
+			isa = PBXGroup;
+			children = (
+				608E66C49927979E3843786B /* LargeScoreApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		46CE44231CD53138FDF3818F /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				8DD8C198346B5DD5D85792D1 /* Samples */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		6588254F01B8CCCCDFE3ADBE /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				4AC98224E7EA271BAF679320 /* LargeScore.app */,
+				FDE7041B4B6767A23CD8453C /* LargeScoreTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		6EFBA28764B3C2479222DF5E /* Reader */ = {
+			isa = PBXGroup;
+			children = (
+				AF478BA8ECBAAE9FED7D8264 /* ScoreCanvas.swift */,
+				678A35DFBE45EE0B024B09A1 /* SpikeReaderView.swift */,
+			);
+			path = Reader;
+			sourceTree = "<group>";
+		};
+		6F11285E53C1AF4CC79B682F /* Engraving */ = {
+			isa = PBXGroup;
+			children = (
+				B770B7CA621635E8184DEDB0 /* Engraver.swift */,
+				6571A2CA874D68B485A827E6 /* PartSplitter.swift */,
+				C38FABE19590F985BF6CD2A6 /* SVGScene.swift */,
+				22EE9AB0CE94FA8966AD7CBA /* VerovioEngraver.swift */,
+			);
+			path = Engraving;
+			sourceTree = "<group>";
+		};
+		7E7B944B14B0783FCB1687F9 /* LargeScoreTests */ = {
+			isa = PBXGroup;
+			children = (
+				619AF0CC40BEA89874498859 /* EngravingTests.swift */,
+				0EC63E18FD383F0E1E6BE72D /* long-piece.musicxml */,
+			);
+			path = LargeScoreTests;
+			sourceTree = "<group>";
+		};
+		84A083FD701D41F1769987D4 = {
+			isa = PBXGroup;
+			children = (
+				8C17AB0D8AF23DEC3C3B034B /* LargeScore */,
+				7E7B944B14B0783FCB1687F9 /* LargeScoreTests */,
+				AD3AAF38391E31BFE5D3DB77 /* Packages */,
+				6588254F01B8CCCCDFE3ADBE /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		8C17AB0D8AF23DEC3C3B034B /* LargeScore */ = {
+			isa = PBXGroup;
+			children = (
+				D70C85A52005056D240202DE /* Info.plist */,
+				28661CD864A83CFCE84FF1EA /* App */,
+				6F11285E53C1AF4CC79B682F /* Engraving */,
+				6EFBA28764B3C2479222DF5E /* Reader */,
+				46CE44231CD53138FDF3818F /* Resources */,
+			);
+			path = LargeScore;
+			sourceTree = "<group>";
+		};
+		8DD8C198346B5DD5D85792D1 /* Samples */ = {
+			isa = PBXGroup;
+			children = (
+				F30C6972272BBECB99A21250 /* evening-air.musicxml */,
+			);
+			path = Samples;
+			sourceTree = "<group>";
+		};
+		AD3AAF38391E31BFE5D3DB77 /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				AA8AEE0316D267D3D6F31DEA /* VerovioKit */,
+			);
+			path = Packages;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		0B7ACDFB3C1C54F07B2AA689 /* LargeScore */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1D76051445D996BECA6B9F28 /* Build configuration list for PBXNativeTarget "LargeScore" */;
+			buildPhases = (
+				2A1BDD6A8AC643C0B6F2E941 /* Sources */,
+				B17844B39C497C46D16828DF /* Resources */,
+				0C7064C09D82A29BB64F0C04 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = LargeScore;
+			packageProductDependencies = (
+				EE43E473F512BA74095E135B /* VerovioToolkit */,
+			);
+			productName = LargeScore;
+			productReference = 4AC98224E7EA271BAF679320 /* LargeScore.app */;
+			productType = "com.apple.product-type.application";
+		};
+		11CAC36B8FD72792445847AF /* LargeScoreTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DE4BFAE7C0008B95264C0EB1 /* Build configuration list for PBXNativeTarget "LargeScoreTests" */;
+			buildPhases = (
+				D56599C365F39616B953C6F9 /* Sources */,
+				05A10B9E1C9587802DAC6C14 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D9222636148DB8495BEDF01E /* PBXTargetDependency */,
+			);
+			name = LargeScoreTests;
+			packageProductDependencies = (
+			);
+			productName = LargeScoreTests;
+			productReference = FDE7041B4B6767A23CD8453C /* LargeScoreTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		6F984EC1099F46D615619096 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					0B7ACDFB3C1C54F07B2AA689 = {
+						DevelopmentTeam = "";
+					};
+					11CAC36B8FD72792445847AF = {
+						DevelopmentTeam = "";
+					};
+				};
+			};
+			buildConfigurationList = E47409E21889DFE3A121FB2E /* Build configuration list for PBXProject "LargeScore" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 84A083FD701D41F1769987D4;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				41CE53A2B10745219AF77A84 /* XCLocalSwiftPackageReference "Packages/VerovioKit" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 6588254F01B8CCCCDFE3ADBE /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				0B7ACDFB3C1C54F07B2AA689 /* LargeScore */,
+				11CAC36B8FD72792445847AF /* LargeScoreTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		05A10B9E1C9587802DAC6C14 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FBD1B36E028B2C52EA17DB80 /* long-piece.musicxml in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B17844B39C497C46D16828DF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				ED294601DA4AD99B5FA233A5 /* evening-air.musicxml in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		2A1BDD6A8AC643C0B6F2E941 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3753B5939D0C165FE98888C9 /* Engraver.swift in Sources */,
+				E6E7DAF75C872D89F7292D88 /* LargeScoreApp.swift in Sources */,
+				7D1319FD90D71337F5CBCAD0 /* PartSplitter.swift in Sources */,
+				E78147419B69271BDDC75854 /* SVGScene.swift in Sources */,
+				7B4E87776861141FEC3495C0 /* ScoreCanvas.swift in Sources */,
+				83752A35C6A930749E128C75 /* SpikeReaderView.swift in Sources */,
+				0177389474DFC4FA754E83EC /* VerovioEngraver.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D56599C365F39616B953C6F9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4B55282274225FC6D37EF85D /* EngravingTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		D9222636148DB8495BEDF01E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0B7ACDFB3C1C54F07B2AA689 /* LargeScore */;
+			targetProxy = 171A350FAF4CAF085AAFE396 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		121AB374FB53B7EFFED573BC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = be.kvds.largescore.tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LargeScore.app/LargeScore";
+			};
+			name = Release;
+		};
+		4F32D248E4FE5A3A981F39FC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = be.kvds.largescore.tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LargeScore.app/LargeScore";
+			};
+			name = Debug;
+		};
+		9D2F0BDE045B66B5E15624C9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 1;
+				INFOPLIST_FILE = LargeScore/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = be.kvds.largescore;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		C96853396B075DD0546A40F6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 2;
+			};
+			name = Release;
+		};
+		EC9BB85F0C36AC66ADA6A0A5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 2;
+			};
+			name = Debug;
+		};
+		F0BF70078A761E9EC6722EDF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 1;
+				INFOPLIST_FILE = LargeScore/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = be.kvds.largescore;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1D76051445D996BECA6B9F28 /* Build configuration list for PBXNativeTarget "LargeScore" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9D2F0BDE045B66B5E15624C9 /* Debug */,
+				F0BF70078A761E9EC6722EDF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		DE4BFAE7C0008B95264C0EB1 /* Build configuration list for PBXNativeTarget "LargeScoreTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4F32D248E4FE5A3A981F39FC /* Debug */,
+				121AB374FB53B7EFFED573BC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		E47409E21889DFE3A121FB2E /* Build configuration list for PBXProject "LargeScore" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EC9BB85F0C36AC66ADA6A0A5 /* Debug */,
+				C96853396B075DD0546A40F6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		41CE53A2B10745219AF77A84 /* XCLocalSwiftPackageReference "Packages/VerovioKit" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/VerovioKit;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		EE43E473F512BA74095E135B /* VerovioToolkit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = VerovioToolkit;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 6F984EC1099F46D615619096 /* Project object */;
+}

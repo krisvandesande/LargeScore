@@ -1,0 +1,42 @@
+// swift-tools-version:5.9
+// Verovio's own targets, unchanged, over the unmodified source in ./verovio
+// (fetched by scripts/fetch-verovio.sh). Verovio's Package.swift declares a test
+// target without a folder, which stops it resolving as a dependency.
+import PackageDescription
+
+let package = Package(
+    name: "VerovioKit",
+    platforms: [.iOS(.v16), .macOS(.v11)],
+    products: [
+        .library(name: "VerovioToolkit", targets: ["VerovioToolkit"])
+    ],
+    targets: [
+        .target(
+            name: "VerovioCore",
+            path: "verovio",
+            sources: ["src", "libmei/dist", "libmei/addons", "tools/c_wrapper.cpp"],
+            publicHeadersPath: "bindings/swift-core",
+            cxxSettings: [
+                .headerSearchPath("include/crc"),
+                .headerSearchPath("include/hum"),
+                .headerSearchPath("include/json"),
+                .headerSearchPath("include/midi"),
+                .headerSearchPath("include/pugi"),
+                .headerSearchPath("include/tuning-library"),
+                .headerSearchPath("include/utf8"),
+                .headerSearchPath("include/vrv"),
+                .headerSearchPath("include/zip"),
+                .headerSearchPath("libmei/dist"),
+                .headerSearchPath("libmei/addons"),
+                .unsafeFlags(["-std=c++23"])
+            ]
+        ),
+        .target(
+            name: "VerovioToolkit",
+            dependencies: ["VerovioCore"],
+            path: "verovio",
+            sources: ["bindings/swift-toolkit"],
+            resources: [.copy("data")]
+        )
+    ]
+)

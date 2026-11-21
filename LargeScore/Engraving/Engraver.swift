@@ -1,0 +1,37 @@
+import Foundation
+import CoreGraphics
+
+/// The size and shape a piece is laid out for.
+nonisolated struct LayoutRequest: Hashable, Sendable {
+    /// The area the music is drawn in, in points.
+    var pageSize: CGSize
+    /// Height of one five-line staff, in points.
+    var staffHeight: CGFloat
+    /// Heavier lines than print, for low vision.
+    var bold: Bool = true
+}
+
+/// One engraved page.
+nonisolated struct EngravedPage: Sendable {
+    var number: Int
+    var svg: String
+}
+
+/// A piece laid out for one request.
+nonisolated struct EngravedScore: Sendable {
+    var request: LayoutRequest
+    var pages: [EngravedPage]
+    /// Time spent engraving, for the speed checks.
+    var duration: Duration
+}
+
+/// Anything that turns MusicXML into pages. Verovio today; kept behind this so
+/// another engraver could take its place.
+nonisolated protocol Engraver: Sendable {
+    func engrave(musicXML: String, request: LayoutRequest) async throws -> EngravedScore
+}
+
+nonisolated enum EngravingError: Error, Equatable {
+    case unreadable
+    case empty
+}

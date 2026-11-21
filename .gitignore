@@ -1,0 +1,17 @@
+## Xcode
+build/
+DerivedData/
+*.xcuserstate
+xcuserdata/
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+## macOS
+.DS_Store
+
+## Verovio source, fetched by scripts/fetch-verovio.sh
+Packages/VerovioKit/verovio/
+
+## App Store Connect credentials
+scripts/asc.env
