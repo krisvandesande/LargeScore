@@ -97,6 +97,37 @@ cat > "$EXPORT_OPTIONS" <<'PLIST'
 </plist>
 PLIST
 
+# The Mac build is Mac Catalyst: its own profile, and a package signed with the
+# installer certificate.
+MAC_EXPORT_OPTIONS="$ARCHIVE_DIR/ExportOptionsMac.plist"
+cat > "$MAC_EXPORT_OPTIONS" <<'PLIST'
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>method</key>
+	<string>app-store-connect</string>
+	<key>destination</key>
+	<string>upload</string>
+	<key>signingStyle</key>
+	<string>manual</string>
+	<key>signingCertificate</key>
+	<string>Apple Distribution</string>
+	<key>installerSigningCertificate</key>
+	<string>3rd Party Mac Developer Installer</string>
+	<key>provisioningProfiles</key>
+	<dict>
+		<key>com.kvds.LargeScore</key>
+		<string>Large Score Mac App Store</string>
+	</dict>
+	<key>teamID</key>
+	<string>UJJPJ9ZHNN</string>
+	<key>manageAppVersionAndBuildNumber</key>
+	<false/>
+</dict>
+</plist>
+PLIST
+
 # The build number the API should wait for, read from the project rather than guessed,
 # so a concurrent upload from Xcode can't be mistaken for this one.
 BUILD_NUMBER=$(xcodebuild -project LargeScore.xcodeproj -target LargeScore -showBuildSettings 2>/dev/null \
@@ -104,7 +135,7 @@ BUILD_NUMBER=$(xcodebuild -project LargeScore.xcodeproj -target LargeScore -show
 echo "Releasing build ${BUILD_NUMBER}"
 
 archive_and_upload() {
-  local platform="$1" archive="$2"
+  local platform="$1" archive="$2" options="${3:-$EXPORT_OPTIONS}"
 
   # Signed with the App Store Connect key, as Chester and Hideaway are. It used to go
   # through Xcode's signed-in account, because the key can only *download* profiles,
@@ -127,18 +158,20 @@ archive_and_upload() {
     -destination "generic/platform=${platform}" \
     -archivePath "$archive" \
     "${auth[@]}"
+  # Archives keep the plain name; a tagged one means the naming settings broke.
+  if ls "$archive/Products/Applications" | grep -q "("; then echo "error: the archived app is named for a local build (Debug or Test), not uploading" >&2; exit 1; fi
 
   echo "==> Uploading ${platform} build"
   xcodebuild -exportArchive \
     -archivePath "$archive" \
-    -exportOptionsPlist "$EXPORT_OPTIONS" \
+    -exportOptionsPlist "$options" \
     -exportPath "$ARCHIVE_DIR/export-${platform// /-}" \
     "${auth[@]}"
 }
 
 archive_and_upload "iOS" "$ARCHIVE_DIR/LargeScore-iOS.xcarchive"
 if [ "$BUILD_MAC" = yes ]; then
-  archive_and_upload "macOS" "$ARCHIVE_DIR/LargeScore-macOS.xcarchive"
+  archive_and_upload "macOS,variant=Mac Catalyst" "$ARCHIVE_DIR/LargeScore-macOS.xcarchive" "$MAC_EXPORT_OPTIONS"
 fi
 
 echo "==> Waiting for processing, then adding testers"

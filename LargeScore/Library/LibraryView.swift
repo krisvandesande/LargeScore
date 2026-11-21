@@ -22,11 +22,10 @@ struct LibraryView: View {
     @Environment(\.modelContext) private var context
     @AppStorage("librarySort") private var sort = Sort.title
     @State private var search = ""
-    @State private var choosingFiles = false
 
     var body: some View {
         NavigationStack {
-            LibraryGrid(sort: sort, search: search, addMusic: { choosingFiles = true })
+            LibraryGrid(sort: sort, search: search, addMusic: { importer.choosingFiles = true })
                 .background(Palette.ground)
                 .navigationTitle("Library")
                 .searchable(text: $search, prompt: Text("Title or Composer"))
@@ -41,11 +40,11 @@ struct LibraryView: View {
                         }
                         .accessibilityLabel("Sort")
                         .accessibilityValue(Text(sort.title))
-                        Button("Add Music") { choosingFiles = true }
+                        Button("Add Music") { importer.choosingFiles = true }
                     }
                 }
         }
-        .fileImporter(isPresented: $choosingFiles, allowedContentTypes: UTType.musicFiles, allowsMultipleSelection: true) { result in
+        .fileImporter(isPresented: Bindable(importer).choosingFiles, allowedContentTypes: UTType.musicFiles, allowsMultipleSelection: true) { result in
             guard case .success(let urls) = result else { return }
             Task { await importer.receive(urls, instruments: settings.instruments, context: context) }
         }

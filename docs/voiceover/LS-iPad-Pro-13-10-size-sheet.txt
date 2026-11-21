@@ -1,0 +1,12 @@
+            Text: Music Size
+            Button: Done
+            Button: Smaller
+            Button: Larger
+            Text: Size 4 of 7
+            Button: Less
+            Button: Normal
+            Text: Normal
+            Button: More
+            Button: Thin
+            Button: Bold
+            Text: Bold

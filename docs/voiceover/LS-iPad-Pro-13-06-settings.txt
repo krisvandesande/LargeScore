@@ -1,0 +1,36 @@
+            Text: Settings
+            Button: Music Size, Size 4 of 7
+            Text: Music Size
+            Text: Music Size, Size 4 of 7
+            Button: Space Between Lines, Normal
+            Text: Normal
+            Text: Space Between Lines
+            Button: Lines, Bold
+            Text: Bold
+            Text: Lines
+            Button: Page, Light
+            Text: Light
+            Text: Page
+            Switch: Half-Page Turns = 0
+            Text: Half-Page Turns
+            Switch:  = 0
+            Text: A half-page turn shows the top of the next page first, so you can read ahead while you finish the bottom.
+            Button: Instruments, Bassoon
+            Text: Instruments
+            Text: Instruments, Bassoon
+            Button: Language
+            Text: Music Folder
+            Text: Music Folder, None
+            Text: Music Folder
+            Button: Choose Folder
+            Text: New and changed MusicXML files in this folder are added to the library whenever Large Score comes to the front. A new version replaces the music of the piece and keeps your notes.
+            Button: About
+            Text: About
+            Button: Today [music.note.list]
+            Button: Today [music.note.list]
+            Button: Programmes [list.number]
+            Button: Programmes [list.number]
+            Button: Library [books.vertical]
+            Button: Library [books.vertical]
+            Button: Settings [gearshape]
+            Button: Settings [gearshape]

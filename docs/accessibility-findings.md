@@ -48,3 +48,11 @@ Changes from Kris's first look at build 1:
 - **Notes landed off their bars.** Verovio's page units are 9/8 of a point, and the notes were drawn and read in points. They're now drawn inside the music's own transform and touches are converted; checked at sizes 4 and 6 of 7 that a circle, a highlight, a breath mark and ink stay on their bars.
 - **The notes palette stops growing at xxxLarge**, like the reader's strip: written down as intended (the audit's "partially unsupported" on its buttons).
 - **Writing notes is a visual task.** VoiceOver hears how many notes a page has ("Page 1 of 2, bars 1 to 8, 3 notes") and every tool has a spoken name ("Finger 3" for the button showing 3); placing marks needs sight, which is written down rather than worked around.
+
+## Phase 7, 2026-11-21
+
+- **Sizes:** the sweep now runs on the iPad mini, the standard iPad (A16) and the iPad Pro 13, standard and AX5, light and dark, with landscape shots of the library and the reader on each.
+- **Reading order:** each screen's accessibility tree is written to `docs/voiceover/<device>-<screen>.txt` by `AccessibilityTreeTests`, kept so a later run shows what changed. The reader is heard as the music first ("Evening Air for Four, Page 1 of 1, bars 1 to 16"), then the strip.
+- **Spoken names:** every button, switch and field has one; the check counts the outermost control only, since a menu or switch shows as a named control around an unnamed inner one (Sort, Half-Page Turns). Tab buttons carry system icon ids ("music.note.list") as identifiers, but VoiceOver reads their labels ("Today").
+- **Contrast, audited on its own:** two flags, both kept. Undo in the notes palette is disabled until there is something to undo (40% opacity; WCAG exempts disabled controls). Add Music in the library toolbar was flagged in light and dark; measured on the screenshots it is 8.4:1 (light) and 8.1:1 (dark) against the toolbar's glass, so the audit misreads the glass.
+- **Still for a real iPad, by hand:** VoiceOver gestures on the page (swipe up and down to turn), Voice Control ("Tap Notes", "Tap Next Piece"), and how a piece reached by pedal is announced.

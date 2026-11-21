@@ -1,0 +1,20 @@
+          Other: Evening Air for Four = Page 1 of 1, bars 1 to 16 [page]
+          Button: Pen
+            Text: Pen
+          Button: Eraser
+          Button: Breath
+          Button: Fermata
+          Button: Finger 1
+          Button: Finger 2
+          Button: Finger 3
+          Button: Finger 4
+          Button: Finger 5
+          Button: Watch
+          Button: Circle Bar
+          Button: Highlight Bar
+          Button: Undo
+          Button: Written Note
+          Button: Previous Page
+          Button: Next Page
+          Button: Done
+          Text: Page 1 of 1

@@ -1,0 +1,14 @@
+            Button: Add Music [BackButton]
+            Text: Evening Air for Four
+            Text: Title
+            TextField: Title = Evening Air for Four
+            Text: Composer
+            TextField: Composer = Test piece
+            Text: Parts
+            Button: Flute
+            Button: Clarinet in B♭
+            Button: Fagot
+            Text: Fagot
+            Button: Horn in F
+            Text: Choose more than one to read several lines together.
+            Text: Preview

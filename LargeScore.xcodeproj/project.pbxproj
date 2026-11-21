@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		0177389474DFC4FA754E83EC /* VerovioEngraver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22EE9AB0CE94FA8966AD7CBA /* VerovioEngraver.swift */; };
 		0E4CB7B5882A868A02DD96E0 /* harmony-and-tempo.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = 55357AD4C01A37DA6BAE963E /* harmony-and-tempo.musicxml */; };
+		0F024D30A30A960FEC7896E3 /* MusicFolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = C288A269A2E3EA86DD034CE5 /* MusicFolder.swift */; };
 		121D807792E20C06A68C05CF /* Style.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88BC77D691F165C1D798BE95 /* Style.swift */; };
 		13D9886FB2B8EE31F95311E9 /* Annotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA97B65AA93ABF968F556EF2 /* Annotation.swift */; };
 		15518B7968D3DD9DC0A07FCE /* evening-air-alto.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = 70789DA4CC8E4B5CFF85F2F5 /* evening-air-alto.musicxml */; };
@@ -38,10 +39,12 @@
 		9E79071A7C052DE7EE7F08B7 /* NotesStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25DB924C78D55FA8D3C71F4C /* NotesStore.swift */; };
 		A85C945FA5919F696B4D025D /* ProgrammeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D2A5F76D09D30FD53EF78D8 /* ProgrammeTests.swift */; };
 		AAB105C83CD709E37C2A54B1 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F84B9B4A9ECB304F011F2454 /* SettingsView.swift */; };
+		B1E1FCD95D45DC60299416B0 /* AccessibilityTreeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A482B89B6020A71EF68FBFD0 /* AccessibilityTreeTests.swift */; };
 		B7FABC4CE2CF4E0CD8C8957D /* long-piece.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = CC2650C197E81A824BD81899 /* long-piece.musicxml */; };
 		B861C91F1E7EB4A9FF927E23 /* MarkRenderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67BE2F6AC6FD73DD22EB2E8B /* MarkRenderTests.swift */; };
 		B8E2B41CE24CB3C0616A654E /* ImportSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45C9CB78E24BC8C1D9F23D28 /* ImportSession.swift */; };
 		C01B1F925B264F392B764D52 /* ReaderSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FF77D829CA58D403A3BE0DC /* ReaderSettings.swift */; };
+		C30EC66063AA58D60F923F1F /* RenderOutput.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D8417E61C09893DAEEE5C3 /* RenderOutput.swift */; };
 		D072985CFC4D85275CC3E3E3 /* TextLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6299FC9AB66EA749AB2CF385 /* TextLayout.swift */; };
 		D24D2E3EF301948729023D3F /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3A2F17269B7472AF6CFD6 /* OnboardingView.swift */; };
 		D903682E9AF2C340AAA29888 /* ProgrammesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A02DBCCD3AF37BB6FB086E /* ProgrammesView.swift */; };
@@ -72,6 +75,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		024291F72A51716EC58FF373 /* LargeScoreMac.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LargeScoreMac.entitlements; sourceTree = "<group>"; };
 		0838610092BDE0C0A68B0374 /* ThicknessRenderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThicknessRenderTests.swift; sourceTree = "<group>"; };
 		09D4E0A9194472104B818A2C /* NotesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotesTests.swift; sourceTree = "<group>"; };
 		11E71A1975CE6270736A016C /* MusicFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicFile.swift; sourceTree = "<group>"; };
@@ -102,7 +106,9 @@
 		7D45E730900A18783D457D9A /* evening-air-quartet.musicxml */ = {isa = PBXFileReference; path = "evening-air-quartet.musicxml"; sourceTree = "<group>"; };
 		88BC77D691F165C1D798BE95 /* Style.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Style.swift; sourceTree = "<group>"; };
 		8A52E6CE0252C886FD197F00 /* evening-air-quartet.mxl */ = {isa = PBXFileReference; path = "evening-air-quartet.mxl"; sourceTree = "<group>"; };
+		8B25E071C77C2ABEC446CA45 /* LargeScore.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LargeScore.entitlements; sourceTree = "<group>"; };
 		93DCD83E23A8A9966544EF13 /* ReaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderTests.swift; sourceTree = "<group>"; };
+		A482B89B6020A71EF68FBFD0 /* AccessibilityTreeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessibilityTreeTests.swift; sourceTree = "<group>"; };
 		A64C9C1F5D246BD26E7EB0ED /* LayoutKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayoutKit.swift; sourceTree = "<group>"; };
 		AA8AEE0316D267D3D6F31DEA /* VerovioKit */ = {isa = PBXFileReference; lastKnownFileType = folder; name = VerovioKit; path = Packages/VerovioKit; sourceTree = SOURCE_ROOT; };
 		AA97B65AA93ABF968F556EF2 /* Annotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Annotation.swift; sourceTree = "<group>"; };
@@ -110,6 +116,8 @@
 		B770B7CA621635E8184DEDB0 /* Engraver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Engraver.swift; sourceTree = "<group>"; };
 		BC28BC7AB931DB55F6791614 /* Score.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Score.swift; sourceTree = "<group>"; };
 		BEA09A15929E52433660615B /* ImportTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportTests.swift; sourceTree = "<group>"; };
+		C0D8417E61C09893DAEEE5C3 /* RenderOutput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenderOutput.swift; sourceTree = "<group>"; };
+		C288A269A2E3EA86DD034CE5 /* MusicFolder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicFolder.swift; sourceTree = "<group>"; };
 		C38FABE19590F985BF6CD2A6 /* SVGScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SVGScene.swift; sourceTree = "<group>"; };
 		C59890C33E6B1A7D558DEC5B /* LargeScoreUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = LargeScoreUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CC2650C197E81A824BD81899 /* long-piece.musicxml */ = {isa = PBXFileReference; path = "long-piece.musicxml"; sourceTree = "<group>"; };
@@ -224,6 +232,7 @@
 				09D4E0A9194472104B818A2C /* NotesTests.swift */,
 				5D2A5F76D09D30FD53EF78D8 /* ProgrammeTests.swift */,
 				93DCD83E23A8A9966544EF13 /* ReaderTests.swift */,
+				C0D8417E61C09893DAEEE5C3 /* RenderOutput.swift */,
 				4F6192D965D015D4432C9E71 /* TextAndFillTests.swift */,
 				0838610092BDE0C0A68B0374 /* ThicknessRenderTests.swift */,
 			);
@@ -247,6 +256,7 @@
 				45C9CB78E24BC8C1D9F23D28 /* ImportSession.swift */,
 				2135B1AA56EFBB86D0F3C587 /* ImportSheet.swift */,
 				11E71A1975CE6270736A016C /* MusicFile.swift */,
+				C288A269A2E3EA86DD034CE5 /* MusicFolder.swift */,
 				1F8F166C31D3BB62BA66B3B9 /* ZipReader.swift */,
 			);
 			path = Import;
@@ -257,6 +267,8 @@
 			children = (
 				72E33B44B559B76024D3E0EB /* Assets.xcassets */,
 				D70C85A52005056D240202DE /* Info.plist */,
+				8B25E071C77C2ABEC446CA45 /* LargeScore.entitlements */,
+				024291F72A51716EC58FF373 /* LargeScoreMac.entitlements */,
 				21FCDEC6F400623C55EC368B /* Localizable.xcstrings */,
 				28661CD864A83CFCE84FF1EA /* App */,
 				6F11285E53C1AF4CC79B682F /* Engraving */,
@@ -296,6 +308,7 @@
 		BB7F17FACAEEC70C0FF6B2C7 /* LargeScoreUITests */ = {
 			isa = PBXGroup;
 			children = (
+				A482B89B6020A71EF68FBFD0 /* AccessibilityTreeTests.swift */,
 				6F3D4B823D53D688EADE29A3 /* ScreenSweepTests.swift */,
 			);
 			path = LargeScoreUITests;
@@ -463,6 +476,7 @@
 				1E3E694D612E7296C55AA653 /* LayoutKit.swift in Sources */,
 				224DA9E13A57C61C072D5DC8 /* LibraryView.swift in Sources */,
 				49B0D03FE11C4AFCF5689BBF /* MusicFile.swift in Sources */,
+				0F024D30A30A960FEC7896E3 /* MusicFolder.swift in Sources */,
 				9E79071A7C052DE7EE7F08B7 /* NotesStore.swift in Sources */,
 				D24D2E3EF301948729023D3F /* OnboardingView.swift in Sources */,
 				2BDABFE1171DE6A0406AC014 /* PageTurner.swift in Sources */,
@@ -494,6 +508,7 @@
 				4671B617995AEB38015B2608 /* NotesTests.swift in Sources */,
 				A85C945FA5919F696B4D025D /* ProgrammeTests.swift in Sources */,
 				FA5AF9ED6A3C5BAEB3764FB4 /* ReaderTests.swift in Sources */,
+				C30EC66063AA58D60F923F1F /* RenderOutput.swift in Sources */,
 				FA379FE0D2838E71017A5D01 /* TextAndFillTests.swift in Sources */,
 				9173E0D4267A293A5B6E6EC1 /* ThicknessRenderTests.swift in Sources */,
 			);
@@ -503,6 +518,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B1E1FCD95D45DC60299416B0 /* AccessibilityTreeTests.swift in Sources */,
 				3BA5A283ABCA62CF09902A13 /* ScreenSweepTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -536,7 +552,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.kvds.LargeScore.Tests;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LargeScore.app/LargeScore";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/$(APP_PRODUCT_NAME).app/LargeScore";
 			};
 			name = Release;
 		};
@@ -553,7 +569,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.kvds.LargeScore.Tests;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LargeScore.app/LargeScore";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/$(APP_PRODUCT_NAME).app/LargeScore";
 			};
 			name = Debug;
 		};
@@ -599,8 +615,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = LargeScore/LargeScore.entitlements;
+				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = LargeScore/LargeScoreMac.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 3;
+				EXECUTABLE_NAME = LargeScore;
 				INFOPLIST_FILE = LargeScore/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -608,6 +627,8 @@
 				);
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.kvds.LargeScore;
+				PRODUCT_MODULE_NAME = LargeScore;
+				PRODUCT_NAME = "$(APP_PRODUCT_NAME)";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -617,6 +638,16 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				APP_DISPLAY_NAME = "$(APP_DISPLAY_NAME_$(APP_NAME_KIND))";
+				APP_DISPLAY_NAME_PLAIN = "Large Score";
+				APP_DISPLAY_NAME_TAGGED = "$(APP_TAGGED_NAME)";
+				APP_NAME_KIND = "$(APP_NAME_KIND_$(DEPLOYMENT_LOCATION))";
+				APP_NAME_KIND_NO = TAGGED;
+				APP_NAME_KIND_YES = PLAIN;
+				APP_PRODUCT_NAME = "$(APP_PRODUCT_NAME_$(APP_NAME_KIND))";
+				APP_PRODUCT_NAME_PLAIN = LargeScore;
+				APP_PRODUCT_NAME_TAGGED = "$(APP_TAGGED_NAME)";
+				APP_TAGGED_NAME = "$(APP_DISPLAY_NAME_PLAIN) (Test)";
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -648,6 +679,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DERIVE_MACCATALYST_PRODUCT_BUNDLE_IDENTIFIER = NO;
 				DEVELOPMENT_TEAM = UJJPJ9ZHNN;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -665,7 +697,7 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
-				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MACCATALYST = YES;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -674,7 +706,7 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 6.0;
-				TARGETED_DEVICE_FAMILY = 2;
+				TARGETED_DEVICE_FAMILY = "2,6";
 			};
 			name = Release;
 		};
@@ -682,6 +714,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				APP_DISPLAY_NAME = "$(APP_DISPLAY_NAME_$(APP_NAME_KIND))";
+				APP_DISPLAY_NAME_PLAIN = "Large Score";
+				APP_DISPLAY_NAME_TAGGED = "$(APP_TAGGED_NAME)";
+				APP_NAME_KIND = TAGGED;
+				APP_PRODUCT_NAME = "$(APP_PRODUCT_NAME_$(APP_NAME_KIND))";
+				APP_PRODUCT_NAME_PLAIN = LargeScore;
+				APP_PRODUCT_NAME_TAGGED = "$(APP_TAGGED_NAME)";
+				APP_TAGGED_NAME = "$(APP_DISPLAY_NAME_PLAIN) (Debug)";
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -713,6 +753,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DERIVE_MACCATALYST_PRODUCT_BUNDLE_IDENTIFIER = NO;
 				DEVELOPMENT_TEAM = UJJPJ9ZHNN;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -737,7 +778,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
-				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MACCATALYST = YES;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
@@ -746,7 +787,7 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 6.0;
-				TARGETED_DEVICE_FAMILY = 2;
+				TARGETED_DEVICE_FAMILY = "2,6";
 			};
 			name = Debug;
 		};
@@ -754,8 +795,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = LargeScore/LargeScore.entitlements;
+				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = LargeScore/LargeScoreMac.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 3;
+				EXECUTABLE_NAME = LargeScore;
 				INFOPLIST_FILE = LargeScore/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -763,6 +807,8 @@
 				);
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.kvds.LargeScore;
+				PRODUCT_MODULE_NAME = LargeScore;
+				PRODUCT_NAME = "$(APP_PRODUCT_NAME)";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

@@ -6,17 +6,35 @@ struct LargeScoreApp: App {
     @State private var settings = ReaderSettings(store: LaunchOptions.store)
     @State private var loader = ScoreLoader()
     @State private var importer = ImportCoordinator()
+    @State private var folder = MusicFolder(store: LaunchOptions.store)
+    @State private var section = RootView.Section.library
     private let container = LaunchOptions.container
 
     var body: some Scene {
         WindowGroup {
-            RootView()
+            RootView(section: $section)
                 .environment(settings)
                 .environment(loader)
                 .environment(importer)
+                .environment(folder)
                 .tint(Palette.accent)
         }
         .modelContainer(container)
+        .commands {
+            // The main actions from the keyboard, listed in the menus.
+            CommandGroup(replacing: .newItem) {
+                Button("Add Music…") {
+                    section = .library
+                    importer.choosingFiles = true
+                }
+                .keyboardShortcut("o")
+                Button("New Programme") {
+                    section = .programmes
+                    importer.namingProgramme = true
+                }
+                .keyboardShortcut("n")
+            }
+        }
     }
 }
 
@@ -25,8 +43,10 @@ struct RootView: View {
 
     @Environment(ReaderSettings.self) private var settings
     @Environment(ImportCoordinator.self) private var importer
+    @Environment(MusicFolder.self) private var folder
     @Environment(\.modelContext) private var context
-    @State private var section = Section.library
+    @Environment(\.scenePhase) private var phase
+    @Binding var section: Section
 
     var body: some View {
         @Bindable var importer = importer
@@ -38,6 +58,13 @@ struct RootView: View {
             }
             .sheet(item: $importer.session) { session in
                 ImportSheet(session: session)
+            }
+            .onChange(of: phase, initial: true) { _, now in
+                // The music folder is looked at whenever the app comes to the front.
+                guard now == .active, folder.isSet else { folder.stopWatching(); return }
+                let look = { Task { await folder.look(instruments: settings.instruments, context: context, importer: importer) } }
+                _ = look()
+                folder.startWatching { _ = look() }
             }
             .task {
                 // Open on Today's programme when there is one.
@@ -83,7 +110,10 @@ enum LaunchOptions {
 
     static var container: ModelContainer {
         let inMemory = ProcessInfo.processInfo.arguments.contains("-resetSettings")
-        let configuration = ModelConfiguration(isStoredInMemoryOnly: inMemory, cloudKitDatabase: .none)
+        // Synced through the iCloud container in the entitlements once there is one
+        // (scripts/enable-icloud.sh); until then, and in tests, on this device only.
+        let configuration = ModelConfiguration(isStoredInMemoryOnly: inMemory,
+                                               cloudKitDatabase: inMemory ? .none : .automatic)
         do {
             return try ModelContainer(for: Score.self, Programme.self, ProgrammeEntry.self, Annotation.self, configurations: configuration)
         } catch {

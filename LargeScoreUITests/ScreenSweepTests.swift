@@ -132,6 +132,13 @@ final class ScreenSweepTests: XCTestCase {
                 app.buttons["Add 3 Pieces"].tap()
                 XCTAssertTrue(card(app).waitForExistence(timeout: 10))
                 shot(app, "10-library", variant: variant)
+                if !dark {
+                    XCUIDevice.shared.orientation = .landscapeLeft
+                    sleep(1)
+                    shot(app, "10-library-landscape", variant: variant)
+                    XCUIDevice.shared.orientation = .portrait
+                    sleep(1)
+                }
                 if !dark { audit(app, "library-\(sizeName)") }
 
                 app.buttons["Today"].firstMatch.tap()
@@ -153,6 +160,13 @@ final class ScreenSweepTests: XCTestCase {
                 XCTAssertTrue(page.waitForExistence(timeout: 10))
                 sleep(2)
                 shot(app, "20-reader-page1", variant: variant)
+                if !dark {
+                    XCUIDevice.shared.orientation = .landscapeLeft
+                    sleep(2)
+                    shot(app, "20-reader-landscape", variant: variant)
+                    XCUIDevice.shared.orientation = .portrait
+                    sleep(2)
+                }
                 if !dark { audit(app, "reader-\(sizeName)") }
                 // Turn by a tap in the right part of the page.
                 page.coordinate(withNormalizedOffset: CGVector(dx: 0.85, dy: 0.5)).tap()
@@ -296,7 +310,8 @@ final class ScreenSweepTests: XCTestCase {
         app.buttons["Written Note"].tap()
         let editor = app.textViews.firstMatch
         XCTAssertTrue(editor.waitForExistence(timeout: 5))
-        sleep(1)
+        if !app.keyboards.firstMatch.waitForExistence(timeout: 3) { editor.tap() }
+        XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 5))
         app.typeText("Breathe before B")
         shot(app, "605-written-note", variant: "standard-light")
         app.navigationBars.buttons["Done"].firstMatch.tap()

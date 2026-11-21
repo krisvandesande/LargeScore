@@ -3,6 +3,10 @@ import UIKit
 
 struct SettingsView: View {
     @Environment(ReaderSettings.self) private var settings
+    @Environment(MusicFolder.self) private var folder
+    @Environment(ImportCoordinator.self) private var importer
+    @Environment(\.modelContext) private var context
+    @State private var choosingFolder = false
 
     var body: some View {
         @Bindable var settings = settings
@@ -48,6 +52,27 @@ struct SettingsView: View {
                         }
                     }
                     .accessibilityHint("Opens Large Score in the Settings app, where the language is chosen.")
+                }
+                Section {
+                    LabeledContent("Music Folder") {
+                        Text(folder.folderName ?? String(localized: "None"))
+                    }
+                    Button(folder.isSet ? "Choose Another Folder" : "Choose Folder") { choosingFolder = true }
+                    if folder.isSet {
+                        Button("Stop Using This Folder", role: .destructive) { folder.forget() }
+                    }
+                } header: {
+                    Text("Music Folder")
+                } footer: {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("New and changed MusicXML files in this folder are added to the library whenever Large Score comes to the front. A new version replaces the music of the piece and keeps your notes.")
+                        if let result = folder.lastResult { Text(result) }
+                    }
+                }
+                .fileImporter(isPresented: $choosingFolder, allowedContentTypes: [.folder]) { result in
+                    guard case .success(let url) = result else { return }
+                    folder.choose(url)
+                    Task { await folder.look(instruments: settings.instruments, context: context, importer: importer) }
                 }
                 Section {
                     NavigationLink("About") { AboutView() }

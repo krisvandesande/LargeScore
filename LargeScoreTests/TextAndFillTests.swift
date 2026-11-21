@@ -39,7 +39,7 @@ struct TextAndFillTests {
             UIColor.white.setFill(); ctx.fill(CGRect(origin: .zero, size: size))
             ScoreCanvas.draw(page, in: ctx.cgContext, size: size, ink: UIColor.black.cgColor)
         }
-        try image.pngData()!.write(to: URL(fileURLWithPath: "/Users/kris/Developer/LargeScore/build/harmony.png"))
+        try image.pngData()!.write(to: renderOutput("harmony.png"))
     }
 
     @Test func pagesFillWithoutRunningOff() async throws {

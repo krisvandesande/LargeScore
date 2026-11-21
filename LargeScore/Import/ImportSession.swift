@@ -103,6 +103,10 @@ final class ImportSession: Identifiable {
 @Observable
 final class ImportCoordinator {
     var session: ImportSession?
+    /// Set by the Add Music command (⌘O) to open the file picker.
+    var choosingFiles = false
+    /// Set by the New Programme command (⌘N).
+    var namingProgramme = false
     private(set) var isReading = false
 
     func receive(_ urls: [URL], instruments: [Instrument], context: ModelContext) async {

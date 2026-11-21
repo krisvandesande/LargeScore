@@ -1,0 +1,12 @@
+            Button: Cancel
+            Button: Add 3 Pieces
+            Text: Add Music
+            Button: Evening Air for Four, Fagot
+            Text: Evening Air for Four
+            Text: Fagot
+            Button: Evening Air for Four, Fagot
+            Text: Evening Air for Four
+            Text: Fagot
+            Button: Long Evening Air, Bassoon
+            Text: Long Evening Air
+            Text: Bassoon

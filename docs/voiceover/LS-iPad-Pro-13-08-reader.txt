@@ -1,0 +1,7 @@
+          Other: Evening Air for Four = Page 1 of 1, bars 1 to 16 [page]
+          Button: Back to Library
+            Text: Library
+          Button: Notes
+          Button: Music Size
+          Text: Evening Air for Four
+          Text: Page 1 of 1

@@ -10,12 +10,33 @@ settings:
     SWIFT_DEFAULT_ACTOR_ISOLATION: MainActor
     SWIFT_APPROACHABLE_CONCURRENCY: YES
     DEVELOPMENT_TEAM: UJJPJ9ZHNN
-    TARGETED_DEVICE_FAMILY: "2"
-    SUPPORTS_MACCATALYST: NO
+    TARGETED_DEVICE_FAMILY: "2,6"
+    SUPPORTS_MACCATALYST: YES
+    # One app on iPad and Mac: the Mac build keeps the iPad's bundle id.
+    DERIVE_MACCATALYST_PRODUCT_BUNDLE_IDENTIFIER: NO
     SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD: NO
     SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD: NO
     LOCALIZATION_PREFERS_STRING_CATALOGS: YES
     SWIFT_EMIT_LOC_STRINGS: YES
+    # Local builds say what they are in their name: "Large Score (Debug).app",
+    # "Large Score (Test).app" for a Release build that isn't archived. Archives
+    # (TestFlight, App Store) keep the plain name. The home screen name stays
+    # "Large Score" (Info.plist). Bundle identifier unchanged.
+    APP_PRODUCT_NAME_PLAIN: LargeScore
+    APP_DISPLAY_NAME_PLAIN: Large Score
+    APP_PRODUCT_NAME_TAGGED: $(APP_TAGGED_NAME)
+    APP_DISPLAY_NAME_TAGGED: $(APP_TAGGED_NAME)
+    APP_PRODUCT_NAME: $(APP_PRODUCT_NAME_$(APP_NAME_KIND))
+    APP_DISPLAY_NAME: $(APP_DISPLAY_NAME_$(APP_NAME_KIND))
+  configs:
+    Debug:
+      APP_TAGGED_NAME: $(APP_DISPLAY_NAME_PLAIN) (Debug)
+      APP_NAME_KIND: TAGGED
+    Release:
+      APP_TAGGED_NAME: $(APP_DISPLAY_NAME_PLAIN) (Test)
+      APP_NAME_KIND: $(APP_NAME_KIND_$(DEPLOYMENT_LOCATION))
+      APP_NAME_KIND_NO: TAGGED
+      APP_NAME_KIND_YES: PLAIN
 packages:
   VerovioKit:
     path: Packages/VerovioKit
@@ -32,6 +53,7 @@ targets:
       path: LargeScore/Info.plist
       properties:
         CFBundleDisplayName: Large Score
+        LSApplicationCategoryType: public.app-category.music
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         CFBundleDevelopmentRegion: en
@@ -44,7 +66,7 @@ targets:
           - UIInterfaceOrientationLandscapeLeft
           - UIInterfaceOrientationLandscapeRight
         ITSAppUsesNonExemptEncryption: false
-        LSSupportsOpeningDocumentsInPlace: false
+        LSSupportsOpeningDocumentsInPlace: true
         CFBundleDocumentTypes:
           - CFBundleTypeName: MusicXML
             CFBundleTypeRole: Viewer
@@ -76,6 +98,11 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.kvds.LargeScore
+        CODE_SIGN_ENTITLEMENTS: LargeScore/LargeScore.entitlements
+        "CODE_SIGN_ENTITLEMENTS[sdk=macosx*]": LargeScore/LargeScoreMac.entitlements
+        PRODUCT_NAME: $(APP_PRODUCT_NAME)
+        PRODUCT_MODULE_NAME: LargeScore
+        EXECUTABLE_NAME: LargeScore
         MARKETING_VERSION: "1.0"
         CURRENT_PROJECT_VERSION: "3"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
@@ -88,6 +115,7 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.kvds.LargeScore.Tests
+        TEST_HOST: $(BUILT_PRODUCTS_DIR)/$(APP_PRODUCT_NAME).app/LargeScore
         GENERATE_INFOPLIST_FILE: YES
   LargeScoreUITests:
     type: bundle.ui-testing

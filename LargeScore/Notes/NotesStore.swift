@@ -214,9 +214,10 @@ struct WrittenNoteSheet: View {
                 }
             }
         }
-        .onAppear {
-            text = store.note
-            // Ready to type at once.
+        .onAppear { text = store.note }
+        .task {
+            // Ready to type at once, once the sheet has finished coming up.
+            try? await Task.sleep(for: .milliseconds(400))
             focused = true
         }
     }

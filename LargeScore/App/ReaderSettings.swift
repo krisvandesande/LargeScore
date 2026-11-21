@@ -53,7 +53,8 @@ final class ReaderSettings {
         sizeStep = min(max(step, 0), Self.staffHeights.count - 1)
         boldLines = store.object(forKey: Key.boldLines) as? Bool ?? true
         lineSpacing = store.string(forKey: Key.lineSpacing).flatMap(LineSpacing.init) ?? .normal
-        pageColour = store.string(forKey: Key.pageColour).flatMap(PageColour.init) ?? .light
+        // The page follows the iPad: white on black in dark mode, unless chosen otherwise.
+        pageColour = store.string(forKey: Key.pageColour).flatMap(PageColour.init) ?? .system
         halfPageTurns = store.bool(forKey: Key.halfPageTurns)
         if let list = store.string(forKey: Key.instruments) {
             instruments = list.split(separator: " ").compactMap { Instrument(rawValue: String($0)) }

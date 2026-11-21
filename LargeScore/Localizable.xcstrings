@@ -208,6 +208,16 @@
         }
       }
     },
+    "Add Music…": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voeg muziek toe…"
+          }
+        }
+      }
+    },
     "Add Pieces": {
       "localizations": {
         "nl": {
@@ -234,6 +244,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Voeg toe aan programma"
+          }
+        }
+      }
+    },
+    "Added: %@": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toegevoegd: %@"
           }
         }
       }
@@ -318,22 +338,32 @@
         }
       }
     },
+    "Choose Another Folder": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kies een andere map"
+          }
+        }
+      }
+    },
+    "Choose Folder": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kies map"
+          }
+        }
+      }
+    },
     "Choose a part": {
       "localizations": {
         "nl": {
           "stringUnit": {
             "state": "translated",
             "value": "Kies een partij"
-          }
-        }
-      }
-    },
-    "Choose every instrument you play.": {
-      "localizations": {
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kies elk instrument dat je speelt."
           }
         }
       }
@@ -808,6 +838,16 @@
         }
       }
     },
+    "Music Folder": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Muziekmap"
+          }
+        }
+      }
+    },
     "Music Size": {
       "localizations": {
         "nl": {
@@ -844,6 +884,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Nieuw programma"
+          }
+        }
+      }
+    },
+    "New and changed MusicXML files in this folder are added to the library whenever Large Score comes to the front. A new version replaces the music of the piece and keeps your notes.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nieuwe en gewijzigde MusicXML-bestanden in deze map komen in de bibliotheek telkens Large Score op de voorgrond komt. Een nieuwe versie vervangt de muziek van het stuk en houdt je notities."
           }
         }
       }
@@ -934,6 +984,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Nog geen programma’s"
+          }
+        }
+      }
+    },
+    "None": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geen"
           }
         }
       }
@@ -1360,6 +1420,16 @@
         }
       }
     },
+    "Stop Using This Folder": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gebruik deze map niet meer"
+          }
+        }
+      }
+    },
     "The library is empty. Add music there first.": {
       "localizations": {
         "nl": {
@@ -1562,6 +1632,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Herstel"
+          }
+        }
+      }
+    },
+    "Updated: %@": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bijgewerkt: %@"
           }
         }
       }

@@ -1,0 +1,19 @@
+            Text: Which instruments do you play?
+            Button: Flute
+            Button: Oboe
+            Button: Clarinet
+            Button: Bassoon
+            Button: Saxophone
+            Button: Horn
+            Button: Trumpet
+            Button: Trombone
+            Button: Tuba
+            Button: Violin
+            Button: Viola
+            Button: Cello
+            Button: Double Bass
+            Button: Piano
+            Button: Organ
+            Button: Voice
+            Button: Other
+            Button: Continue

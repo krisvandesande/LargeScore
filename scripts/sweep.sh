@@ -1,6 +1,6 @@
 #!/bin/bash
-# Runs the screen sweep on fresh simulators made for the run: iPad mini upright and
-# iPad Pro 13-inch. Screenshots land in build/sweep/<date>/, audit lines in the log.
+# Runs the screen sweep on fresh simulators made for the run: iPad mini upright, the
+# standard iPad and iPad Pro 13-inch. Screenshots land in build/sweep/<date>/, audit lines in the log.
 # Crash reports from the simulators' own processes are checked after each run.
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -36,14 +36,15 @@ check_crashes() { # udid since
 
 MINI=$(fresh_simulator "iPad mini" com.apple.CoreSimulator.SimDeviceType.iPad-mini-A17-Pro)
 PRO=$(fresh_simulator "iPad Pro 13" com.apple.CoreSimulator.SimDeviceType.iPad-Pro-13-inch-M5-12GB)
+IPAD=$(fresh_simulator "iPad" com.apple.CoreSimulator.SimDeviceType.iPad-A16)
 STAMP=$(mktemp); touch "$STAMP"
 
-for UDID in $MINI $PRO; do
+for UDID in $MINI $IPAD $PRO; do
   xcrun simctl boot "$UDID" 2>/dev/null || true
   xcrun simctl bootstatus "$UDID" -b >/dev/null
-  TEST_RUNNER_SWEEP_DIR="$PWD/$OUT" xcodebuild -project LargeScore.xcodeproj -scheme LargeScore \
+  TEST_RUNNER_SWEEP_DIR="$PWD/$OUT" TEST_RUNNER_VOICEOVER_DIR="$PWD/docs/voiceover" xcodebuild -project LargeScore.xcodeproj -scheme LargeScore \
     -destination "id=$UDID" -derivedDataPath build/dd \
-    -only-testing:LargeScoreUITests test 2>&1 | tee "$OUT/log-$UDID.txt" | grep -E "AUDIT|✘|passed|failed|error:" || true
+    -only-testing:LargeScoreUITests test 2>&1 | tee "$OUT/log-$UDID.txt" | grep -E "AUDIT|CONTRAST|✘|passed|failed|error:" || true
   check_crashes "$UDID" "$STAMP" || true
   xcrun simctl shutdown "$UDID"
 done

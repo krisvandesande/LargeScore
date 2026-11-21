@@ -39,12 +39,7 @@ struct OnboardingView: View {
     private func content(viewport: CGSize) -> some View {
         switch step {
         case .instrument:
-            VStack(alignment: .leading, spacing: 12) {
-                ScreenTitle(text: "Which instruments do you play?")
-                Text("Choose every instrument you play.")
-                    .font(.title3)
-                    .foregroundStyle(.secondary)
-            }
+            ScreenTitle(text: "Which instruments do you play?")
             InstrumentGrid()
         case .size:
             VStack(alignment: .leading, spacing: 12) {

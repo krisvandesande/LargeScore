@@ -85,7 +85,7 @@ struct ReaderSettingsTests {
         let settings = ReaderSettings(store: suite)
         #expect(settings.sizeStep == ReaderSettings.defaultSizeStep)
         #expect(settings.boldLines)
-        #expect(settings.pageColour == .light)
+        #expect(settings.pageColour == .system)
         #expect(!settings.onboardingDone)
         settings.sizeStep = 6
         settings.instruments = [.viola, .cello]

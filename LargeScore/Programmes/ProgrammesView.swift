@@ -5,6 +5,7 @@ import SwiftData
 struct ProgrammesView: View {
     @Query(sort: \Programme.createdAt, order: .reverse) private var programmes: [Programme]
     @Environment(\.modelContext) private var context
+    @Environment(ImportCoordinator.self) private var commands
     @State private var naming = false
     @State private var newName = ""
     @State private var deleting: Programme?
@@ -59,6 +60,9 @@ struct ProgrammesView: View {
             }
             .navigationDestination(for: Programme.self) { programme in
                 ProgrammeDetail(programme: programme)
+            }
+            .onChange(of: commands.namingProgramme, initial: true) { _, asked in
+                if asked { naming = true; commands.namingProgramme = false }
             }
             .alert("New Programme", isPresented: $naming) {
                 TextField("Name", text: $newName)

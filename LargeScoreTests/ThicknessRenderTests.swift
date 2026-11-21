@@ -16,7 +16,7 @@ struct ThicknessRenderTests {
                 UIColor.white.setFill(); ctx.fill(CGRect(origin: .zero, size: size))
                 ScoreCanvas.draw(page, in: ctx.cgContext, size: size, ink: UIColor.black.cgColor, glyphWeight: staff / 4 * 0.07)
             }
-            try image.pngData()!.write(to: URL(fileURLWithPath: "/Users/kris/Developer/LargeScore/build/portrait-\(Int(staff)).png"))
+            try image.pngData()!.write(to: renderOutput("portrait-\(Int(staff)).png"))
         }
     }
 

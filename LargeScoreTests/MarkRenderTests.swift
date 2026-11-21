@@ -17,6 +17,6 @@ struct MarkRenderTests {
             ScoreCanvas.draw(page, in: ctx.cgContext, size: size, ink: UIColor.black.cgColor,
                              marks: (marks, geometry, UIColor.red.cgColor))
         }
-        try image.pngData()!.write(to: URL(fileURLWithPath: "/Users/kris/Developer/LargeScore/build/marks.png"))
+        try image.pngData()!.write(to: renderOutput("marks.png"))
     }
 }

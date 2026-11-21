@@ -1,0 +1,20 @@
+            Button: More [TopOverflowBarButtonItem]
+            Button: Search
+            Text: Library
+            Button: Evening Air for Four, Test piece
+            Text: Evening Air for Four
+            Text: Test piece
+            Button: Evening Air for Four, Test piece
+            Text: Evening Air for Four
+            Text: Test piece
+            Button: Long Evening Air, Test piece
+            Text: Long Evening Air
+            Text: Test piece
+            Button: Today [music.note.list]
+            Button: Today [music.note.list]
+            Button: Programmes [list.number]
+            Button: Programmes [list.number]
+            Button: Library [books.vertical]
+            Button: Library [books.vertical]
+            Button: Settings [gearshape]
+            Button: Settings [gearshape]
