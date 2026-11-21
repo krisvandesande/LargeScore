@@ -73,8 +73,18 @@ cat > "$EXPORT_OPTIONS" <<'PLIST'
 	<string>app-store-connect</string>
 	<key>destination</key>
 	<string>upload</string>
+	<!-- Manual: the App Store Connect key can't make profiles through Xcode's cloud
+	     signing ("No profiles for com.kvds.LargeScore"). The profile was made through
+	     the API (2026-11-21, "Large Score App Store") and is installed locally. -->
 	<key>signingStyle</key>
-	<string>automatic</string>
+	<string>manual</string>
+	<key>signingCertificate</key>
+	<string>Apple Distribution</string>
+	<key>provisioningProfiles</key>
+	<dict>
+		<key>com.kvds.LargeScore</key>
+		<string>Large Score App Store</string>
+	</dict>
 	<key>teamID</key>
 	<string>UJJPJ9ZHNN</string>
 	<key>uploadSymbols</key>
