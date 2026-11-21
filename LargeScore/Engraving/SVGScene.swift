@@ -19,6 +19,9 @@ nonisolated struct SVGScene: @unchecked Sendable {
     var systems: [CGRect]
     /// Bars on this page.
     var measureCount: Int
+    /// Each bar's staff area (from its staff lines, all staves), in page order and
+    /// viewBox units. Notes are anchored to these.
+    var measures: [CGRect]
 
     init?(svg: String) {
         let builder = SceneBuilder()
@@ -29,6 +32,7 @@ nonisolated struct SVGScene: @unchecked Sendable {
         items = builder.items
         systems = builder.systems
         measureCount = builder.measureCount
+        measures = builder.measures
     }
 }
 
@@ -39,6 +43,7 @@ nonisolated private final class SceneBuilder: NSObject, XMLParserDelegate {
     var items: [SVGScene.Item] = []
     var systems: [CGRect] = []
     var measureCount = 0
+    var measures: [CGRect] = []
 
     private struct Frame {
         var transform: CGAffineTransform
@@ -46,6 +51,9 @@ nonisolated private final class SceneBuilder: NSObject, XMLParserDelegate {
         var bold: Bool
         var defID: String?
         var system: Int?
+        var measure: Int?
+        /// True directly inside a `g.staff`: its paths are the staff lines.
+        var isStaff = false
     }
 
     private var stack: [Frame] = []
@@ -76,8 +84,14 @@ nonisolated private final class SceneBuilder: NSObject, XMLParserDelegate {
     func parser(_ parser: XMLParser, didStartElement element: String, namespaceURI: String?, qualifiedName: String?, attributes a: [String: String] = [:]) {
         var frame = stack.last ?? Frame(transform: .identity, classes: [], bold: false, defID: nil, system: nil)
         if let t = a["transform"] { frame.transform = Self.transform(t).concatenating(frame.transform) }
+        if element == "g" { frame.isStaff = false }
         if let c = a["class"] {
             let names = c.split(separator: " ").map(String.init)
+            if element == "g", inDefs == 0, names.contains("measure") {
+                frame.measure = measures.count
+                measures.append(.null)
+            }
+            if element == "g", inDefs == 0, names.contains("staff") { frame.isStaff = true }
             frame.classes.formUnion(names)
             if element == "g", inDefs == 0, names.contains("system") {
                 frame.system = systems.count
@@ -238,6 +252,9 @@ nonisolated private final class SceneBuilder: NSObject, XMLParserDelegate {
             bounds = bounds.insetBy(dx: -width / 2, dy: -width / 2)
         }
         cover(bounds, in: frame)
+        if frame.isStaff, let index = frame.measure, measures.indices.contains(index) {
+            measures[index] = measures[index].union(placed.boundingBoxOfPath)
+        }
     }
 
     /// Grows the bounds of the line of music the item belongs to.

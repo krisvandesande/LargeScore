@@ -92,6 +92,13 @@ nonisolated struct MusicFile: Sendable, Identifiable {
         do { return try ZipReader.contents(of: target, in: data) } catch { throw Failure.damaged }
     }
 
+    /// Bars in the first part: notes are fixed to bar numbers, so a change here
+    /// means they may have moved.
+    var barCount: Int {
+        guard let start = xml.range(of: "<part "), let end = xml.range(of: "</part>", range: start.upperBound..<xml.endIndex) else { return 0 }
+        return xml[start.lowerBound..<end.lowerBound].components(separatedBy: "<measure ").count - 1
+    }
+
     /// The part to offer first: the first one any of `instruments` plays, trying them
     /// in the player's order; else the only part.
     func suggestedPart(for instruments: [Instrument]) -> ScorePart? {

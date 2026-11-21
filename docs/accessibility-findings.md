@@ -42,3 +42,9 @@ Changes from Kris's first look at build 1:
 - **Add Pieces went into the toolbar's overflow menu** once Rename joined Reorder. It's now a large button after the programme's last piece, always in sight.
 - **"Dynamic Type partially unsupported" on Rename and Reorder** in the navigation bar: the system's own bar buttons, written down as the platform's.
 - The reader's Next button names the piece ("Next piece: Long Evening Air"); a piece reached by a pedal or tap past the end is announced by its title.
+
+## Phase 6, 2026-11-21
+
+- **Notes landed off their bars.** Verovio's page units are 9/8 of a point, and the notes were drawn and read in points. They're now drawn inside the music's own transform and touches are converted; checked at sizes 4 and 6 of 7 that a circle, a highlight, a breath mark and ink stay on their bars.
+- **The notes palette stops growing at xxxLarge**, like the reader's strip: written down as intended (the audit's "partially unsupported" on its buttons).
+- **Writing notes is a visual task.** VoiceOver hears how many notes a page has ("Page 1 of 2, bars 1 to 8, 3 notes") and every tool has a spoken name ("Finger 3" for the button showing 3); placing marks needs sight, which is written down rather than worked around.

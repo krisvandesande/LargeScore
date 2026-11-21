@@ -93,7 +93,14 @@ struct ImportDetail: View {
                     Text("\(existing.title) is already in the library")
                 } footer: {
                     if candidate.replace {
-                        Text("Your notes and programmes stay. The previous version can be restored from the library.")
+                        VStack(alignment: .leading, spacing: 8) {
+                            if !(existing.annotations ?? []).isEmpty, existing.barCount > 0,
+                               existing.barCount != candidate.file.barCount {
+                                Text("This version has \(candidate.file.barCount) bars instead of \(existing.barCount). Check your notes: after the change they may sit on other bars.")
+                                    .foregroundStyle(Palette.notes)
+                            }
+                            Text("Your notes and programmes stay. The previous version can be restored from the library.")
+                        }
                     }
                 }
             }

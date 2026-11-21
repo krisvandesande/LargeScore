@@ -128,7 +128,7 @@ private struct LibraryGrid: View {
             try? context.save()
             open = score
         } label: {
-            PieceCard(title: score.title, composer: score.composer)
+            PieceCard(title: score.title, composer: score.composer, note: score.note)
         }
         .buttonStyle(.plain)
         .contextMenu {
@@ -238,6 +238,7 @@ private struct PartChooser: View {
 struct PieceCard: View {
     let title: String
     let composer: String?
+    var note: String = ""
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -248,6 +249,12 @@ struct PieceCard: View {
                 Text(composer)
                     .font(.title3)
                     .foregroundStyle(.secondary)
+            }
+            if !note.isEmpty {
+                Text(note)
+                    .font(.title3.italic())
+                    .foregroundStyle(Palette.notes)
+                    .padding(.top, 4)
             }
         }
         .multilineTextAlignment(.leading)

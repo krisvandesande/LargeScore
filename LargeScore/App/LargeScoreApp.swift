@@ -85,7 +85,7 @@ enum LaunchOptions {
         let inMemory = ProcessInfo.processInfo.arguments.contains("-resetSettings")
         let configuration = ModelConfiguration(isStoredInMemoryOnly: inMemory, cloudKitDatabase: .none)
         do {
-            return try ModelContainer(for: Score.self, Programme.self, ProgrammeEntry.self, configurations: configuration)
+            return try ModelContainer(for: Score.self, Programme.self, ProgrammeEntry.self, Annotation.self, configurations: configuration)
         } catch {
             fatalError("The library could not be opened: \(error)")
         }

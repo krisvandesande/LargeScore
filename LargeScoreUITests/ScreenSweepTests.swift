@@ -272,4 +272,49 @@ final class ScreenSweepTests: XCTestCase {
             app.terminate()
         }
     }
+
+    func testNotes() {
+        let app = launchWithLibrary()
+        card(app).tap()
+        let page = app.otherElements["page"]
+        XCTAssertTrue(page.waitForExistence(timeout: 10))
+        sleep(2)
+        app.buttons["Notes"].tap()
+        // A line of handwriting over the second bar, drawn slowly like a pen.
+        let start = page.coordinate(withNormalizedOffset: CGVector(dx: 0.55, dy: 0.08))
+        let end = page.coordinate(withNormalizedOffset: CGVector(dx: 0.75, dy: 0.12))
+        start.press(forDuration: 0.1, thenDragTo: end, withVelocity: .slow, thenHoldForDuration: 0.1)
+        app.buttons["Breath"].tap()
+        page.coordinate(withNormalizedOffset: CGVector(dx: 0.3, dy: 0.09)).tap()
+        app.buttons["Circle Bar"].tap()
+        page.coordinate(withNormalizedOffset: CGVector(dx: 0.4, dy: 0.32)).tap()
+        app.buttons["Highlight Bar"].tap()
+        page.coordinate(withNormalizedOffset: CGVector(dx: 0.8, dy: 0.32)).tap()
+        sleep(1)
+        shot(app, "60-notes-mode", variant: "standard-light")
+        audit(app, "notes-standard")
+        app.buttons["Written Note"].tap()
+        let editor = app.textViews.firstMatch
+        XCTAssertTrue(editor.waitForExistence(timeout: 5))
+        sleep(1)
+        app.typeText("Breathe before B")
+        shot(app, "605-written-note", variant: "standard-light")
+        app.navigationBars.buttons["Done"].firstMatch.tap()
+        sleep(1)
+        app.buttons["Done"].firstMatch.tap()
+        sleep(1)
+        shot(app, "61-notes-shown", variant: "standard-light")
+        XCTAssertTrue((page.value as? String ?? "").contains("notes"))
+        // A larger size: the notes go with their bars.
+        app.buttons["Music Size"].tap()
+        app.buttons["Larger"].tap()
+        app.buttons["Larger"].tap()
+        app.buttons["Done"].firstMatch.tap()
+        sleep(2)
+        shot(app, "62-notes-larger", variant: "standard-light")
+        app.buttons["Back to Library"].firstMatch.tap()
+        sleep(1)
+        shot(app, "63-card-with-note", variant: "standard-light")
+        XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Breathe before B")).firstMatch.exists)
+    }
 }

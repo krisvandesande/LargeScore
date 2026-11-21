@@ -22,6 +22,14 @@ struct ReaderView: View {
         _place = State(initialValue: ProgrammePlace(count: pieces.count, index: min(max(start, 0), max(pieces.count - 1, 0))))
     }
 
+    @Environment(\.modelContext) private var context
+    @State private var notes: NotesStore?
+    @State private var annotating = false
+    @State private var tool: NotesTool = .pen
+    /// The line of handwriting being drawn, in page units.
+    @State private var line: [CGPoint] = []
+    @State private var writingNote = false
+
     @State private var place: ProgrammePlace
     /// Set when going back into the previous piece: it opens on its last page.
     @State private var startAtEnd = false
@@ -54,9 +62,11 @@ struct ReaderView: View {
                     .frame(width: proxy.size.width, height: proxy.size.height, alignment: .topLeading)
                     .contentShape(Rectangle())
                     .onTapGesture { location in
+                        guard !annotating else { return }
                         location.x < proxy.size.width / 3 ? turn(forward: false) : turn(forward: true)
                     }
                     .gesture(DragGesture(minimumDistance: 40).onEnded { value in
+                        guard !annotating else { return }
                         if value.translation.width < -40 { turn(forward: true) }
                         else if value.translation.width > 40 { turn(forward: false) }
                     })
@@ -73,15 +83,28 @@ struct ReaderView: View {
             }
             .accessibilityIdentifier("page")
 
-            ReaderStrip(title: piece.title, backTitle: backTitle, pageText: pageText,
-                        nextTitle: nextPiece?.title,
-                        back: { dismiss() }, next: { goToNextPiece() }, size: { choosingSize = true })
+            if annotating, let notes {
+                NotesPalette(tool: $tool, canUndo: notes.canUndo, pageText: pageText,
+                             undo: { notes.undo() }, writtenNote: { writingNote = true },
+                             previousPage: { turn(forward: false) }, nextPage: { turn(forward: true) },
+                             done: { annotating = false })
+            } else {
+                ReaderStrip(title: piece.title, backTitle: backTitle, pageText: pageText,
+                            nextTitle: nextPiece?.title,
+                            back: { dismiss() }, next: { goToNextPiece() },
+                            notes: notes?.canAnnotate == true ? { startAnnotating() } : nil,
+                            size: { choosingSize = true })
+            }
         }
         .environment(\.colorScheme, scheme)
         .background { PedalKeys(forward: { turn(forward: true) }, back: { turn(forward: false) }, close: { dismiss() }) }
         .onAppear {
             UIApplication.shared.isIdleTimerDisabled = true
+            notes = NotesStore(pieceID: piece.id, context: context)
             onShow(piece)
+        }
+        .sheet(isPresented: $writingNote) {
+            if let notes { WrittenNoteSheet(store: notes) }
         }
         .onDisappear { UIApplication.shared.isIdleTimerDisabled = false }
         .onChange(of: settings.halfPageTurns) { _, half in
@@ -98,15 +121,24 @@ struct ReaderView: View {
         let ink: Color = scheme == .dark ? .white : .black
         if let laidOut, laidOut.pages.indices.contains(turner.page) {
             let current = laidOut.pages[turner.page]
+            let marks = notes?.marks ?? []
+            let geometry = barGeometry(laidOut, page: turner.page)
             if turner.halfway, laidOut.pages.indices.contains(turner.page + 1),
                let split = HalfPageSplit.split(current: current.systems,
                                                next: laidOut.pages[turner.page + 1].systems,
                                                pageHeight: current.viewBox.height) {
-                ScoreCanvas(scene: current, upper: laidOut.pages[turner.page + 1], split: split, ink: ink, glyphWeight: settings.glyphWeight)
+                ScoreCanvas(scene: current, upper: laidOut.pages[turner.page + 1], split: split, ink: ink, glyphWeight: settings.glyphWeight,
+                            marks: marks, geometry: geometry, upperMarks: marks,
+                            upperGeometry: barGeometry(laidOut, page: turner.page + 1))
                     .frame(width: area.width, height: area.height)
             } else {
-                ScoreCanvas(scene: current, ink: ink, glyphWeight: settings.glyphWeight)
+                ScoreCanvas(scene: current, ink: ink, glyphWeight: settings.glyphWeight, marks: marks, geometry: geometry)
                     .frame(width: area.width, height: area.height)
+                    .overlay {
+                        if annotating, let geometry {
+                            drawingLayer(geometry, scale: ScoreCanvas.scale(of: current, in: area))
+                        }
+                    }
             }
         } else if failed {
             Text("This music could not be read.")
@@ -114,6 +146,58 @@ struct ReaderView: View {
                 .frame(width: area.width, height: area.height)
         } else {
             Color.clear.frame(width: area.width, height: area.height)
+        }
+    }
+
+    private func barGeometry(_ laidOut: LaidOutPiece, page: Int) -> BarGeometry? {
+        guard laidOut.pages.indices.contains(page) else { return nil }
+        return BarGeometry(page: laidOut.pages[page], firstBar: laidOut.firstBars[page],
+                           request: laidOut.request)
+    }
+
+    private func startAnnotating() {
+        // Notes go on one whole page at a time.
+        if turner.halfway { turner.back() }
+        annotating = true
+    }
+
+    /// Takes the pen, the eraser or a mark while notes are being written. Touches are
+    /// in points; the page is drawn at `scale` points a page unit.
+    private func drawingLayer(_ geometry: BarGeometry, scale: CGFloat) -> some View {
+        let toPage = { (p: CGPoint) in CGPoint(x: p.x / scale, y: p.y / scale) }
+        return
+        ZStack {
+            Path { path in
+                guard let first = line.first else { return }
+                path.move(to: first)
+                for point in line.dropFirst() { path.addLine(to: point) }
+            }
+            .stroke(Palette.notes, style: StrokeStyle(lineWidth: geometry.space * scale * 0.22, lineCap: .round, lineJoin: .round))
+            Color.clear
+                .contentShape(Rectangle())
+                .gesture(DragGesture(minimumDistance: 0).onChanged { value in
+                    switch tool {
+                    case .pen: line.append(value.location)
+                    case .eraser:
+                        guard let notes else { return }
+                        notes.remove(geometry.marks(notes.marks, near: toPage(value.location), radius: geometry.space * 1.5))
+                    case .mark: break
+                    }
+                }.onEnded { value in
+                    switch tool {
+                    case .pen:
+                        if let mark = geometry.mark(ink: line.map(toPage)) { notes?.add(mark) }
+                        line = []
+                    case .mark(let kind):
+                        if hypot(value.translation.width, value.translation.height) < 20,
+                           let mark = geometry.mark(kind, at: toPage(value.location)) {
+                            notes?.add(mark)
+                        }
+                    case .eraser: break
+                    }
+                })
+                .accessibilityLabel("Music")
+                .accessibilityHint("Draw or place the chosen mark here.")
         }
     }
 
@@ -130,7 +214,9 @@ struct ReaderView: View {
             ? Text("bar \(bars.lowerBound)")
             : Text("bars \(bars.lowerBound) to \(bars.upperBound)")
         let top = turner.halfway ? Text(", top shows page \(turner.page + 2)") : Text("")
-        return Text("\(page), \(barText)\(top)")
+        let count = (notes?.marks ?? []).filter { bars.contains($0.bar) }.count
+        let noted = count > 0 ? Text(", ^[\(count) note](inflect: true)") : Text("")
+        return Text("\(page), \(barText)\(top)\(noted)")
     }
 
     private func turn(forward: Bool) {
@@ -152,6 +238,7 @@ struct ReaderView: View {
     private func showPiece() {
         // Never show the old piece's page under the new title.
         laidOut = nil
+        notes = NotesStore(pieceID: piece.id, context: context)
         onShow(piece)
         UIAccessibility.post(notification: .announcement, argument: piece.title)
     }
@@ -274,6 +361,7 @@ struct ReaderStrip: View {
     var nextTitle: String? = nil
     let back: () -> Void
     var next: () -> Void = {}
+    var notes: (() -> Void)? = nil
     let size: () -> Void
 
     var body: some View {
@@ -281,7 +369,7 @@ struct ReaderStrip: View {
             row(showTitle: true)
             row(showTitle: false)
             VStack(alignment: .leading, spacing: 12) {
-                HStack(spacing: 16) { backButton; Spacer(minLength: 0); sizeButton }
+                HStack(spacing: 16) { backButton; Spacer(minLength: 0); notesButton; sizeButton }
                 HStack(spacing: 16) { pageLabel; Spacer(minLength: 0); nextButton }
             }
         }
@@ -308,7 +396,17 @@ struct ReaderStrip: View {
             Spacer(minLength: 0)
             pageLabel
             nextButton
+            notesButton
             sizeButton
+        }
+    }
+
+    @ViewBuilder
+    private var notesButton: some View {
+        if let notes {
+            Button("Notes", action: notes)
+                .buttonStyle(.large)
+                .fixedSize()
         }
     }
 

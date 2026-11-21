@@ -24,6 +24,13 @@ final class Score {
     @Attribute(.externalStorage) var previousMusicXML: Data?
     var previousPartID: String?
     var replacedAt: Date?
+    /// A note in words about the whole piece.
+    var note: String = ""
+    /// Bars in the first part shown, to warn when a new version changes them.
+    var barCount: Int = 0
+    /// Handwriting and marks, fixed to bars.
+    @Relationship(deleteRule: .cascade, inverse: \Annotation.score)
+    var annotations: [Annotation]? = []
     /// Its places in programmes, removed with the piece.
     @Relationship(deleteRule: .cascade, inverse: \ProgrammeEntry.score)
     var entries: [ProgrammeEntry]? = []
@@ -43,6 +50,7 @@ final class Score {
         partName = parts.map(\.name).joined(separator: ", ")
         partCount = file.parts.count
         musicXML = Data(file.xml.utf8)
+        barCount = file.barCount
     }
 
     /// Takes the new version's music, keeping the old one for Restore. Parts chosen in
@@ -56,6 +64,7 @@ final class Score {
         replacedAt = .now
         musicXML = Data(file.xml.utf8)
         partCount = file.parts.count
+        barCount = file.barCount
         composer = file.composer ?? composer
         arranger = file.arranger ?? arranger
         let kept = file.parts.filter { oldIDs.contains($0.id) }
