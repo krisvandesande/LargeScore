@@ -30,6 +30,32 @@
         }
       }
     },
+    "%lld": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld"
+          }
+        }
+      }
+    },
+    "%lld, %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$lld, %2$@"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld, %@"
+          }
+        }
+      }
+    },
     ", top shows page %lld": {
       "localizations": {
         "nl": {
@@ -46,6 +72,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bij een halve paginaomslag zie je eerst de bovenkant van de volgende pagina, zodat je vooruit kunt lezen terwijl je onderaan verder speelt."
+          }
+        }
+      }
+    },
+    "A programme lists the pieces for a rehearsal or concert, in the order you play them.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Een programma zet de stukken voor een repetitie of concert op een rij, in de volgorde waarin je ze speelt."
           }
         }
       }
@@ -100,12 +136,32 @@
         }
       }
     },
+    "Add Pieces": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voeg stukken toe"
+          }
+        }
+      }
+    },
     "Add as a New Piece": {
       "localizations": {
         "nl": {
           "stringUnit": {
             "state": "translated",
             "value": "Voeg toe als nieuw stuk"
+          }
+        }
+      }
+    },
+    "Add to Programme": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voeg toe aan programma"
           }
         }
       }
@@ -300,6 +356,16 @@
         }
       }
     },
+    "Create": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maak aan"
+          }
+        }
+      }
+    },
     "Dark": {
       "localizations": {
         "nl": {
@@ -326,6 +392,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "%@ verwijderen?"
+          }
+        }
+      }
+    },
+    "Delete Programme": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verwijder programma"
           }
         }
       }
@@ -370,12 +446,32 @@
         }
       }
     },
+    "For example the rehearsal or concert it's for.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bijvoorbeeld de repetitie of het concert waarvoor het is."
+          }
+        }
+      }
+    },
     "GNU Lesser General Public License 3.0. Large Score uses Verovio unchanged; its source and Large Score's own let you build the app with another version.": {
       "localizations": {
         "nl": {
           "stringUnit": {
             "state": "translated",
             "value": "GNU Lesser General Public License 3.0. Large Score gebruikt Verovio ongewijzigd; met de broncode daarvan en die van Large Score kun je de app met een andere versie bouwen."
+          }
+        }
+      }
+    },
+    "Go to Programmes": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ga naar Programma’s"
           }
         }
       }
@@ -540,6 +636,36 @@
         }
       }
     },
+    "Name": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Naam"
+          }
+        }
+      }
+    },
+    "New Programme": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nieuw programma"
+          }
+        }
+      }
+    },
+    "Next": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volgende"
+          }
+        }
+      }
+    },
     "Next Page": {
       "localizations": {
         "nl": {
@@ -550,12 +676,52 @@
         }
       }
     },
+    "Next Piece": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volgende stuk"
+          }
+        }
+      }
+    },
+    "Next piece: %@": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volgende stuk: %@"
+          }
+        }
+      }
+    },
+    "Next: %@": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volgende: %@"
+          }
+        }
+      }
+    },
     "No music yet": {
       "localizations": {
         "nl": {
           "stringUnit": {
             "state": "translated",
             "value": "Nog geen muziek"
+          }
+        }
+      }
+    },
+    "No pieces yet": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nog geen stukken"
           }
         }
       }
@@ -766,6 +932,36 @@
         }
       }
     },
+    "Rename": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wijzig naam"
+          }
+        }
+      }
+    },
+    "Rename Programme": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wijzig naam van programma"
+          }
+        }
+      }
+    },
+    "Reorder": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Herschik"
+          }
+        }
+      }
+    },
     "Replace the Music": {
       "localizations": {
         "nl": {
@@ -942,6 +1138,16 @@
         }
       }
     },
+    "The library is empty. Add music there first.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De bibliotheek is leeg. Voeg daar eerst muziek toe."
+          }
+        }
+      }
+    },
     "The music at this size": {
       "localizations": {
         "nl": {
@@ -968,6 +1174,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Het stuk en je notities erbij worden van deze iPad verwijderd."
+          }
+        }
+      }
+    },
+    "The pieces stay in the library.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De stukken blijven in de bibliotheek."
           }
         }
       }
@@ -1052,6 +1268,26 @@
         }
       }
     },
+    "Today’s Programme": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Programma van vandaag"
+          }
+        }
+      }
+    },
+    "Today’s programme is what Large Score opens on.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Large Score opent op het programma van vandaag."
+          }
+        }
+      }
+    },
     "Trombone": {
       "localizations": {
         "nl": {
@@ -1078,6 +1314,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Tuba"
+          }
+        }
+      }
+    },
+    "Use Today": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gebruik vandaag"
           }
         }
       }
@@ -1138,6 +1384,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "Je notities en programma’s blijven. De vorige versie kun je terugzetten vanuit de bibliotheek."
+          }
+        }
+      }
+    },
+    "^[%lld piece](inflect: true)": {
+      "localizations": {
+        "nl": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld stuk"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld stukken"
+                }
+              }
+            }
           }
         }
       }

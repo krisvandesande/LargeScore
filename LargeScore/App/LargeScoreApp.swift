@@ -40,6 +40,11 @@ struct RootView: View {
                 ImportSheet(session: session)
             }
             .task {
+                // Open on Today's programme when there is one.
+                let pinned = (try? context.fetchCount(FetchDescriptor<Programme>(predicate: #Predicate { $0.isToday }))) ?? 0
+                if pinned > 0 { section = .today }
+            }
+            .task {
                 guard LaunchOptions.importSamples else { return }
                 let urls = ["evening-air-quartet.mxl", "evening-air-quartet.musicxml", "long-piece.musicxml"]
                     .compactMap { Bundle.main.url(forResource: $0, withExtension: nil) }
@@ -52,11 +57,10 @@ struct RootView: View {
         if settings.onboardingDone {
             TabView(selection: $section) {
                 Tab("Today", systemImage: "music.note.list", value: .today) {
-                    EmptyTab(title: "Today", heading: "No programme for today",
-                             message: "Choose one in Programmes.")
+                    TodayView(showProgrammes: { section = .programmes })
                 }
                 Tab("Programmes", systemImage: "list.number", value: .programmes) {
-                    EmptyTab(title: "Programmes", heading: "No programmes yet")
+                    ProgrammesView()
                 }
                 Tab("Library", systemImage: "books.vertical", value: .library) {
                     LibraryView()
@@ -81,7 +85,7 @@ enum LaunchOptions {
         let inMemory = ProcessInfo.processInfo.arguments.contains("-resetSettings")
         let configuration = ModelConfiguration(isStoredInMemoryOnly: inMemory, cloudKitDatabase: .none)
         do {
-            return try ModelContainer(for: Score.self, configurations: configuration)
+            return try ModelContainer(for: Score.self, Programme.self, ProgrammeEntry.self, configurations: configuration)
         } catch {
             fatalError("The library could not be opened: \(error)")
         }

@@ -24,6 +24,9 @@ final class Score {
     @Attribute(.externalStorage) var previousMusicXML: Data?
     var previousPartID: String?
     var replacedAt: Date?
+    /// Its places in programmes, removed with the piece.
+    @Relationship(deleteRule: .cascade, inverse: \ProgrammeEntry.score)
+    var entries: [ProgrammeEntry]? = []
 
     var partIDs: [String] { partID.split(separator: " ").map(String.init) }
 

@@ -22,6 +22,7 @@
 		3C1FD0409376A0D1D08E716B /* evening-air-treble.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = FEDAB8FE7CB3DC5664A5D395 /* evening-air-treble.musicxml */; };
 		3CE2F4743A48725594979F2D /* VerovioToolkit in Frameworks */ = {isa = PBXBuildFile; productRef = EE43E473F512BA74095E135B /* VerovioToolkit */; };
 		3E173542E0E5D03848EFA032 /* evening-air-quartet.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = 7D45E730900A18783D457D9A /* evening-air-quartet.musicxml */; };
+		3FDD5D05C6B5B9CACE5AEBCB /* Programme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58BC05456B5B0A8432E0B42C /* Programme.swift */; };
 		49B0D03FE11C4AFCF5689BBF /* MusicFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11E71A1975CE6270736A016C /* MusicFile.swift */; };
 		4B55282274225FC6D37EF85D /* EngravingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 619AF0CC40BEA89874498859 /* EngravingTests.swift */; };
 		56162D7F02D5255C0286C0B4 /* evening-air-quartet.mxl in Resources */ = {isa = PBXBuildFile; fileRef = 8A52E6CE0252C886FD197F00 /* evening-air-quartet.mxl */; };
@@ -32,12 +33,14 @@
 		9173E0D4267A293A5B6E6EC1 /* ThicknessRenderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0838610092BDE0C0A68B0374 /* ThicknessRenderTests.swift */; };
 		96CCF458D90D562983B458EE /* ScoreLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4C3345DCD65C0A8E77FDBF9 /* ScoreLoader.swift */; };
 		9D3D1F9DDC72FF21118EE562 /* ImportSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2135B1AA56EFBB86D0F3C587 /* ImportSheet.swift */; };
+		A85C945FA5919F696B4D025D /* ProgrammeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D2A5F76D09D30FD53EF78D8 /* ProgrammeTests.swift */; };
 		AAB105C83CD709E37C2A54B1 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F84B9B4A9ECB304F011F2454 /* SettingsView.swift */; };
 		B7FABC4CE2CF4E0CD8C8957D /* long-piece.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = CC2650C197E81A824BD81899 /* long-piece.musicxml */; };
 		B8E2B41CE24CB3C0616A654E /* ImportSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45C9CB78E24BC8C1D9F23D28 /* ImportSession.swift */; };
 		C01B1F925B264F392B764D52 /* ReaderSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FF77D829CA58D403A3BE0DC /* ReaderSettings.swift */; };
 		D072985CFC4D85275CC3E3E3 /* TextLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6299FC9AB66EA749AB2CF385 /* TextLayout.swift */; };
 		D24D2E3EF301948729023D3F /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3A2F17269B7472AF6CFD6 /* OnboardingView.swift */; };
+		D903682E9AF2C340AAA29888 /* ProgrammesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A02DBCCD3AF37BB6FB086E /* ProgrammesView.swift */; };
 		DA6568EEFDA2DDBC640DE381 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 72E33B44B559B76024D3E0EB /* Assets.xcassets */; };
 		DAB61FEF895146F62463F30B /* SampleCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 713D748931CE744279E773B4 /* SampleCard.swift */; };
 		E6E7DAF75C872D89F7292D88 /* LargeScoreApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 608E66C49927979E3843786B /* LargeScoreApp.swift */; };
@@ -74,10 +77,13 @@
 		22EE9AB0CE94FA8966AD7CBA /* VerovioEngraver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerovioEngraver.swift; sourceTree = "<group>"; };
 		2D849716F934CBA7A3FD4D00 /* ReaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderView.swift; sourceTree = "<group>"; };
 		2FF77D829CA58D403A3BE0DC /* ReaderSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderSettings.swift; sourceTree = "<group>"; };
+		43A02DBCCD3AF37BB6FB086E /* ProgrammesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgrammesView.swift; sourceTree = "<group>"; };
 		45C9CB78E24BC8C1D9F23D28 /* ImportSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportSession.swift; sourceTree = "<group>"; };
 		4AC98224E7EA271BAF679320 /* LargeScore.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = LargeScore.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4F6192D965D015D4432C9E71 /* TextAndFillTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextAndFillTests.swift; sourceTree = "<group>"; };
 		55357AD4C01A37DA6BAE963E /* harmony-and-tempo.musicxml */ = {isa = PBXFileReference; path = "harmony-and-tempo.musicxml"; sourceTree = "<group>"; };
+		58BC05456B5B0A8432E0B42C /* Programme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Programme.swift; sourceTree = "<group>"; };
+		5D2A5F76D09D30FD53EF78D8 /* ProgrammeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgrammeTests.swift; sourceTree = "<group>"; };
 		608E66C49927979E3843786B /* LargeScoreApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LargeScoreApp.swift; sourceTree = "<group>"; };
 		619AF0CC40BEA89874498859 /* EngravingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngravingTests.swift; sourceTree = "<group>"; };
 		6299FC9AB66EA749AB2CF385 /* TextLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextLayout.swift; sourceTree = "<group>"; };
@@ -149,6 +155,15 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
+		652845952A8D9EAA7C8D1BD5 /* Programmes */ = {
+			isa = PBXGroup;
+			children = (
+				58BC05456B5B0A8432E0B42C /* Programme.swift */,
+				43A02DBCCD3AF37BB6FB086E /* ProgrammesView.swift */,
+			);
+			path = Programmes;
+			sourceTree = "<group>";
+		};
 		6588254F01B8CCCCDFE3ADBE /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -188,6 +203,7 @@
 				619AF0CC40BEA89874498859 /* EngravingTests.swift */,
 				55357AD4C01A37DA6BAE963E /* harmony-and-tempo.musicxml */,
 				BEA09A15929E52433660615B /* ImportTests.swift */,
+				5D2A5F76D09D30FD53EF78D8 /* ProgrammeTests.swift */,
 				93DCD83E23A8A9966544EF13 /* ReaderTests.swift */,
 				4F6192D965D015D4432C9E71 /* TextAndFillTests.swift */,
 				0838610092BDE0C0A68B0374 /* ThicknessRenderTests.swift */,
@@ -228,6 +244,7 @@
 				867A7EEADCFB11EE059702C2 /* Import */,
 				FCEBBB55A1D059515D8A2405 /* Library */,
 				42A80176588A19DF1C8D2E50 /* Onboarding */,
+				652845952A8D9EAA7C8D1BD5 /* Programmes */,
 				6EFBA28764B3C2479222DF5E /* Reader */,
 				46CE44231CD53138FDF3818F /* Resources */,
 				E9B5F463633220B7C8A46E60 /* Settings */,
@@ -428,6 +445,8 @@
 				D24D2E3EF301948729023D3F /* OnboardingView.swift in Sources */,
 				2BDABFE1171DE6A0406AC014 /* PageTurner.swift in Sources */,
 				7D1319FD90D71337F5CBCAD0 /* PartSplitter.swift in Sources */,
+				3FDD5D05C6B5B9CACE5AEBCB /* Programme.swift in Sources */,
+				D903682E9AF2C340AAA29888 /* ProgrammesView.swift in Sources */,
 				C01B1F925B264F392B764D52 /* ReaderSettings.swift in Sources */,
 				57635CA06508C611ADC0212C /* ReaderView.swift in Sources */,
 				E78147419B69271BDDC75854 /* SVGScene.swift in Sources */,
@@ -449,6 +468,7 @@
 			files = (
 				4B55282274225FC6D37EF85D /* EngravingTests.swift in Sources */,
 				2AD6FA9985243F747B68EB9B /* ImportTests.swift in Sources */,
+				A85C945FA5919F696B4D025D /* ProgrammeTests.swift in Sources */,
 				FA5AF9ED6A3C5BAEB3764FB4 /* ReaderTests.swift in Sources */,
 				FA379FE0D2838E71017A5D01 /* TextAndFillTests.swift in Sources */,
 				9173E0D4267A293A5B6E6EC1 /* ThicknessRenderTests.swift in Sources */,

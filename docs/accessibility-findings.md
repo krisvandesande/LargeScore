@@ -36,3 +36,9 @@ Changes from Kris's first look at build 1:
 - **Several instruments, several parts.** Setup and Settings take every instrument played; the import sheet and the library's Change Parts take several parts, read together. Rehearsal marks and tempo, which notation programs write into every part, show once, on the top part.
 - **An AirDropped .mxl went to Files.** The app now offers to open any file (lowest rank) and ZIP archives besides its own types, and Add Music accepts any file; the contents are checked when read.
 - **The Entertainer (Kris's first real file, build 2):** about 380 pt of room left under three lines; the tempo's note missing; chord names at the wrong size and overlapping, with a missing-character box; a brace before each line. Text is now laid out span by span as Verovio writes it, with SMuFL characters drawn from Verovio's own glyph outlines; the one-part copy drops the score's part groups; pages are filled with a tight bottom margin and engraved again with more room only when something under a page's last line would run off.
+
+## Phase 5, 2026-11-21
+
+- **Add Pieces went into the toolbar's overflow menu** once Rename joined Reorder. It's now a large button after the programme's last piece, always in sight.
+- **"Dynamic Type partially unsupported" on Rename and Reorder** in the navigation bar: the system's own bar buttons, written down as the platform's.
+- The reader's Next button names the piece ("Next piece: Long Evening Air"); a piece reached by a pedal or tap past the end is announced by its title.

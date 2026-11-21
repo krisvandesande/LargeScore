@@ -61,6 +61,7 @@ private struct LibraryGrid: View {
     let addMusic: () -> Void
     let isSearching: Bool
     @Query private var scores: [Score]
+    @Query(sort: \Programme.createdAt, order: .reverse) private var programmes: [Programme]
     @Environment(\.modelContext) private var context
     @ScaledMetric(relativeTo: .title2) private var cardWidth: CGFloat = 320
     @State private var open: Score?
@@ -131,6 +132,16 @@ private struct LibraryGrid: View {
         }
         .buttonStyle(.plain)
         .contextMenu {
+            if !programmes.isEmpty {
+                Menu("Add to Programme", systemImage: "text.badge.plus") {
+                    ForEach(programmes) { programme in
+                        Button(programme.name) {
+                            programme.append([score])
+                            try? context.save()
+                        }
+                    }
+                }
+            }
             if score.partCount > 1 {
                 Button("Change Parts", systemImage: "music.note.list") { changingPart = score }
             }

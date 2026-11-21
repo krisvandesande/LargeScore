@@ -224,4 +224,52 @@ final class ScreenSweepTests: XCTestCase {
             XCTAssertTrue(value().hasPrefix(expected), "key \(key.rawValue.unicodeScalars.map { $0.value })")
         }
     }
+
+    func testProgrammes() {
+        for (sizeName, size) in sizes {
+            let variant = "\(sizeName)-light"
+            let app = launchWithLibrary(size: size)
+            app.buttons["Programmes"].firstMatch.tap()
+            XCTAssertTrue(app.staticTexts["No programmes yet"].waitForExistence(timeout: 5))
+            shot(app, "50-programmes-empty", variant: variant)
+            app.buttons["New Programme"].firstMatch.tap()
+            let name = app.textFields.firstMatch
+            XCTAssertTrue(name.waitForExistence(timeout: 5))
+            name.typeText("Thursday Rehearsal")
+            app.buttons["Create"].tap()
+            sleep(1)
+            shot(app, "505-after-create", variant: variant)
+            XCTAssertTrue(app.buttons["Add Pieces"].waitForExistence(timeout: 5))
+            app.buttons["Add Pieces"].tap()
+            for title in ["Evening Air for Four", "Long Evening Air"] {
+                app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", title)).firstMatch.tap()
+            }
+            app.buttons["Add 2 Pieces"].tap()
+            let pin = app.switches["Today’s Programme"].firstMatch
+            XCTAssertTrue(pin.waitForExistence(timeout: 5))
+            (pin.switches.firstMatch.exists ? pin.switches.firstMatch : pin).tap()
+            sleep(1)
+            shot(app, "51-programme", variant: variant)
+            audit(app, "programme-\(sizeName)")
+            app.buttons["Today"].firstMatch.tap()
+            sleep(1)
+            shot(app, "52-today", variant: variant)
+            audit(app, "today-\(sizeName)")
+            // Open the first piece and turn past its end into the second.
+            app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "1,")).firstMatch.tap()
+            let page = app.otherElements["page"]
+            XCTAssertTrue(page.waitForExistence(timeout: 10))
+            sleep(2)
+            shot(app, "53-reader-in-programme", variant: variant)
+            let next = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Next piece")).firstMatch
+            XCTAssertTrue(next.exists)
+            next.tap()
+            sleep(2)
+            XCTAssertEqual(page.label, "Long Evening Air")
+            app.typeKey(XCUIKeyboardKey.leftArrow, modifierFlags: [])
+            sleep(2)
+            XCTAssertEqual(page.label, "Evening Air for Four") // back into the first piece, on its last page
+            app.terminate()
+        }
+    }
 }

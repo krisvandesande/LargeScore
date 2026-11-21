@@ -3,10 +3,32 @@ import UIKit
 
 /// A piece, full screen: the music fills the page, a strip at the foot holds the way
 /// back, the title, the page and the size. Pages turn by a tap (left third back, the
-/// rest forward), a swipe, or a pedal's keys.
+/// rest forward), a swipe, or a pedal's keys. Opened from a programme, turning past
+/// the last page goes on to the next piece, and back past the first to the one before.
 struct ReaderView: View {
-    let piece: Piece
+    let pieces: [Piece]
     var backTitle: LocalizedStringResource = "Library"
+    /// Called whenever a piece comes up, to note when it was last played.
+    var onShow: (Piece) -> Void = { _ in }
+
+    init(piece: Piece, backTitle: LocalizedStringResource = "Library", onShow: @escaping (Piece) -> Void = { _ in }) {
+        self.init(pieces: [piece], start: 0, backTitle: backTitle, onShow: onShow)
+    }
+
+    init(pieces: [Piece], start: Int, backTitle: LocalizedStringResource, onShow: @escaping (Piece) -> Void = { _ in }) {
+        self.pieces = pieces
+        self.backTitle = backTitle
+        self.onShow = onShow
+        _place = State(initialValue: ProgrammePlace(count: pieces.count, index: min(max(start, 0), max(pieces.count - 1, 0))))
+    }
+
+    @State private var place: ProgrammePlace
+    /// Set when going back into the previous piece: it opens on its last page.
+    @State private var startAtEnd = false
+    @State private var laidOutPieceID: String?
+
+    private var piece: Piece { pieces[place.index] }
+    private var nextPiece: Piece? { place.hasNext ? pieces[place.index + 1] : nil }
 
     @Environment(ReaderSettings.self) private var settings
     @Environment(ScoreLoader.self) private var loader
@@ -38,7 +60,7 @@ struct ReaderView: View {
                         if value.translation.width < -40 { turn(forward: true) }
                         else if value.translation.width > 40 { turn(forward: false) }
                     })
-                    .task(id: settings.layoutRequest(for: area)) {
+                    .task(id: ReaderKey(request: settings.layoutRequest(for: area), piece: piece)) {
                         await layOut(area: area)
                     }
             }
@@ -52,12 +74,14 @@ struct ReaderView: View {
             .accessibilityIdentifier("page")
 
             ReaderStrip(title: piece.title, backTitle: backTitle, pageText: pageText,
-                        back: { dismiss() }, size: { choosingSize = true })
+                        nextTitle: nextPiece?.title,
+                        back: { dismiss() }, next: { goToNextPiece() }, size: { choosingSize = true })
         }
         .environment(\.colorScheme, scheme)
         .background { PedalKeys(forward: { turn(forward: true) }, back: { turn(forward: false) }, close: { dismiss() }) }
         .onAppear {
             UIApplication.shared.isIdleTimerDisabled = true
+            onShow(piece)
         }
         .onDisappear { UIApplication.shared.isIdleTimerDisabled = false }
         .onChange(of: settings.halfPageTurns) { _, half in
@@ -110,17 +134,48 @@ struct ReaderView: View {
     }
 
     private func turn(forward: Bool) {
-        if forward { turner.forward() } else { turner.back() }
+        if forward {
+            if !turner.forward() { goToNextPiece() }
+        } else if !turner.back(), place.previous() {
+            startAtEnd = true
+            showPiece()
+        }
+    }
+
+    private func goToNextPiece() {
+        guard place.next() else { return }
+        startAtEnd = false
+        showPiece()
+    }
+
+    /// A new piece came up without the person looking at the strip: say which.
+    private func showPiece() {
+        // Never show the old piece's page under the new title.
+        laidOut = nil
+        onShow(piece)
+        UIAccessibility.post(notification: .announcement, argument: piece.title)
     }
 
     private func layOut(area: CGSize) async {
         guard area.width > 100, area.height > 100 else { return }
         do {
-            let result = try await loader.layOut(piece, request: settings.layoutRequest(for: area))
-            // Keep the place by bar when the size or orientation changes.
-            let firstBar = laidOut?.firstBars[safe: turner.page] ?? 1
-            let page = result.firstBars.lastIndex(where: { $0 <= firstBar }) ?? 0
+            let shown = piece
+            let result = try await loader.layOut(shown, request: settings.layoutRequest(for: area))
+            let page: Int
+            if laidOutPieceID == shown.id {
+                // Same piece, new size or orientation: keep the place by bar.
+                let firstBar = laidOut?.firstBars[safe: turner.page] ?? 1
+                page = result.firstBars.lastIndex(where: { $0 <= firstBar }) ?? 0
+            } else {
+                page = startAtEnd ? result.pages.count - 1 : 0
+            }
             laidOut = result
+            laidOutPieceID = shown.id
+            if let next = nextPiece {
+                // Engrave the next piece ahead, so turning into it is immediate.
+                let request = settings.layoutRequest(for: area)
+                Task { _ = try? await loader.layOut(next, request: request) }
+            }
             turner = PageTurner(pageCount: result.pages.count, halfPageTurns: settings.halfPageTurns, page: page)
             failed = false
         } catch {
@@ -204,13 +259,21 @@ final class KeyCatcherView: UIView {
     @objc private func closeReader() { close() }
 }
 
-/// Layout B's strip: back, title, page, size. At the accessibility sizes the title
-/// goes first, since the person chose the piece and the page number matters more.
+private struct ReaderKey: Hashable {
+    var request: LayoutRequest
+    var piece: Piece
+}
+
+/// Layout B's strip: back, title, page, the next piece in a programme, size. Where
+/// the row doesn't fit, the title goes first, since the person chose the piece and
+/// the page number matters more.
 struct ReaderStrip: View {
     let title: String
     let backTitle: LocalizedStringResource
     let pageText: Text?
+    var nextTitle: String? = nil
     let back: () -> Void
+    var next: () -> Void = {}
     let size: () -> Void
 
     var body: some View {
@@ -219,7 +282,7 @@ struct ReaderStrip: View {
             row(showTitle: false)
             VStack(alignment: .leading, spacing: 12) {
                 HStack(spacing: 16) { backButton; Spacer(minLength: 0); sizeButton }
-                pageLabel
+                HStack(spacing: 16) { pageLabel; Spacer(minLength: 0); nextButton }
             }
         }
         .air(.horizontal, 32)
@@ -244,7 +307,21 @@ struct ReaderStrip: View {
             }
             Spacer(minLength: 0)
             pageLabel
+            nextButton
             sizeButton
+        }
+    }
+
+    @ViewBuilder
+    private var nextButton: some View {
+        if let nextTitle {
+            Button(action: next) {
+                Label { Text("Next: \(nextTitle)").lineLimit(1) } icon: { Image(systemName: "chevron.forward") }
+                    .labelStyle(TrailingIcon())
+            }
+            .buttonStyle(.large)
+            .accessibilityLabel(Text("Next piece: \(nextTitle)"))
+            .accessibilityInputLabels([Text("Next"), Text("Next Piece")])
         }
     }
 
@@ -308,4 +385,14 @@ struct SizeSheet: View {
 
 extension Array {
     subscript(safe index: Int) -> Element? { indices.contains(index) ? self[index] : nil }
+}
+
+/// Words first, the icon after them: a button that goes forward.
+private struct TrailingIcon: LabelStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        HStack(spacing: 12) {
+            configuration.title
+            configuration.icon
+        }
+    }
 }
