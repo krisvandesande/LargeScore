@@ -56,6 +56,13 @@ nonisolated struct LaidOutPiece: Sendable {
     /// The first bar number on each page, counted from 1.
     var firstBars: [Int]
 
+    /// True when a page's music reaches past its bottom edge.
+    var overflows: Bool {
+        pages.contains { page in
+            page.systems.contains { !$0.isNull && $0.maxY > page.viewBox.maxY }
+        }
+    }
+
     func bars(onPage index: Int) -> ClosedRange<Int>? {
         guard pages.indices.contains(index), pages[index].measureCount > 0 else { return nil }
         let first = firstBars[index]
@@ -71,8 +78,15 @@ final class ScoreLoader {
 
     func layOut(_ piece: Piece, request: LayoutRequest) async throws -> LaidOutPiece {
         let xml = try await Self.prepare(piece)
-        let score = try await engraver.engrave(musicXML: xml, request: request)
-        return await Self.read(score)
+        var request = request
+        var laidOut = await Self.read(try await engraver.engrave(musicXML: xml, request: request))
+        // Pages are filled tightly; if anything under a page's last line runs off the
+        // page, engrave again with more room at the foot, as often as needed.
+        while laidOut.overflows, request.bottomRoom < 400 {
+            request.bottomRoom += 60
+            laidOut = await Self.read(try await engraver.engrave(musicXML: xml, request: request))
+        }
+        return laidOut
     }
 
     /// Splitting out one part reads the whole file: kept off the main thread.

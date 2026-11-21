@@ -65,31 +65,16 @@ struct ScoreCanvas: View {
                 cg.setLineJoin(round ? .round : .miter)
                 cg.addPath(path)
                 cg.strokePath()
-            case .text(let run):
-                if text { draw(run, in: cg, color: ink) }
+            case .text(let line, let origin):
+                guard text else { continue }
+                cg.saveGState()
+                cg.translateBy(x: origin.x, y: origin.y)
+                cg.scaleBy(x: 1, y: -1)
+                cg.textPosition = .zero
+                CTLineDraw(line, cg)
+                cg.restoreGState()
             }
         }
-        cg.restoreGState()
-    }
-
-    private static func draw(_ run: SVGScene.TextRun, in cg: CGContext, color: CGColor) {
-        let font = FontCache.font(size: run.size, bold: run.bold, italic: run.italic)
-        let attributes: [NSAttributedString.Key: Any] = [
-            NSAttributedString.Key(kCTFontAttributeName as String): font,
-            NSAttributedString.Key(kCTForegroundColorAttributeName as String): color,
-        ]
-        let line = CTLineCreateWithAttributedString(NSAttributedString(string: run.string, attributes: attributes))
-        let width = CTLineGetTypographicBounds(line, nil, nil, nil)
-        let dx: CGFloat = switch run.anchor {
-        case .start: 0
-        case .middle: -width / 2
-        case .end: -width
-        }
-        cg.saveGState()
-        cg.translateBy(x: run.position.x + dx, y: run.position.y)
-        cg.scaleBy(x: 1, y: -1)
-        cg.textPosition = .zero
-        CTLineDraw(line, cg)
         cg.restoreGState()
     }
 }

@@ -27,7 +27,7 @@ actor VerovioEngraver: Engraver {
             "pageMarginLeft": 25,
             "pageMarginRight": 25,
             "pageMarginTop": 40,
-            "pageMarginBottom": 150,
+            "pageMarginBottom": request.bottomRoom,
             "scale": 100,
             "breaks": "auto",
             "adjustPageHeight": false,

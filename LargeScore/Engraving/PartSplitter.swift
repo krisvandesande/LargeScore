@@ -97,6 +97,11 @@ nonisolated private final class PartFilter: NSObject, XMLParserDelegate {
             skipDepth = 1
             return
         }
+        // The full score's brackets and braces would be drawn around what's left.
+        if element == "part-group" {
+            skipDepth = 1
+            return
+        }
         if element == "part" { keptPartsSeen += 1 }
         if element == "direction", keptPartsSeen > 1 {
             directionStart = output.endIndex

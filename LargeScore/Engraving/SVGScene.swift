@@ -1,5 +1,6 @@
 import Foundation
 import CoreGraphics
+import CoreText
 
 /// A Verovio page read once into paths and text, ready to draw at any size and colour.
 /// Covers what Verovio writes: nested `svg` with viewBox, `g` and `use` with transforms,
@@ -8,17 +9,8 @@ nonisolated struct SVGScene: @unchecked Sendable {
     enum Item {
         case fill(CGPath)
         case stroke(CGPath, width: CGFloat, round: Bool)
-        case text(TextRun)
-    }
-
-    struct TextRun {
-        var string: String
-        var position: CGPoint
-        var size: CGFloat
-        var bold: Bool
-        var italic: Bool
-        var anchor: Anchor
-        enum Anchor { case start, middle, end }
+        /// Words, laid out once when the page is read; drawn in the context's colour.
+        case text(CTLine, origin: CGPoint)
     }
 
     var viewBox: CGRect
@@ -61,14 +53,22 @@ nonisolated private final class SceneBuilder: NSObject, XMLParserDelegate {
     private var inDefs = 0
     private var currentDef: String?
 
-    // Text being collected.
+    // Text being collected: the spans of one `text`, each with its own style.
+    private struct SpanStyle {
+        var size: CGFloat = 0
+        var bold = false
+        var italic = false
+        var font: String?
+        var shift: CGFloat = 0
+        /// Set on the element that carries its own font size: Verovio's leaf tspans,
+        /// the only ones whose characters are text rather than indentation.
+        var leaf = false
+    }
     private var textOrigin: CGPoint?
-    private var textAnchor: SVGScene.TextRun.Anchor = .start
-    private var textSize: CGFloat = 0
-    private var textBold = false
-    private var textItalic = false
-    private var textBuffer = ""
-    private var tspanSizes: [CGFloat] = []
+    private var textAnchor: TextLayout.Anchor = .start
+    private var styles: [SpanStyle] = []
+    private var spans: [TextSpan] = []
+    private var buffer = ""
 
     private var ctm: CGAffineTransform { stack.last?.transform ?? .identity }
     private var classes: Set<String> { stack.last?.classes ?? [] }
@@ -143,18 +143,32 @@ nonisolated private final class SceneBuilder: NSObject, XMLParserDelegate {
         case "text":
             textOrigin = CGPoint(x: num(a["x"]), y: num(a["y"])).applying(frame.transform)
             textAnchor = a["text-anchor"] == "middle" ? .middle : a["text-anchor"] == "end" ? .end : .start
-            textBuffer = ""
-            textSize = 0
-            textBold = frame.bold || !frame.classes.isDisjoint(with: ["reh", "tempo", "ending", "fing"])
-            textItalic = !frame.classes.isDisjoint(with: ["dynam", "mNum", "dir"])
-            tspanSizes = []
-        case "tspan":
-            if let s = a["font-size"], let size = Double(s.replacingOccurrences(of: "px", with: "")), size > 0 {
+            spans = []
+            buffer = ""
+            var style = SpanStyle()
+            style.bold = frame.bold || !frame.classes.isDisjoint(with: ["reh", "tempo", "ending", "fing"])
+            style.italic = !frame.classes.isDisjoint(with: ["dynam", "mNum", "dir"]) || a["font-style"] == "italic"
+            styles = [style]
+        case "tspan" where textOrigin != nil:
+            flushSpan()
+            var style = styles.last ?? SpanStyle()
+            style.leaf = false
+            let scale = sqrt(abs(frame.transform.a * frame.transform.d))
+            if let s = a["font-size"], let size = Double(s.replacingOccurrences(of: "px", with: "")) {
                 // Font sizes are in the element's own units; scale them like the coordinates.
-                let scale = sqrt(abs(frame.transform.a * frame.transform.d))
-                textSize = CGFloat(size) * scale
+                style.size = CGFloat(size) * scale
+                style.leaf = size > 0
             }
-            if frame.bold { textBold = true }
+            if a["font-weight"] == "bold" { style.bold = true }
+            if a["font-weight"] == "normal" { style.bold = false }
+            if a["font-style"] == "italic" { style.italic = true }
+            if a["font-style"] == "normal" { style.italic = false }
+            if let family = a["font-family"] {
+                let name = family.split(separator: ",").first.map { $0.trimmingCharacters(in: .whitespaces) } ?? family
+                style.font = TextLayout.musicFonts.contains(name) ? name : nil
+            }
+            if let dy = a["dy"].flatMap(Double.init) { style.shift += CGFloat(dy) * scale }
+            styles.append(style)
         default:
             break
         }
@@ -162,7 +176,15 @@ nonisolated private final class SceneBuilder: NSObject, XMLParserDelegate {
     }
 
     func parser(_ parser: XMLParser, foundCharacters string: String) {
-        if textOrigin != nil { textBuffer += string }
+        if textOrigin != nil, styles.last?.leaf == true { buffer += string }
+    }
+
+    /// Closes the characters collected so far into a span in the current style.
+    private func flushSpan() {
+        guard !buffer.isEmpty, let style = styles.last else { buffer = ""; return }
+        spans.append(TextSpan(string: buffer, size: style.size, bold: style.bold, italic: style.italic,
+                              musicFont: style.font, shift: style.shift))
+        buffer = ""
     }
 
     func parser(_ parser: XMLParser, didEndElement element: String, namespaceURI: String?, qualifiedName: String?) {
@@ -172,18 +194,24 @@ nonisolated private final class SceneBuilder: NSObject, XMLParserDelegate {
             inDefs -= 1
         case "g":
             if let id = frame?.defID, id == currentDef { currentDef = nil }
+        case "tspan" where textOrigin != nil:
+            flushSpan()
+            if styles.count > 1 { styles.removeLast() }
         case "text":
-            let words = textBuffer.trimmingCharacters(in: .whitespacesAndNewlines)
-            if let origin = textOrigin, !words.isEmpty, textSize > 0 {
-                items.append(.text(.init(string: words, position: origin, size: textSize,
-                                         bold: textBold, italic: textItalic, anchor: textAnchor)))
-                if let frame {
-                    let width = textSize * 0.6 * CGFloat(words.count)
-                    let x = textAnchor == .start ? origin.x : textAnchor == .middle ? origin.x - width / 2 : origin.x - width
-                    cover(CGRect(x: x, y: origin.y - textSize * 0.8, width: width, height: textSize), in: frame)
+            flushSpan()
+            if let origin = textOrigin {
+                let laidOut = TextLayout.layOut(spans, at: origin, anchor: textAnchor)
+                for piece in laidOut.pieces {
+                    switch piece {
+                    case .words(let line, let at): items.append(.text(line, origin: at))
+                    case .glyph(let path): items.append(.fill(path))
+                    }
                 }
+                if let frame, !laidOut.bounds.isNull { cover(laidOut.bounds, in: frame) }
             }
             textOrigin = nil
+            spans = []
+            styles = []
         default:
             break
         }

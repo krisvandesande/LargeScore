@@ -12,6 +12,9 @@ nonisolated struct LayoutRequest: Hashable, Sendable {
     /// Room between lines of music, in half staff spaces on top of what Verovio
     /// already leaves for slurs and dynamics.
     var lineGap: Int = 4
+    /// Room under the last line, in Verovio units. Tight first; more only when what
+    /// hangs below the last line (dynamics, lyrics, chord names) would run off.
+    var bottomRoom: Int = 40
 }
 
 /// One engraved page.
