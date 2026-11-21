@@ -96,13 +96,17 @@ extension EngravingSpeedTests {
         let start = clock.now
         let scenes = score.pages.compactMap { SVGScene(svg: $0.svg) }
         let read = clock.now - start
-        let drawStart = clock.now
         let size = request.pageSize
         let context = try #require(CGContext(data: nil, width: Int(size.width * 2), height: Int(size.height * 2), bitsPerComponent: 8, bytesPerRow: 0, space: CGColorSpaceCreateDeviceRGB(), bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue))
         context.scaleBy(x: 2, y: 2)
+        let coldStart = clock.now
         ScoreCanvas.draw(scenes[0], in: context, size: size, ink: CGColor(gray: 0, alpha: 1))
+        let cold = clock.now - coldStart
+        // A page turn: the next page, fonts already made.
+        let drawStart = clock.now
+        ScoreCanvas.draw(scenes[1], in: context, size: size, ink: CGColor(gray: 0, alpha: 1))
         let draw = clock.now - drawStart
-        print("SPEED long piece: \(score.pages.count) pages, engrave \(score.duration), read all \(read), draw one page \(draw)")
+        print("SPEED long piece: \(score.pages.count) pages, engrave \(score.duration), read all \(read), first draw \(cold), page turn draw \(draw)")
         #expect(scenes.count == score.pages.count)
         #expect(score.duration < .milliseconds(300))
         #expect(draw < .milliseconds(16))

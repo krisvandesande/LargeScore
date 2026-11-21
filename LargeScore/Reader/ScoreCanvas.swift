@@ -64,11 +64,7 @@ struct ScoreCanvas: View {
     }
 
     private static func draw(_ run: SVGScene.TextRun, in cg: CGContext, color: CGColor) {
-        var traits: CTFontSymbolicTraits = []
-        if run.bold { traits.insert(.traitBold) }
-        if run.italic { traits.insert(.traitItalic) }
-        let base = CTFontCreateWithName("Times New Roman" as CFString, run.size, nil)
-        let font = CTFontCreateCopyWithSymbolicTraits(base, run.size, nil, traits, traits) ?? base
+        let font = FontCache.font(size: run.size, bold: run.bold, italic: run.italic)
         let attributes: [NSAttributedString.Key: Any] = [
             NSAttributedString.Key(kCTFontAttributeName as String): font,
             NSAttributedString.Key(kCTForegroundColorAttributeName as String): color,
@@ -86,5 +82,23 @@ struct ScoreCanvas: View {
         cg.textPosition = .zero
         CTLineDraw(line, cg)
         cg.restoreGState()
+    }
+}
+
+/// Fonts for the music's words, made once per size and style rather than on every draw.
+nonisolated enum FontCache {
+    // NSCache is thread-safe; CTFont is immutable.
+    nonisolated(unsafe) private static let cache = NSCache<NSString, CTFont>()
+
+    static func font(size: CGFloat, bold: Bool, italic: Bool) -> CTFont {
+        let key = "\(size)-\(bold)-\(italic)" as NSString
+        if let font = cache.object(forKey: key) { return font }
+        var traits: CTFontSymbolicTraits = []
+        if bold { traits.insert(.traitBold) }
+        if italic { traits.insert(.traitItalic) }
+        let base = CTFontCreateWithName("Times New Roman" as CFString, size, nil)
+        let font = CTFontCreateCopyWithSymbolicTraits(base, size, nil, traits, traits) ?? base
+        cache.setObject(font, forKey: key)
+        return font
     }
 }
