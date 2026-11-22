@@ -114,6 +114,9 @@ enum LaunchOptions {
         // (scripts/enable-icloud.sh); until then, and in tests, on this device only.
         let configuration = ModelConfiguration(isStoredInMemoryOnly: inMemory,
                                                cloudKitDatabase: inMemory ? .none : .automatic)
+        #if DEBUG
+        CloudSchema.initializeIfNeeded()
+        #endif
         do {
             return try ModelContainer(for: Score.self, Programme.self, ProgrammeEntry.self, Annotation.self, configurations: configuration)
         } catch {
