@@ -56,9 +56,8 @@ struct OnboardingView: View {
             MusicSizePanel(rows: [.size])
         case .spacing:
             ScreenTitle(text: "Choose the space between lines")
-            SampleCard(piece: .sample(for: settings.instrument), description: "Sample music", fills: true)
+            PreviewWithSpacing(card: SampleCard(piece: .sample(for: settings.instrument), description: "Sample music", fills: true))
                 .frame(minHeight: 320)
-            MusicSizePanel(rows: [.spacing])
         case .lines:
             ScreenTitle(text: "Choose the line thickness")
             SampleCard(piece: .sample(for: settings.instrument), description: "Sample music", fills: true)

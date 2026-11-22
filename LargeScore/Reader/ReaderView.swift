@@ -474,7 +474,7 @@ struct SizeSheet: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 24) {
-                SampleCard(piece: piece, description: "The music at this size", page: page, fills: true)
+                PreviewWithSpacing(card: SampleCard(piece: piece, description: "The music at this size", page: page, fills: true))
                 MusicSizePanel()
             }
             .air(.all, 24)

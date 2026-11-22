@@ -147,25 +147,57 @@ struct LineChoice: View {
     }
 }
 
-/// The room between lines as a slider, tight to the left.
+/// The room between lines as a slider standing upright beside the music: up for
+/// more room, down for less.
 struct SpacingChoice: View {
     @Environment(ReaderSettings.self) private var settings
 
     var body: some View {
-        StepSlider(value: settings.lineGap, count: ReaderSettings.maxLineGap + 1,
-                   smaller: "arrow.down.and.line.horizontal.and.arrow.up",
-                   larger: "arrow.up.and.line.horizontal.and.arrow.down") {
-            settings.lineGap = $0
+        VStack(spacing: 12) {
+            Image(systemName: "arrow.up.and.line.horizontal.and.arrow.down")
+                .imageScale(.large).foregroundStyle(.secondary).accessibilityHidden(true)
+            GeometryReader { proxy in
+                Slider(value: Binding(get: { Double(settings.lineGap) }, set: { settings.lineGap = Int($0.rounded()) }),
+                       in: 0...Double(ReaderSettings.maxLineGap), step: 1)
+                    .tint(Palette.accent)
+                    .frame(width: proxy.size.height)
+                    .rotationEffect(.degrees(-90))
+                    .position(x: proxy.size.width / 2, y: proxy.size.height / 2)
+            }
+            Image(systemName: "arrow.down.and.line.horizontal.and.arrow.up")
+                .imageScale(.large).foregroundStyle(.secondary).accessibilityHidden(true)
         }
+        .frame(width: 56)
+        .frame(minHeight: 200)
+        .accessibilityElement(children: .combine)
         .accessibilityLabel("Space between lines")
         .accessibilityValue(Text("\(settings.lineGap + 1) of \(ReaderSettings.maxLineGap + 1)"))
+        .accessibilityAdjustableAction { direction in
+            switch direction {
+            case .increment: if settings.lineGap < ReaderSettings.maxLineGap { settings.lineGap += 1 }
+            case .decrement: if settings.lineGap > 0 { settings.lineGap -= 1 }
+            @unknown default: break
+            }
+        }
+    }
+}
+
+/// The preview with the spacing slider standing at its right.
+struct PreviewWithSpacing: View {
+    let card: SampleCard
+
+    var body: some View {
+        HStack(spacing: 16) {
+            card
+            SpacingChoice()
+        }
     }
 }
 
 /// The three choices as named rows in one panel: the name on the left, its control
 /// on the right, all controls the same width; at large text the name goes above.
 struct MusicSizePanel: View {
-    var rows: Set<Row> = [.size, .spacing, .lines]
+    var rows: Set<Row> = [.size, .lines]
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     enum Row { case size, spacing, lines }

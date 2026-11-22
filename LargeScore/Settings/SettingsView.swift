@@ -80,7 +80,7 @@ struct SizeSettingsView: View {
 
     var body: some View {
         VStack(spacing: 24) {
-            SampleCard(piece: .sample(for: settings.instrument), description: "Sample music", fills: true)
+            PreviewWithSpacing(card: SampleCard(piece: .sample(for: settings.instrument), description: "Sample music", fills: true))
             MusicSizePanel()
         }
         .air(.all, 32)
