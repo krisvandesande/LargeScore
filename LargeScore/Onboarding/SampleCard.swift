@@ -12,6 +12,9 @@ struct SampleCard: View {
     /// Which page to show, for `fills`.
     var page: Int = 0
     var fills = false
+    /// Drawn as the reader draws a page, edge to edge with the reader's margins, so
+    /// the lines break where they will when reading; else a rounded card.
+    var asPage = false
 
     @Environment(ReaderSettings.self) private var settings
     @Environment(ScoreLoader.self) private var loader
@@ -20,9 +23,15 @@ struct SampleCard: View {
     @State private var size: CGSize = .zero
 
     private let inset: CGFloat = 20
+    /// The reader's own margins (ReaderView).
+    private var margins: EdgeInsets {
+        asPage ? EdgeInsets(top: 16, leading: 12, bottom: 12, trailing: 12)
+               : EdgeInsets(top: inset, leading: inset, bottom: inset, trailing: inset)
+    }
 
     private var area: CGSize {
-        CGSize(width: max(size.width - inset * 2, 1), height: max((fills ? size.height : maxHeight) - inset * 2, 1))
+        CGSize(width: max(size.width - margins.leading - margins.trailing, 1),
+               height: max((fills ? size.height : maxHeight) - margins.top - margins.bottom, 1))
     }
 
     private var request: LayoutRequest { settings.layoutRequest(for: area, centred: fills) }
@@ -43,13 +52,13 @@ struct SampleCard: View {
             if let page = scene {
                 ScoreCanvas(scene: page, ink: dark ? .white : .black, glyphWeight: settings.glyphWeight)
                     .frame(width: area.width, height: area.height)
-                    .padding(inset)
+                    .padding(margins)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: fills ? .infinity : nil)
         .frame(height: fills ? nil : cardHeight, alignment: .top)
-        .clipShape(RoundedRectangle(cornerRadius: 26))
-        .overlay(RoundedRectangle(cornerRadius: 26).strokeBorder(Color(.separator)))
+        .clipShape(RoundedRectangle(cornerRadius: asPage ? 0 : 26))
+        .overlay(RoundedRectangle(cornerRadius: asPage ? 0 : 26).strokeBorder(asPage ? Color.clear : Color(.separator)))
         .onGeometryChange(for: CGSize.self) { $0.size } action: { size = $0 }
         .task(id: request) {
             guard area.width > 100, area.height > 60 else { return }
@@ -147,8 +156,7 @@ struct LineChoice: View {
     }
 }
 
-/// The room between lines as a slider standing upright beside the music: up for
-/// more room, down for less.
+/// The room between lines as a slider standing upright: up for more room, down for less.
 struct SpacingChoice: View {
     @Environment(ReaderSettings.self) private var settings
 
@@ -160,6 +168,8 @@ struct SpacingChoice: View {
                 Slider(value: Binding(get: { Double(settings.lineGap) }, set: { settings.lineGap = Int($0.rounded()) }),
                        in: 0...Double(ReaderSettings.maxLineGap), step: 1)
                     .tint(Palette.accent)
+                    .accessibilityLabel("Space between lines")
+                    .accessibilityValue(Text("\(settings.lineGap + 1) of \(ReaderSettings.maxLineGap + 1)"))
                     .frame(width: proxy.size.height)
                     .rotationEffect(.degrees(-90))
                     .position(x: proxy.size.width / 2, y: proxy.size.height / 2)
@@ -167,30 +177,50 @@ struct SpacingChoice: View {
             Image(systemName: "arrow.down.and.line.horizontal.and.arrow.up")
                 .imageScale(.large).foregroundStyle(.secondary).accessibilityHidden(true)
         }
-        .frame(width: 56)
-        .frame(minHeight: 200)
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel("Space between lines")
-        .accessibilityValue(Text("\(settings.lineGap + 1) of \(ReaderSettings.maxLineGap + 1)"))
-        .accessibilityAdjustableAction { direction in
-            switch direction {
-            case .increment: if settings.lineGap < ReaderSettings.maxLineGap { settings.lineGap += 1 }
-            case .decrement: if settings.lineGap > 0 { settings.lineGap -= 1 }
-            @unknown default: break
-            }
-        }
+        .frame(width: 44)
     }
 }
 
-/// The preview with the spacing slider standing at its right.
-struct PreviewWithSpacing: View {
+/// The music with its two sliders: the space between lines upright at the right
+/// (up for more), the size along the foot (right for larger). `floating` lays them
+/// over the music's edges, so the music keeps the full width of the reader's page;
+/// otherwise they sit beside the card.
+struct MusicSizePreview: View {
     let card: SampleCard
+    var floating = false
 
     var body: some View {
-        HStack(spacing: 16) {
+        if floating {
             card
-            SpacingChoice()
+                .overlay(alignment: .trailing) {
+                    SpacingChoice()
+                        .padding(.vertical, 14)
+                        .padding(.horizontal, 4)
+                        .frame(maxHeight: 420)
+                        .background(.regularMaterial, in: Capsule())
+                        .padding(.trailing, 4)
+                }
+                .overlay(alignment: .bottom) { sizeBar.padding(.horizontal, 80).padding(.bottom, 16) }
+        } else {
+            VStack(spacing: 12) {
+                HStack(spacing: 12) {
+                    card
+                    SpacingChoice()
+                }
+                HStack(spacing: 12) {
+                    SizeStepper()
+                    Color.clear.frame(width: 44, height: 1)
+                }
+            }
         }
+    }
+
+    private var sizeBar: some View {
+        SizeStepper()
+            .padding(.horizontal, 24)
+            .padding(.vertical, 6)
+            .frame(maxWidth: 620)
+            .background(.regularMaterial, in: Capsule())
     }
 }
 

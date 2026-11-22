@@ -20,6 +20,10 @@ struct SettingsView: View {
                             Text("Size \(settings.sizeStep + 1) of \(ReaderSettings.staffHeights.count)")
                         }
                     }
+                    FittingPicker(String(localized: "Lines"), value: settings.boldLines ? String(localized: "Bold") : String(localized: "Thin"), selection: $settings.boldLines) {
+                        Text("Thin").tag(false)
+                        Text("Bold").tag(true)
+                    }
                     FittingPicker(String(localized: "Page"), value: String(localized: settings.pageColour.title), selection: $settings.pageColour) {
                         ForEach(ReaderSettings.PageColour.allCases) { colour in
                             Text(colour.title).tag(colour)
@@ -79,13 +83,13 @@ struct SizeSettingsView: View {
     @Environment(ReaderSettings.self) private var settings
 
     var body: some View {
-        VStack(spacing: 24) {
-            PreviewWithSpacing(card: SampleCard(piece: .sample(for: settings.instrument), description: "Sample music", fills: true))
-            MusicSizePanel()
-        }
-        .air(.all, 32)
-        .background(Palette.ground)
-        .navigationTitle("Music Size")
+        // The music at its real size, as wide as the reader's page, so the lines
+        // break where they will when reading.
+        MusicSizePreview(card: SampleCard(piece: .sample(for: settings.instrument), description: "Sample music",
+                                          fills: true, asPage: true), floating: true)
+            .ignoresSafeArea(edges: .bottom)
+            .navigationTitle("Music Size")
+            .navigationBarTitleDisplayMode(.inline)
     }
 }
 

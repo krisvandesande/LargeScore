@@ -3,7 +3,7 @@ import SwiftUI
 /// First launch: the instrument (for the clef of the sample and the part to choose),
 /// then the size and line thickness, chosen by looking at real music.
 struct OnboardingView: View {
-    enum Step: Int { case instrument, size, spacing, lines }
+    enum Step: Int { case instrument, size, lines }
 
     @Environment(ReaderSettings.self) private var settings
     @State private var step = Step.instrument
@@ -51,13 +51,8 @@ struct OnboardingView: View {
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
-            SampleCard(piece: .sample(for: settings.instrument), description: "Sample music", fills: true)
-                .frame(minHeight: 320)
-            MusicSizePanel(rows: [.size])
-        case .spacing:
-            ScreenTitle(text: "Choose the space between lines")
-            PreviewWithSpacing(card: SampleCard(piece: .sample(for: settings.instrument), description: "Sample music", fills: true))
-                .frame(minHeight: 320)
+            MusicSizePreview(card: SampleCard(piece: .sample(for: settings.instrument), description: "Sample music", fills: true))
+                .frame(minHeight: 380)
         case .lines:
             ScreenTitle(text: "Choose the line thickness")
             SampleCard(piece: .sample(for: settings.instrument), description: "Sample music", fills: true)

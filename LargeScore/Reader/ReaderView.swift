@@ -45,7 +45,6 @@ struct ReaderView: View {
     @State private var laidOut: LaidOutPiece?
     @State private var turner = PageTurner(pageCount: 0, halfPageTurns: false)
     @State private var failed = false
-    @State private var choosingSize = false
 
     /// Even and small at the sides: the staff runs from one margin to the other, so
     /// the music gets every point of the width the eye can use.
@@ -92,13 +91,12 @@ struct ReaderView: View {
                 ReaderStrip(title: piece.title, backTitle: backTitle, pageText: pageText,
                             nextTitle: nextPiece?.title,
                             back: { dismiss() }, next: { goToNextPiece() },
-                            notes: notes?.canAnnotate == true ? { startAnnotating() } : nil,
-                            size: { choosingSize = true })
+                            notes: notes?.canAnnotate == true ? { startAnnotating() } : nil)
             }
         }
         .environment(\.colorScheme, scheme)
         // The pedal's keys, except while a sheet over the reader needs the keyboard.
-        .background { PedalKeys(active: !writingNote && !choosingSize,
+        .background { PedalKeys(active: !writingNote,
                                 forward: { turn(forward: true) }, back: { turn(forward: false) }, close: { dismiss() }) }
         .onAppear {
             UIApplication.shared.isIdleTimerDisabled = true
@@ -111,9 +109,6 @@ struct ReaderView: View {
         .onDisappear { UIApplication.shared.isIdleTimerDisabled = false }
         .onChange(of: settings.halfPageTurns) { _, half in
             turner.update(pageCount: turner.pageCount, halfPageTurns: half)
-        }
-        .sheet(isPresented: $choosingSize) {
-            SizeSheet(piece: piece, page: turner.page)
         }
         .persistentSystemOverlays(.hidden)
     }
@@ -368,14 +363,13 @@ struct ReaderStrip: View {
     let back: () -> Void
     var next: () -> Void = {}
     var notes: (() -> Void)? = nil
-    let size: () -> Void
 
     var body: some View {
         ViewThatFits(in: .horizontal) {
             row(showTitle: true)
             row(showTitle: false)
             VStack(alignment: .leading, spacing: 12) {
-                HStack(spacing: 16) { backButton; Spacer(minLength: 0); notesButton; sizeButton }
+                HStack(spacing: 16) { backButton; Spacer(minLength: 0); notesButton }
                 HStack(spacing: 16) { pageLabel; Spacer(minLength: 0); nextButton }
             }
         }
@@ -404,7 +398,6 @@ struct ReaderStrip: View {
             pageLabel
             nextButton
             notesButton
-            sizeButton
         }
     }
 
@@ -443,15 +436,6 @@ struct ReaderStrip: View {
         .accessibilityInputLabels([Text(backTitle), Text("Back")])
     }
 
-    private var sizeButton: some View {
-        Button("Size", action: size)
-            .buttonStyle(.large)
-            .fixedSize()
-            .accessibilityLabel("Music Size")
-            .accessibilityShowsLargeContentViewer()
-            .accessibilityInputLabels([Text("Size"), Text("Music Size")])
-    }
-
     @ViewBuilder
     private var pageLabel: some View {
         if let pageText {
@@ -461,34 +445,6 @@ struct ReaderStrip: View {
                 .fixedSize()
                 .accessibilityHidden(true)
         }
-    }
-}
-
-/// The size, changed while reading: the same choice as at the start.
-struct SizeSheet: View {
-    let piece: Piece
-    /// The page being read: the preview is that page, as the reader draws it.
-    var page = 0
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        NavigationStack {
-            VStack(spacing: 24) {
-                PreviewWithSpacing(card: SampleCard(piece: piece, description: "The music at this size", page: page, fills: true))
-                MusicSizePanel()
-            }
-            .air(.all, 24)
-            .background(Palette.ground)
-            .navigationTitle("Music Size")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") { dismiss() }
-                        .font(.title3.weight(.semibold))
-                }
-            }
-        }
-        .presentationSizing(.page)
     }
 }
 

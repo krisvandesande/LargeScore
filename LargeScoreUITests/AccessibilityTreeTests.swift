@@ -105,9 +105,11 @@ final class AccessibilityTreeTests: XCTestCase {
         sleep(1)
         record(app, "09-notes")
         app.buttons["Done"].firstMatch.tap()
-        app.buttons["Music Size"].tap()
+        app.buttons["Back to Library"].firstMatch.tap()
+        app.buttons["Settings"].firstMatch.tap()
+        app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Music Size")).firstMatch.tap()
         sleep(1)
-        record(app, "10-size-sheet")
+        record(app, "10-size-settings")
 
         XCTAssertTrue(nameless.isEmpty, "Controls without a spoken name or with a raw one:\n" + nameless.joined(separator: "\n"))
     }

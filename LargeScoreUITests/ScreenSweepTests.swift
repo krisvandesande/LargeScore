@@ -96,11 +96,6 @@ final class ScreenSweepTests: XCTestCase {
                 shot(app, "02-size", variant: variant)
                 if !dark { audit(app, "onboarding-size-\(sizeName)") }
                 app.buttons["Continue"].tap()
-                XCTAssertTrue(app.staticTexts["Choose the space between lines"].waitForExistence(timeout: 5))
-                sleep(1)
-                shot(app, "025-spacing", variant: variant)
-                if !dark { audit(app, "onboarding-spacing-\(sizeName)") }
-                app.buttons["Continue"].tap()
                 XCTAssertTrue(app.staticTexts["Choose the line thickness"].waitForExistence(timeout: 5))
                 sleep(1)
                 shot(app, "03-lines", variant: variant)
@@ -172,10 +167,21 @@ final class ScreenSweepTests: XCTestCase {
                 page.coordinate(withNormalizedOffset: CGVector(dx: 0.85, dy: 0.5)).tap()
                 sleep(1)
                 shot(app, "21-reader-page2", variant: variant)
-                app.buttons["Music Size"].tap()
+                app.buttons["Back to Library"].firstMatch.tap()
+                app.buttons["Settings"].firstMatch.tap()
+                let sizeRow = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Music Size")).firstMatch
+                // Settings may still be scrolled down from the About step: back to its top.
+                for _ in 0..<3 where !sizeRow.waitForExistence(timeout: 2) {
+                    app.collectionViews.firstMatch.swipeDown()
+                }
+                XCTAssertTrue(sizeRow.waitForExistence(timeout: 5))
+                sizeRow.tap()
                 sleep(2)
-                shot(app, "22-size-sheet", variant: variant)
-                app.buttons["Done"].tap()
+                shot(app, "22-size-settings", variant: variant)
+                if !dark { audit(app, "size-settings-\(sizeName)") }
+                // The app reopens where it was left: leave Music Size first.
+                app.navigationBars.buttons.firstMatch.tap()
+                sleep(1)
                 app.terminate()
             }
         }
@@ -321,15 +327,18 @@ final class ScreenSweepTests: XCTestCase {
         let closed = expectation(for: NSPredicate(format: "exists == false"), evaluatedWith: editor)
         wait(for: [closed], timeout: 5)
         app.buttons["Done"].firstMatch.tap()
-        XCTAssertTrue(app.buttons["Music Size"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["Notes"].waitForExistence(timeout: 5))
         shot(app, "61-notes-shown", variant: "standard-light")
         XCTAssertTrue((page.value as? String ?? "").contains("notes"))
-        // A larger size: the notes go with their bars.
-        app.buttons["Music Size"].tap()
+        // A larger size, set in Settings: the notes go with their bars.
+        app.buttons["Back to Library"].firstMatch.tap()
+        app.buttons["Settings"].firstMatch.tap()
+        app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Music Size")).firstMatch.tap()
         let slider = app.sliders["Music size"]
         XCTAssertTrue(slider.waitForExistence(timeout: 5))
         slider.adjust(toNormalizedSliderPosition: 0.84)
-        app.buttons["Done"].firstMatch.tap()
+        app.buttons["Library"].firstMatch.tap()
+        card(app).tap()
         sleep(2)
         shot(app, "62-notes-larger", variant: "standard-light")
         app.buttons["Back to Library"].firstMatch.tap()
