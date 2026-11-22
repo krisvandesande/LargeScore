@@ -49,10 +49,12 @@ nonisolated struct MusicFile: Sendable, Identifiable {
 
     /// Reads a file from any source: compressed or not, UTF-8 or UTF-16.
     static func read(_ data: Data, fileName: String) throws -> MusicFile {
-        let xml = try text(of: data)
-        guard xml.contains("<score-partwise") else {
-            throw xml.contains("<score-timewise") ? Failure.timewise : Failure.notMusicXML
+        let raw = try text(of: data)
+        guard raw.contains("<score-partwise") else {
+            throw raw.contains("<score-timewise") ? Failure.timewise : Failure.notMusicXML
         }
+        // Every note and bar gets an id, so a note tapped on the page can be fixed.
+        let xml = MusicXMLEdit.withIDs(raw)
         let info = Metadata.read(xml)
         let fallback = (fileName as NSString).deletingPathExtension
         let title = [info.workTitle, info.movementTitle, info.creditTitle]

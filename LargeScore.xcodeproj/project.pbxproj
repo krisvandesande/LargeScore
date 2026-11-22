@@ -17,6 +17,7 @@
 		1E3E694D612E7296C55AA653 /* LayoutKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = A64C9C1F5D246BD26E7EB0ED /* LayoutKit.swift */; };
 		224DA9E13A57C61C072D5DC8 /* LibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17268AD31FC953CCF78E7F0A /* LibraryView.swift */; };
 		227C58F7FEF2C1E1115D5CBE /* ConversionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1D60A5D10C3B9173796CC05 /* ConversionTests.swift */; };
+		27A52EEC71E4821E9A565F9F /* FixSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86C0F5F1A0FE25C6907142DD /* FixSession.swift */; };
 		2AD6FA9985243F747B68EB9B /* ImportTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA09A15929E52433660615B /* ImportTests.swift */; };
 		2BDABFE1171DE6A0406AC014 /* PageTurner.swift in Sources */ = {isa = PBXBuildFile; fileRef = F44D8CA440E27E7D7D2037D8 /* PageTurner.swift */; };
 		2E3E9640839400CA3864B8A8 /* ZipReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F8F166C31D3BB62BA66B3B9 /* ZipReader.swift */; };
@@ -37,6 +38,7 @@
 		78EB2DD2FF31CDC9C21707F5 /* Score.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC28BC7AB931DB55F6791614 /* Score.swift */; };
 		7B4E87776861141FEC3495C0 /* ScoreCanvas.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF478BA8ECBAAE9FED7D8264 /* ScoreCanvas.swift */; };
 		7D1319FD90D71337F5CBCAD0 /* PartSplitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6571A2CA874D68B485A827E6 /* PartSplitter.swift */; };
+		7F531218DC3CF616015B717C /* FixNotesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11987A0C4C4B64976C2055A3 /* FixNotesTests.swift */; };
 		9173E0D4267A293A5B6E6EC1 /* ThicknessRenderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0838610092BDE0C0A68B0374 /* ThicknessRenderTests.swift */; };
 		96CCF458D90D562983B458EE /* ScoreLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4C3345DCD65C0A8E77FDBF9 /* ScoreLoader.swift */; };
 		9D3D1F9DDC72FF21118EE562 /* ImportSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2135B1AA56EFBB86D0F3C587 /* ImportSheet.swift */; };
@@ -49,6 +51,7 @@
 		B861C91F1E7EB4A9FF927E23 /* MarkRenderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67BE2F6AC6FD73DD22EB2E8B /* MarkRenderTests.swift */; };
 		B8E2B41CE24CB3C0616A654E /* ImportSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45C9CB78E24BC8C1D9F23D28 /* ImportSession.swift */; };
 		C01B1F925B264F392B764D52 /* ReaderSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FF77D829CA58D403A3BE0DC /* ReaderSettings.swift */; };
+		C1BEAD7B8DF01DC885566F57 /* MusicXMLEdit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 621B9411D5B09EAA448B9A68 /* MusicXMLEdit.swift */; };
 		C30EC66063AA58D60F923F1F /* RenderOutput.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D8417E61C09893DAEEE5C3 /* RenderOutput.swift */; };
 		D072985CFC4D85275CC3E3E3 /* TextLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6299FC9AB66EA749AB2CF385 /* TextLayout.swift */; };
 		D24D2E3EF301948729023D3F /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3A2F17269B7472AF6CFD6 /* OnboardingView.swift */; };
@@ -85,6 +88,7 @@
 		0838610092BDE0C0A68B0374 /* ThicknessRenderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThicknessRenderTests.swift; sourceTree = "<group>"; };
 		09D4E0A9194472104B818A2C /* NotesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotesTests.swift; sourceTree = "<group>"; };
 		0D3C8381AA93F40B9C09CF5B /* converted-by-audiveris.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "converted-by-audiveris.pdf"; sourceTree = "<group>"; };
+		11987A0C4C4B64976C2055A3 /* FixNotesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixNotesTests.swift; sourceTree = "<group>"; };
 		11E71A1975CE6270736A016C /* MusicFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicFile.swift; sourceTree = "<group>"; };
 		17268AD31FC953CCF78E7F0A /* LibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryView.swift; sourceTree = "<group>"; };
 		1F8F166C31D3BB62BA66B3B9 /* ZipReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZipReader.swift; sourceTree = "<group>"; };
@@ -103,6 +107,7 @@
 		5D2A5F76D09D30FD53EF78D8 /* ProgrammeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgrammeTests.swift; sourceTree = "<group>"; };
 		608E66C49927979E3843786B /* LargeScoreApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LargeScoreApp.swift; sourceTree = "<group>"; };
 		619AF0CC40BEA89874498859 /* EngravingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngravingTests.swift; sourceTree = "<group>"; };
+		621B9411D5B09EAA448B9A68 /* MusicXMLEdit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicXMLEdit.swift; sourceTree = "<group>"; };
 		6299FC9AB66EA749AB2CF385 /* TextLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextLayout.swift; sourceTree = "<group>"; };
 		6571A2CA874D68B485A827E6 /* PartSplitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PartSplitter.swift; sourceTree = "<group>"; };
 		67BE2F6AC6FD73DD22EB2E8B /* MarkRenderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkRenderTests.swift; sourceTree = "<group>"; };
@@ -111,6 +116,7 @@
 		713D748931CE744279E773B4 /* SampleCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleCard.swift; sourceTree = "<group>"; };
 		72E33B44B559B76024D3E0EB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		7D45E730900A18783D457D9A /* evening-air-quartet.musicxml */ = {isa = PBXFileReference; path = "evening-air-quartet.musicxml"; sourceTree = "<group>"; };
+		86C0F5F1A0FE25C6907142DD /* FixSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixSession.swift; sourceTree = "<group>"; };
 		86F011439BA621309C700329 /* CloudSchema.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSchema.swift; sourceTree = "<group>"; };
 		88BC77D691F165C1D798BE95 /* Style.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Style.swift; sourceTree = "<group>"; };
 		8A52E6CE0252C886FD197F00 /* evening-air-quartet.mxl */ = {isa = PBXFileReference; path = "evening-air-quartet.mxl"; sourceTree = "<group>"; };
@@ -216,6 +222,7 @@
 			isa = PBXGroup;
 			children = (
 				E19AAC2327854B917708BCEE /* CompareView.swift */,
+				86C0F5F1A0FE25C6907142DD /* FixSession.swift */,
 				F44D8CA440E27E7D7D2037D8 /* PageTurner.swift */,
 				2D849716F934CBA7A3FD4D00 /* ReaderView.swift */,
 				AF478BA8ECBAAE9FED7D8264 /* ScoreCanvas.swift */,
@@ -227,6 +234,7 @@
 			isa = PBXGroup;
 			children = (
 				B770B7CA621635E8184DEDB0 /* Engraver.swift */,
+				621B9411D5B09EAA448B9A68 /* MusicXMLEdit.swift */,
 				6571A2CA874D68B485A827E6 /* PartSplitter.swift */,
 				F4C3345DCD65C0A8E77FDBF9 /* ScoreLoader.swift */,
 				C38FABE19590F985BF6CD2A6 /* SVGScene.swift */,
@@ -241,6 +249,7 @@
 			children = (
 				B1D60A5D10C3B9173796CC05 /* ConversionTests.swift */,
 				619AF0CC40BEA89874498859 /* EngravingTests.swift */,
+				11987A0C4C4B64976C2055A3 /* FixNotesTests.swift */,
 				55357AD4C01A37DA6BAE963E /* harmony-and-tempo.musicxml */,
 				BEA09A15929E52433660615B /* ImportTests.swift */,
 				67BE2F6AC6FD73DD22EB2E8B /* MarkRenderTests.swift */,
@@ -492,6 +501,7 @@
 				3046DB222CB6DD220594DA32 /* CloudSchema.swift in Sources */,
 				1845795E420ABF434E131392 /* CompareView.swift in Sources */,
 				3753B5939D0C165FE98888C9 /* Engraver.swift in Sources */,
+				27A52EEC71E4821E9A565F9F /* FixSession.swift in Sources */,
 				B8E2B41CE24CB3C0616A654E /* ImportSession.swift in Sources */,
 				9D3D1F9DDC72FF21118EE562 /* ImportSheet.swift in Sources */,
 				E6E7DAF75C872D89F7292D88 /* LargeScoreApp.swift in Sources */,
@@ -499,6 +509,7 @@
 				224DA9E13A57C61C072D5DC8 /* LibraryView.swift in Sources */,
 				49B0D03FE11C4AFCF5689BBF /* MusicFile.swift in Sources */,
 				0F024D30A30A960FEC7896E3 /* MusicFolder.swift in Sources */,
+				C1BEAD7B8DF01DC885566F57 /* MusicXMLEdit.swift in Sources */,
 				9E79071A7C052DE7EE7F08B7 /* NotesStore.swift in Sources */,
 				D24D2E3EF301948729023D3F /* OnboardingView.swift in Sources */,
 				2BDABFE1171DE6A0406AC014 /* PageTurner.swift in Sources */,
@@ -526,6 +537,7 @@
 			files = (
 				227C58F7FEF2C1E1115D5CBE /* ConversionTests.swift in Sources */,
 				4B55282274225FC6D37EF85D /* EngravingTests.swift in Sources */,
+				7F531218DC3CF616015B717C /* FixNotesTests.swift in Sources */,
 				2AD6FA9985243F747B68EB9B /* ImportTests.swift in Sources */,
 				B861C91F1E7EB4A9FF927E23 /* MarkRenderTests.swift in Sources */,
 				4671B617995AEB38015B2608 /* NotesTests.swift in Sources */,

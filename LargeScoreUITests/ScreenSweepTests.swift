@@ -351,4 +351,48 @@ final class ScreenSweepTests: XCTestCase {
         sleep(1)
         XCTAssertFalse(app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Check against the PDF")).firstMatch.exists)
     }
+
+    func testFixNotes() {
+        let app = launchWithLibrary()
+        let converted = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Check against the PDF")).firstMatch
+        XCTAssertTrue(converted.waitForExistence(timeout: 10))
+        converted.press(forDuration: 1.2)
+        let fix = app.descendants(matching: .any)["Fix Notes"].firstMatch
+        XCTAssertTrue(fix.waitForExistence(timeout: 5))
+        fix.tap()
+        let music = app.otherElements["Music to fix"].firstMatch
+        XCTAssertTrue(music.waitForExistence(timeout: 10))
+        sleep(2)
+        shot(app, "72-fix", variant: "standard-light")
+        // Walk along the first line until a note is under the finger.
+        let higher = app.buttons["Higher"]
+        var y = 0.06
+        search: while y < 0.3 {
+            var x = 0.15
+            while x < 0.95 {
+                music.coordinate(withNormalizedOffset: CGVector(dx: x, dy: y)).tap()
+                if higher.waitForExistence(timeout: 0.5) { break search }
+                x += 0.04
+            }
+            y += 0.02
+        }
+        XCTAssertTrue(higher.exists)
+        shot(app, "73-fix-note", variant: "standard-light")
+        audit(app, "fix-standard")
+        higher.tap()
+        sleep(1)
+        XCTAssertTrue(app.buttons["Undo"].isEnabled)
+        app.buttons["Length"].tap()
+        app.buttons["Sixteenth"].tap()
+        sleep(1)
+        shot(app, "74-fix-short-bar", variant: "standard-light")
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "don't add up")).firstMatch.exists)
+        app.buttons["Undo"].tap()
+        sleep(1)
+        XCTAssertFalse(app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "don't add up")).firstMatch.exists)
+        app.buttons["Save Fixes"].tap()
+        sleep(1)
+        converted.press(forDuration: 1.2)
+        XCTAssertTrue(app.descendants(matching: .any)["Restore Previous Version"].firstMatch.waitForExistence(timeout: 5))
+    }
 }

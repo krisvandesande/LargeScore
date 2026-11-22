@@ -47,6 +47,7 @@ xcodebuild -project LargeScore.xcodeproj -scheme LargeScore \
 - `.onKeyPress` doesn't reach a full-screen cover; pedal keys go through a first-responder view with key commands. Page Up/Down never arrive from the simulator's runner.
 - iCloud sync is on (container `iCloud.com.kvds.LargeScore`, 2026-11-22); the CloudKit schema still needs deploying to production once (`docs/icloud-setup.md`, step 3). Xcode's agent tools build headless and see "No Accounts": anything that needs Kris's account (registering a container) needs a build in his Xcode window.
 - PDFs go through Audiveris on the grandfather's Mac Pro (2013, Intel, Monterey): `scripts/macpro/` (converter and installer, bash 3.2), guide in `docs/mac-pro-converter.md`. Files a recognition program wrote (`encoding/software`) are marked "Check against the PDF" until checked; a version saved from MuseScore counts as checked. The Large Score Mac app can't run on that Mac (macOS 26, Apple silicon).
+- Fix Notes edits the MusicXML itself (`MusicXMLEdit`): every note and bar gets an id on import (`ls-n…`, `ls-m…`), Verovio keeps those ids on what it draws, and `SVGScene.noteBoxes` maps a tap back to the note. Edits assume the echo writer's form (opening and closing tags, no self-closing).
 
 ## TestFlight
 

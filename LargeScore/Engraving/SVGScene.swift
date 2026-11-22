@@ -22,6 +22,10 @@ nonisolated struct SVGScene: @unchecked Sendable {
     /// Each bar's staff area (from its staff lines, all staves), in page order and
     /// viewBox units. Notes are anchored to these.
     var measures: [CGRect]
+    /// The id of each bar in `measures`, as in the MusicXML.
+    var measureIDs: [String?]
+    /// Where each note and rest is drawn, by its MusicXML id, in viewBox units.
+    var noteBoxes: [String: CGRect]
 
     init?(svg: String) {
         let builder = SceneBuilder()
@@ -33,6 +37,30 @@ nonisolated struct SVGScene: @unchecked Sendable {
         systems = builder.systems
         measureCount = builder.measureCount
         measures = builder.measures
+        measureIDs = builder.measureIDs
+        noteBoxes = builder.noteBoxes
+    }
+
+    /// The note or rest drawn nearest a point (viewBox units), within `reach`.
+    func note(at point: CGPoint, reach: CGFloat) -> String? {
+        noteBoxes
+            .map { ($0.key, Self.distance(point, $0.value)) }
+            .filter { $0.1 <= reach }
+            .min { $0.1 < $1.1 }?.0
+    }
+
+    /// The bar a point falls in (viewBox units), by the bar's staff area, widened up and down.
+    func measure(at point: CGPoint, reach: CGFloat) -> String? {
+        for (index, box) in measures.enumerated() where !box.isNull {
+            if box.insetBy(dx: 0, dy: -reach).contains(point) { return measureIDs[index] }
+        }
+        return nil
+    }
+
+    private static func distance(_ p: CGPoint, _ r: CGRect) -> CGFloat {
+        let dx = max(r.minX - p.x, 0, p.x - r.maxX)
+        let dy = max(r.minY - p.y, 0, p.y - r.maxY)
+        return (dx * dx + dy * dy).squareRoot()
     }
 }
 
@@ -44,6 +72,8 @@ nonisolated private final class SceneBuilder: NSObject, XMLParserDelegate {
     var systems: [CGRect] = []
     var measureCount = 0
     var measures: [CGRect] = []
+    var measureIDs: [String?] = []
+    var noteBoxes: [String: CGRect] = [:]
 
     private struct Frame {
         var transform: CGAffineTransform
@@ -54,6 +84,8 @@ nonisolated private final class SceneBuilder: NSObject, XMLParserDelegate {
         var measure: Int?
         /// True directly inside a `g.staff`: its paths are the staff lines.
         var isStaff = false
+        /// The note or rest this element is part of.
+        var noteID: String?
     }
 
     private var stack: [Frame] = []
@@ -90,8 +122,12 @@ nonisolated private final class SceneBuilder: NSObject, XMLParserDelegate {
             if element == "g", inDefs == 0, names.contains("measure") {
                 frame.measure = measures.count
                 measures.append(.null)
+                measureIDs.append(a["id"])
             }
             if element == "g", inDefs == 0, names.contains("staff") { frame.isStaff = true }
+            if element == "g", inDefs == 0, names.contains(where: { ["note", "rest", "mRest"].contains($0) }), let id = a["id"] {
+                frame.noteID = id
+            }
             frame.classes.formUnion(names)
             if element == "g", inDefs == 0, names.contains("system") {
                 frame.system = systems.count
@@ -259,6 +295,7 @@ nonisolated private final class SceneBuilder: NSObject, XMLParserDelegate {
 
     /// Grows the bounds of the line of music the item belongs to.
     private func cover(_ rect: CGRect, in frame: Frame) {
+        if let id = frame.noteID { noteBoxes[id] = (noteBoxes[id] ?? .null).union(rect) }
         guard let index = frame.system, systems.indices.contains(index) else { return }
         systems[index] = systems[index].union(rect)
     }

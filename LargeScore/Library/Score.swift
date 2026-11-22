@@ -99,6 +99,15 @@ final class Score {
         changedAt = .now
     }
 
+    /// Fixes made in Large Score: a new version, with the one before kept for Restore.
+    func saveFixes(_ xml: String) {
+        previousMusicXML = musicXML
+        previousPartID = partID
+        replacedAt = .now
+        musicXML = Data(xml.utf8)
+        changedAt = .now
+    }
+
     func chooseParts(_ parts: [ScorePart]) {
         guard !parts.isEmpty else { return }
         show(parts)

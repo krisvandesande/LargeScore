@@ -72,3 +72,10 @@ Run with Apple's `accessibility-dynamic-type-specialist` and `accessibility-suff
 
 - The library card's "Check against the PDF" pill comes from real state (converted by a recognition program, not yet checked): white on the notes red (6.5:1), black on the dark mode red (9.2:1).
 - The compare view: both panes have headings ("PDF", "Large Score") and spoken names; Done and Mark as Checked are the navigation bar's own (the audit's "partially unsupported" on them is the platform's).
+
+## Fix Notes, 2026-11-22
+
+- Every fix is a worded button in the app's large style (Higher, Lower, Sharp, Flat, Natural, Length, Dot, Tie to Next, Make Rest; Rehearsal Mark, Tempo, Fermata), wrapping onto more lines as the text grows. The selected note is named in words above them ("B flat, Quarter").
+- Bars that don't add up are outlined dashed in the notes red and also named in a sentence above the music, so colour isn't the only signal.
+- Choosing a note is a tap on the music, which needs sight; the music is one element with direct interaction ("Music to fix") for Voice Control and Switch Control users who can see. Written down as intended, like placing notes.
+- Checked: iPad (A16) upright, standard size, light. Still to run in the sweep: AX5, dark, the iPad mini.

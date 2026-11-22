@@ -4,12 +4,32 @@
     "": {
       "shouldTranslate": false
     },
+    "%@ flat": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ mol"
+          }
+        }
+      }
+    },
     "%@ is already in the library": {
       "localizations": {
         "nl": {
           "stringUnit": {
             "state": "translated",
             "value": "%@ staat al in de bibliotheek"
+          }
+        }
+      }
+    },
+    "%@ sharp": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kruis"
           }
         }
       }
@@ -274,6 +294,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Terug naar %@"
+          }
+        }
+      }
+    },
+    "Bar %lld": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maat %lld"
           }
         }
       }
@@ -548,12 +578,42 @@
         }
       }
     },
+    "Discard Fixes": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gooi verbeteringen weg"
+          }
+        }
+      }
+    },
+    "Discard your fixes?": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Je verbeteringen weggooien?"
+          }
+        }
+      }
+    },
     "Done": {
       "localizations": {
         "nl": {
           "stringUnit": {
             "state": "translated",
             "value": "Gereed"
+          }
+        }
+      }
+    },
+    "Dot": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Punt"
           }
         }
       }
@@ -574,6 +634,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Teken of plaats hier het gekozen teken."
+          }
+        }
+      }
+    },
+    "Eighth": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Achtste"
           }
         }
       }
@@ -658,6 +728,26 @@
         }
       }
     },
+    "Fix Notes": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verbeter noten"
+          }
+        }
+      }
+    },
+    "Flat": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mol"
+          }
+        }
+      }
+    },
     "Flute": {
       "localizations": {
         "nl": {
@@ -698,6 +788,16 @@
         }
       }
     },
+    "Half": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Halve"
+          }
+        }
+      }
+    },
     "Half-Page Turns": {
       "localizations": {
         "nl": {
@@ -714,6 +814,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Verberg details"
+          }
+        }
+      }
+    },
+    "Higher": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hoger"
           }
         }
       }
@@ -788,12 +898,32 @@
         }
       }
     },
+    "Length": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Duur"
+          }
+        }
+      }
+    },
     "Less": {
       "localizations": {
         "nl": {
           "stringUnit": {
             "state": "translated",
             "value": "Minder"
+          }
+        }
+      }
+    },
+    "Letter or number": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Letter of cijfer"
           }
         }
       }
@@ -838,12 +968,42 @@
         }
       }
     },
+    "Lower": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lager"
+          }
+        }
+      }
+    },
     "MIT License": {
       "localizations": {
         "nl": {
           "stringUnit": {
             "state": "translated",
             "value": "MIT-licentie"
+          }
+        }
+      }
+    },
+    "Make Note": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maak noot"
+          }
+        }
+      }
+    },
+    "Make Rest": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maak rust"
           }
         }
       }
@@ -918,12 +1078,32 @@
         }
       }
     },
+    "Music to fix": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Muziek om te verbeteren"
+          }
+        }
+      }
+    },
     "Name": {
       "localizations": {
         "nl": {
           "stringUnit": {
             "state": "translated",
             "value": "Naam"
+          }
+        }
+      }
+    },
+    "Natural": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Herstellingsteken"
           }
         }
       }
@@ -1264,12 +1444,52 @@
         }
       }
     },
+    "Quarter": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kwart"
+          }
+        }
+      }
+    },
     "Recently Played": {
       "localizations": {
         "nl": {
           "stringUnit": {
             "state": "translated",
             "value": "Laatst gespeeld"
+          }
+        }
+      }
+    },
+    "Rehearsal Mark": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Repetitieletter"
+          }
+        }
+      }
+    },
+    "Remove Dot": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verwijder punt"
+          }
+        }
+      }
+    },
+    "Remove Tie": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verwijder overbinding"
           }
         }
       }
@@ -1314,6 +1534,16 @@
         }
       }
     },
+    "Rest": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rust"
+          }
+        }
+      }
+    },
     "Restore Previous Version": {
       "localizations": {
         "nl": {
@@ -1354,12 +1584,32 @@
         }
       }
     },
+    "Save Fixes": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bewaar verbeteringen"
+          }
+        }
+      }
+    },
     "Saxophone": {
       "localizations": {
         "nl": {
           "stringUnit": {
             "state": "translated",
             "value": "Saxofoon"
+          }
+        }
+      }
+    },
+    "Selected: %@": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gekozen: %@"
           }
         }
       }
@@ -1374,12 +1624,32 @@
         }
       }
     },
+    "Sharp": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kruis"
+          }
+        }
+      }
+    },
     "Show details": {
       "localizations": {
         "nl": {
           "stringUnit": {
             "state": "translated",
             "value": "Toon details"
+          }
+        }
+      }
+    },
+    "Sixteenth": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zestiende"
           }
         }
       }
@@ -1490,6 +1760,26 @@
         }
       }
     },
+    "Tap a note or a bar to fix it.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tik op een noot of een maat om die te verbeteren."
+          }
+        }
+      }
+    },
+    "Tempo": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tempo"
+          }
+        }
+      }
+    },
     "The library is empty. Add music there first.": {
       "localizations": {
         "nl": {
@@ -1516,6 +1806,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "De muziek die je het laatst toevoegde, wordt vervangen door de versie ervoor."
+          }
+        }
+      }
+    },
+    "The notes in bar %@ don't add up to the time signature.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De noten in maat %@ kloppen niet met de maatsoort."
+          }
+        }
+      }
+    },
+    "The notes in bars %@ don't add up to the time signature.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De noten in maten %@ kloppen niet met de maatsoort."
           }
         }
       }
@@ -1570,6 +1880,16 @@
         }
       }
     },
+    "This bar has no note to put a fermata on.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deze maat heeft geen noot voor een fermate."
+          }
+        }
+      }
+    },
     "This compressed MusicXML file can't be opened. Export it again.": {
       "localizations": {
         "nl": {
@@ -1610,6 +1930,26 @@
         }
       }
     },
+    "This note can't be changed that way.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deze noot kan zo niet veranderd worden."
+          }
+        }
+      }
+    },
+    "This note has no next note to tie to.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Na deze noot komt geen noot om mee te verbinden."
+          }
+        }
+      }
+    },
     "This version has %lld bars instead of %lld. Check your notes: after the change they may sit on other bars.": {
       "localizations": {
         "en": {
@@ -1622,6 +1962,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Deze versie heeft %lld maten in plaats van %lld. Kijk je notities na: na de wijziging staan ze mogelijk bij andere maten."
+          }
+        }
+      }
+    },
+    "Tie to Next": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verbind met volgende"
           }
         }
       }
@@ -1792,6 +2142,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "Welke instrumenten speel je?"
+          }
+        }
+      }
+    },
+    "Whole": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hele"
+          }
+        }
+      }
+    },
+    "Words above the bar": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Woorden boven de maat"
           }
         }
       }

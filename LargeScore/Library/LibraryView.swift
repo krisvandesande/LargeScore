@@ -68,6 +68,7 @@ private struct LibraryGrid: View {
     @State private var deleting: Score?
     @State private var restoring: Score?
     @State private var comparing: Score?
+    @State private var fixing: Score?
 
     init(sort: LibraryView.Sort, search: String, addMusic: @escaping () -> Void) {
         self.addMusic = addMusic
@@ -103,6 +104,9 @@ private struct LibraryGrid: View {
             }
             .fullScreenCover(item: $comparing) { score in
                 CompareView(score: score)
+            }
+            .fullScreenCover(item: $fixing) { score in
+                CompareView(score: score, startFixing: true)
             }
             .sheet(item: $changingPart) { score in
                 PartChooser(score: score)
@@ -148,6 +152,7 @@ private struct LibraryGrid: View {
             if score.pdf != nil {
                 Button("Compare with PDF", systemImage: "doc.on.doc") { comparing = score }
             }
+            Button("Fix Notes", systemImage: "pencil") { fixing = score }
             if score.needsCheck {
                 Button("Mark as Checked", systemImage: "checkmark") {
                     score.needsCheck = false
@@ -164,6 +169,7 @@ private struct LibraryGrid: View {
         }
         .accessibilityAction(named: Text("Change Parts")) { changingPart = score }
         .accessibilityAction(named: Text("Delete")) { deleting = score }
+        .accessibilityAction(named: Text("Fix Notes")) { fixing = score }
         .accessibilityAction(named: Text("Compare with PDF")) { if score.pdf != nil { comparing = score } }
     }
 
