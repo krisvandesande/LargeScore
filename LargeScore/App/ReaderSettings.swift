@@ -108,7 +108,7 @@ nonisolated enum LineSpacing: String, CaseIterable, Identifiable {
 /// The instruments offered in setup. Chooses the sample's clef now, and the part to
 /// preselect when music is added.
 nonisolated enum Instrument: String, CaseIterable, Identifiable {
-    case flute, oboe, clarinet, bassoon, saxophone, horn, trumpet, trombone, tuba
+    case flute, oboe, clarinet, bassoon, saxophone, horn, trumpet, trombone, baritone, tuba
     case violin, viola, cello, doubleBass, piano, organ, voice, other
 
     var id: String { rawValue }
@@ -123,6 +123,7 @@ nonisolated enum Instrument: String, CaseIterable, Identifiable {
         case .horn: "Horn"
         case .trumpet: "Trumpet"
         case .trombone: "Trombone"
+        case .baritone: "Baritone"
         case .tuba: "Tuba"
         case .violin: "Violin"
         case .viola: "Viola"

@@ -164,6 +164,8 @@ struct FixBar: View {
     @Bindable var session: FixSession
     /// The bar number of the selected bar, as printed.
     var barNumber: Int?
+    /// At most half the music's pane: past that the buttons scroll.
+    var maxHeight: CGFloat = .infinity
     @State private var asking: Question?
 
     private enum Question: Identifiable, Equatable {
@@ -176,6 +178,22 @@ struct FixBar: View {
     static let times: [(Int, Int)] = [(2, 4), (3, 4), (4, 4), (5, 4), (2, 2), (3, 8), (6, 8), (9, 8), (12, 8)]
 
     var body: some View {
+        ViewThatFits(in: .vertical) {
+            buttons
+            ScrollView { buttons }
+                .scrollBounceBehavior(.basedOnSize)
+        }
+        .frame(maxHeight: maxHeight)
+        .background(.bar)
+        // Like the reader's strip, the buttons stop growing at the largest standard
+        // size so the music keeps the screen; touch and hold shows each one larger.
+        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+        .alert(alertTitle, isPresented: Binding(get: { asking != nil }, set: { if !$0 { asking = nil } })) {
+            alertContent
+        }
+    }
+
+    private var buttons: some View {
         VStack(alignment: .leading, spacing: 12) {
             if let problem = session.problem {
                 Text(problem)
@@ -195,8 +213,10 @@ struct FixBar: View {
         }
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(.bar)
-        .alert(alertTitle, isPresented: Binding(get: { asking != nil }, set: { if !$0 { asking = nil } })) {
+    }
+
+    @ViewBuilder
+    private var alertContent: some View {
             switch asking {
             case .restBars:
                 TextField("Number of bars", text: $words)
@@ -223,7 +243,6 @@ struct FixBar: View {
                 asking = nil
             }
             Button("Cancel", role: .cancel) { asking = nil }
-        }
     }
 
     private var alertTitle: LocalizedStringResource {
@@ -240,7 +259,6 @@ struct FixBar: View {
             if let summary = session.selectedSummary {
                 Text(summary)
                     .font(.headline)
-                    .accessibilityLabel(Text("Selected: \(summary)"))
             }
             FlowLayout(spacing: 8, lineSpacing: 8) {
                 if !session.selectedIsRest {
@@ -334,6 +352,7 @@ struct FixBar: View {
     private func fixButton(_ title: LocalizedStringResource, action: @escaping () -> Void) -> some View {
         Button(action: action) { Text(title) }
             .buttonStyle(.large)
+            .accessibilityShowsLargeContentViewer()
     }
 
 }

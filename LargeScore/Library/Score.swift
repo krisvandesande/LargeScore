@@ -30,6 +30,11 @@ final class Score {
     var needsCheck: Bool = false
     /// A note in words about the whole piece.
     var note: String = ""
+    /// Read in another key: what the part is written for and what plays it
+    /// (`WrittenFor` raw values), and octaves up or down on top.
+    var transposeFrom: String?
+    var transposeTo: String?
+    var transposeOctaves: Int = 0
     /// Bars in the first part shown, to warn when a new version changes them.
     var barCount: Int = 0
     /// Handwriting and marks, fixed to bars.
@@ -108,6 +113,20 @@ final class Score {
         changedAt = .now
     }
 
+    var transposition: Transposition? {
+        get {
+            guard let from = transposeFrom.flatMap(WrittenFor.init), let to = transposeTo.flatMap(WrittenFor.init) else { return nil }
+            let t = Transposition(from: from, to: to, octaves: transposeOctaves)
+            return t.isNothing ? nil : t
+        }
+        set {
+            transposeFrom = newValue?.from.rawValue
+            transposeTo = newValue?.to.rawValue
+            transposeOctaves = newValue?.octaves ?? 0
+            changedAt = .now
+        }
+    }
+
     func chooseParts(_ parts: [ScorePart]) {
         guard !parts.isEmpty else { return }
         show(parts)
@@ -122,7 +141,7 @@ final class Score {
     /// What the reader opens.
     var piece: Piece {
         Piece(id: id.uuidString, title: title, composer: composer, partIDs: partIDs,
-              source: .stored(musicXML ?? Data()), version: changedAt)
+              source: .stored(musicXML ?? Data()), version: changedAt, transposition: transposition)
     }
 
     /// Same piece if the title and composer match, ignoring case and spacing.

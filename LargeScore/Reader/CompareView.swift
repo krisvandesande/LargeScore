@@ -25,13 +25,16 @@ struct CompareView: View {
                     : CGSize(width: proxy.size.width, height: proxy.size.height / 2)
                 layout {
                     if let pdf = score.pdf {
+                        // Upright while fixing, the music and its buttons get two thirds.
                         pane(title: "PDF") { PDFPane(data: pdf) }
+                            .frame(height: !wide && session != nil ? proxy.size.height * 0.3 : nil)
                     }
                     pane(title: "Large Score") {
                         engraving
                             .safeAreaInset(edge: .bottom, spacing: 0) {
                                 if let session {
-                                    FixBar(session: session, barNumber: session.selectedBar.flatMap(barNumber))
+                                    FixBar(session: session, barNumber: session.selectedBar.flatMap(barNumber),
+                                           maxHeight: (wide || !showsPDF ? proxy.size.height : proxy.size.height * 0.7) * 0.5)
                                 }
                             }
                     }
@@ -118,6 +121,7 @@ struct CompareView: View {
         VStack(alignment: .leading, spacing: 0) {
             Text(title)
                 .formHeading()
+                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                 .accessibilityAddTraits(.isHeader)
                 .padding(.horizontal, 16)
                 .padding(.vertical, 8)
@@ -139,6 +143,8 @@ struct CompareView: View {
         let area = CGSize(width: width - 24, height: (width - 24) * 1.414)
         let request = LayoutRequest(pageSize: area, staffHeight: max(width / 22, 24), bold: false, lineGap: 4)
         var piece = score.piece
+        // As written, so it matches the PDF and the notes being fixed.
+        piece.transposition = nil
         if let session {
             piece.source = .stored(Data(session.xml.utf8))
             piece.version = session.version

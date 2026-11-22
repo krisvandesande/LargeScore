@@ -381,6 +381,24 @@ nonisolated struct MusicXMLEdit {
             .replacingOccurrences(of: "&quot;", with: "\"").replacingOccurrences(of: "&amp;", with: "&")
     }
 
+    /// Words a recognition program made of marks it misread (".> . .", "§", a row
+    /// of dashes): words with no letter or digit in them, removed.
+    static func withoutSymbolWords(_ xml: String) -> String {
+        func noLettersOrDigits(_ text: String) -> Bool {
+            !unescape(text).contains { $0.isLetter || $0.isNumber }
+        }
+        var result = xml.replacingMatches(of: #"(<lyric\b[^>]*>(?:(?!</lyric>)[\s\S])*?</lyric>)"#) { lyric in
+            let text = lyric.firstMatch(#"<text\b[^>]*>([^<]*)</text>"#) ?? ""
+            return noLettersOrDigits(text) ? "" : lyric
+        }
+        result = result.replacingMatches(of: #"(<words\b[^>]*>[^<]*</words>)"#) { words in
+            let text = words.firstMatch(#"<words\b[^>]*>([^<]*)</words>"#) ?? ""
+            return noLettersOrDigits(text) ? "" : words
+        }
+        result = result.removingAll(#"<direction-type>\s*</direction-type>"#)
+        return result.replacingMatches(of: #"(<direction(?:\s[^>]*)?>(?:(?!<direction-type)[\s\S])*?</direction>)"#) { _ in "" }
+    }
+
     // MARK: Time signatures and rests
 
     /// Sets the time signature from this bar on.

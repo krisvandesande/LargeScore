@@ -16,15 +16,18 @@ nonisolated struct Piece: Identifiable, Hashable, Sendable {
     var source: Source
     /// Changes whenever the music or the part changes.
     var version: Date = .distantPast
+    /// Read in another key, for a part written for another instrument.
+    var transposition: Transposition?
 
     static func == (a: Piece, b: Piece) -> Bool {
-        a.id == b.id && a.partIDs == b.partIDs && a.version == b.version
+        a.id == b.id && a.partIDs == b.partIDs && a.version == b.version && a.transposition == b.transposition
     }
 
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
         hasher.combine(partIDs)
         hasher.combine(version)
+        hasher.combine(transposition)
     }
 
     /// The score as the engraver gets it: one part only.
@@ -39,8 +42,8 @@ nonisolated struct Piece: Identifiable, Hashable, Sendable {
         case .stored(let data):
             xml = String(decoding: data, as: UTF8.self)
         }
-        guard !partIDs.isEmpty else { return xml }
-        return PartSplitter.keeping(partIDs: partIDs, in: xml) ?? xml
+        let kept = partIDs.isEmpty ? xml : PartSplitter.keeping(partIDs: partIDs, in: xml) ?? xml
+        return transposition?.clefs(in: kept) ?? kept
     }
 
     static func sample(for instrument: Instrument?) -> Piece {
@@ -79,6 +82,7 @@ final class ScoreLoader {
     func layOut(_ piece: Piece, request: LayoutRequest) async throws -> LaidOutPiece {
         let xml = try await Self.prepare(piece)
         var request = request
+        request.transpose = piece.transposition?.interval
         var laidOut = await Self.read(try await engraver.engrave(musicXML: xml, request: request))
         // Pages are filled tightly; if anything under a page's last line runs off the
         // page, engrave again with more room at the foot, as often as needed.

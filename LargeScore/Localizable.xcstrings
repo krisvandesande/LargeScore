@@ -298,6 +298,46 @@
         }
       }
     },
+    "An Octave Higher": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Een octaaf hoger"
+          }
+        }
+      }
+    },
+    "An Octave Lower": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Een octaaf lager"
+          }
+        }
+      }
+    },
+    "As Written": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zoals geschreven"
+          }
+        }
+      }
+    },
+    "As written": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zoals geschreven"
+          }
+        }
+      }
+    },
     "Back": {
       "localizations": {
         "nl": {
@@ -324,6 +364,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Maat %lld"
+          }
+        }
+      }
+    },
+    "Baritone": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bariton"
           }
         }
       }
@@ -364,6 +414,36 @@
           "stringUnit": {
             "state": "translated",
             "value": "Adem"
+          }
+        }
+      }
+    },
+    "B♭ (clarinet, trumpet, tenor sax, baritone)": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "B♭ (klarinet, trompet, tenorsax, bariton)"
+          }
+        }
+      }
+    },
+    "C (flute, oboe, violin)": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "C (fluit, hobo, viool)"
+          }
+        }
+      }
+    },
+    "C, bass clef (trombone, euphonium, tuba)": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "C, bassleutel (trombone, euphonium, tuba)"
           }
         }
       }
@@ -708,6 +788,16 @@
         }
       }
     },
+    "Down a %@": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Een %@ lager"
+          }
+        }
+      }
+    },
     "Draw or place the chosen mark here.": {
       "localizations": {
         "nl": {
@@ -754,6 +844,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "Uitgeklapt"
+          }
+        }
+      }
+    },
+    "E♭ (alto and baritone sax, E♭ horn)": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "E♭ (alt- en baritonsax, E♭-hoorn)"
+          }
+        }
+      }
+    },
+    "F (horn)": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "F (hoorn)"
           }
         }
       }
@@ -1198,6 +1308,16 @@
         }
       }
     },
+    "Nearest": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dichtstbij"
+          }
+        }
+      }
+    },
     "New Programme": {
       "localizations": {
         "nl": {
@@ -1388,6 +1508,16 @@
         }
       }
     },
+    "Octave": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Octaaf"
+          }
+        }
+      }
+    },
     "Only a bar of rests can become a rest of several bars.": {
       "localizations": {
         "nl": {
@@ -1500,6 +1630,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Piano"
+          }
+        }
+      }
+    },
+    "Played On": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gespeeld op"
           }
         }
       }
@@ -1710,16 +1850,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Saxofoon"
-          }
-        }
-      }
-    },
-    "Selected: %@": {
-      "localizations": {
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Gekozen: %@"
           }
         }
       }
@@ -2182,6 +2312,16 @@
         }
       }
     },
+    "Transpose": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Transponeer"
+          }
+        }
+      }
+    },
     "Trombone": {
       "localizations": {
         "nl": {
@@ -2218,6 +2358,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Herstel"
+          }
+        }
+      }
+    },
+    "Up a %@": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Een %@ hoger"
           }
         }
       }
@@ -2332,6 +2482,16 @@
         }
       }
     },
+    "Written For": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geschreven voor"
+          }
+        }
+      }
+    },
     "Written Note": {
       "localizations": {
         "nl": {
@@ -2396,6 +2556,166 @@
           "stringUnit": {
             "state": "translated",
             "value": "maten %lld tot %lld"
+          }
+        }
+      }
+    },
+    "bass clef": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "bassleutel"
+          }
+        }
+      }
+    },
+    "eleventh": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "undecime"
+          }
+        }
+      }
+    },
+    "fifth": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "kwint"
+          }
+        }
+      }
+    },
+    "fourteenth": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "quartdecime"
+          }
+        }
+      }
+    },
+    "fourth": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "kwart"
+          }
+        }
+      }
+    },
+    "ninth": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "none"
+          }
+        }
+      }
+    },
+    "octave": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "octaaf"
+          }
+        }
+      }
+    },
+    "second": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "secunde"
+          }
+        }
+      }
+    },
+    "seventh": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "septiem"
+          }
+        }
+      }
+    },
+    "sixth": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "sext"
+          }
+        }
+      }
+    },
+    "tenth": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "decime"
+          }
+        }
+      }
+    },
+    "third": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "terts"
+          }
+        }
+      }
+    },
+    "thirteenth": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "tredecime"
+          }
+        }
+      }
+    },
+    "treble clef": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "solsleutel"
+          }
+        }
+      }
+    },
+    "twelfth": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "duodecime"
+          }
+        }
+      }
+    },
+    "two octaves": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "dubbel octaaf"
           }
         }
       }

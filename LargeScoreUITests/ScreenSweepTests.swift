@@ -317,9 +317,11 @@ final class ScreenSweepTests: XCTestCase {
         editor.typeText("Breathe before B")
         shot(app, "605-written-note", variant: "standard-light")
         app.navigationBars.buttons["Done"].firstMatch.tap()
-        sleep(1)
+        // Wait for the sheet to close before the palette's Done.
+        let closed = expectation(for: NSPredicate(format: "exists == false"), evaluatedWith: editor)
+        wait(for: [closed], timeout: 5)
         app.buttons["Done"].firstMatch.tap()
-        sleep(1)
+        XCTAssertTrue(app.buttons["Music Size"].waitForExistence(timeout: 5))
         shot(app, "61-notes-shown", variant: "standard-light")
         XCTAssertTrue((page.value as? String ?? "").contains("notes"))
         // A larger size: the notes go with their bars.
@@ -405,5 +407,75 @@ final class ScreenSweepTests: XCTestCase {
         sleep(1)
         converted.press(forDuration: 1.2)
         XCTAssertTrue(app.descendants(matching: .any)["Restore Previous Version"].firstMatch.waitForExistence(timeout: 5))
+    }
+
+    /// Taps along the music until a note is selected (the note buttons appear).
+    private func selectANote(_ app: XCUIApplication) -> Bool {
+        let music = app.otherElements["Music to fix"].firstMatch
+        guard music.waitForExistence(timeout: 10) else { return false }
+        sleep(2)
+        let higher = app.buttons["Higher"]
+        var y = 0.06
+        while y < 0.4 {
+            var x = 0.15
+            while x < 0.95 {
+                music.coordinate(withNormalizedOffset: CGVector(dx: x, dy: y)).tap()
+                if higher.waitForExistence(timeout: 0.5) { return true }
+                x += 0.04
+            }
+            y += 0.02
+        }
+        return false
+    }
+
+    func testFixScreenSizes() {
+        for (sizeName, size) in sizes {
+            for dark in [false, true] {
+                let variant = "\(sizeName)-\(dark ? "dark" : "light")"
+                let app = launchWithLibrary(size: size, dark: dark)
+                let converted = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Check against the PDF")).firstMatch
+                XCTAssertTrue(converted.waitForExistence(timeout: 10))
+                converted.press(forDuration: 1.2)
+                let fix = app.descendants(matching: .any)["Fix Notes"].firstMatch
+                XCTAssertTrue(fix.waitForExistence(timeout: 5))
+                fix.tap()
+                XCTAssertTrue(selectANote(app))
+                shot(app, "76-fix-note", variant: variant)
+                // A word in the bar, to show the words list.
+                let tempo = app.buttons["Tempo"]
+                if !tempo.isHittable { app.swipeUp() }
+                tempo.tap()
+                let field = app.textFields.firstMatch
+                XCTAssertTrue(field.waitForExistence(timeout: 5))
+                field.typeText("Andante")
+                app.buttons["Add"].tap()
+                sleep(2)
+                shot(app, "77-fix-bar-words", variant: variant)
+                if !dark { audit(app, "fix-\(sizeName)") }
+                XCUIDevice.shared.orientation = .landscapeLeft
+                sleep(2)
+                shot(app, "78-fix-landscape", variant: variant)
+                XCUIDevice.shared.orientation = .portrait
+                app.terminate()
+            }
+        }
+    }
+
+    func testTranspose() {
+        let app = launchWithLibrary()
+        let converted = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Check against the PDF")).firstMatch
+        XCTAssertTrue(converted.waitForExistence(timeout: 10))
+        converted.press(forDuration: 1.2)
+        let transpose = app.descendants(matching: .any)["Transpose"].firstMatch
+        XCTAssertTrue(transpose.waitForExistence(timeout: 5))
+        transpose.tap()
+        XCTAssertTrue(app.staticTexts["Up a fourth"].waitForExistence(timeout: 5))
+        shot(app, "79-transpose", variant: "standard-light")
+        audit(app, "transpose-standard")
+        app.buttons["Done"].firstMatch.tap()
+        sleep(1)
+        converted.tap()
+        sleep(3)
+        shot(app, "79-transposed-reader", variant: "standard-light")
     }
 }

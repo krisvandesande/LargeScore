@@ -28,6 +28,7 @@
 		3C1FD0409376A0D1D08E716B /* evening-air-treble.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = FEDAB8FE7CB3DC5664A5D395 /* evening-air-treble.musicxml */; };
 		3CE2F4743A48725594979F2D /* VerovioToolkit in Frameworks */ = {isa = PBXBuildFile; productRef = EE43E473F512BA74095E135B /* VerovioToolkit */; };
 		3E173542E0E5D03848EFA032 /* evening-air-quartet.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = 7D45E730900A18783D457D9A /* evening-air-quartet.musicxml */; };
+		3F8CB360E3A9BB44E3952B76 /* TranspositionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5F94FBBCC69CEB57BB024BC /* TranspositionTests.swift */; };
 		3FDD5D05C6B5B9CACE5AEBCB /* Programme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58BC05456B5B0A8432E0B42C /* Programme.swift */; };
 		4671B617995AEB38015B2608 /* NotesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D4E0A9194472104B818A2C /* NotesTests.swift */; };
 		49B0D03FE11C4AFCF5689BBF /* MusicFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11E71A1975CE6270736A016C /* MusicFile.swift */; };
@@ -48,6 +49,7 @@
 		A85C945FA5919F696B4D025D /* ProgrammeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D2A5F76D09D30FD53EF78D8 /* ProgrammeTests.swift */; };
 		AAB105C83CD709E37C2A54B1 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F84B9B4A9ECB304F011F2454 /* SettingsView.swift */; };
 		B1E1FCD95D45DC60299416B0 /* AccessibilityTreeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A482B89B6020A71EF68FBFD0 /* AccessibilityTreeTests.swift */; };
+		B74EE9CC11FBB58C5E6921EA /* Transposition.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9139CDD207E4577CFBA339C /* Transposition.swift */; };
 		B7FABC4CE2CF4E0CD8C8957D /* long-piece.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = CC2650C197E81A824BD81899 /* long-piece.musicxml */; };
 		B861C91F1E7EB4A9FF927E23 /* MarkRenderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67BE2F6AC6FD73DD22EB2E8B /* MarkRenderTests.swift */; };
 		B8E2B41CE24CB3C0616A654E /* ImportSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45C9CB78E24BC8C1D9F23D28 /* ImportSession.swift */; };
@@ -124,6 +126,7 @@
 		8B25E071C77C2ABEC446CA45 /* LargeScore.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LargeScore.entitlements; sourceTree = "<group>"; };
 		93DCD83E23A8A9966544EF13 /* ReaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderTests.swift; sourceTree = "<group>"; };
 		A482B89B6020A71EF68FBFD0 /* AccessibilityTreeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessibilityTreeTests.swift; sourceTree = "<group>"; };
+		A5F94FBBCC69CEB57BB024BC /* TranspositionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranspositionTests.swift; sourceTree = "<group>"; };
 		A64C9C1F5D246BD26E7EB0ED /* LayoutKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayoutKit.swift; sourceTree = "<group>"; };
 		AA8AEE0316D267D3D6F31DEA /* VerovioKit */ = {isa = PBXFileReference; lastKnownFileType = folder; name = VerovioKit; path = Packages/VerovioKit; sourceTree = SOURCE_ROOT; };
 		AA97B65AA93ABF968F556EF2 /* Annotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Annotation.swift; sourceTree = "<group>"; };
@@ -146,6 +149,7 @@
 		F44D8CA440E27E7D7D2037D8 /* PageTurner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageTurner.swift; sourceTree = "<group>"; };
 		F4C3345DCD65C0A8E77FDBF9 /* ScoreLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreLoader.swift; sourceTree = "<group>"; };
 		F84B9B4A9ECB304F011F2454 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		F9139CDD207E4577CFBA339C /* Transposition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transposition.swift; sourceTree = "<group>"; };
 		FAB3A2F17269B7472AF6CFD6 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		FDE7041B4B6767A23CD8453C /* LargeScoreTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = LargeScoreTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FEDAB8FE7CB3DC5664A5D395 /* evening-air-treble.musicxml */ = {isa = PBXFileReference; path = "evening-air-treble.musicxml"; sourceTree = "<group>"; };
@@ -241,6 +245,7 @@
 				F4C3345DCD65C0A8E77FDBF9 /* ScoreLoader.swift */,
 				C38FABE19590F985BF6CD2A6 /* SVGScene.swift */,
 				6299FC9AB66EA749AB2CF385 /* TextLayout.swift */,
+				F9139CDD207E4577CFBA339C /* Transposition.swift */,
 				22EE9AB0CE94FA8966AD7CBA /* VerovioEngraver.swift */,
 			);
 			path = Engraving;
@@ -263,6 +268,7 @@
 				C0D8417E61C09893DAEEE5C3 /* RenderOutput.swift */,
 				4F6192D965D015D4432C9E71 /* TextAndFillTests.swift */,
 				0838610092BDE0C0A68B0374 /* ThicknessRenderTests.swift */,
+				A5F94FBBCC69CEB57BB024BC /* TranspositionTests.swift */,
 			);
 			path = LargeScoreTests;
 			sourceTree = "<group>";
@@ -529,6 +535,7 @@
 				AAB105C83CD709E37C2A54B1 /* SettingsView.swift in Sources */,
 				121D807792E20C06A68C05CF /* Style.swift in Sources */,
 				D072985CFC4D85275CC3E3E3 /* TextLayout.swift in Sources */,
+				B74EE9CC11FBB58C5E6921EA /* Transposition.swift in Sources */,
 				0177389474DFC4FA754E83EC /* VerovioEngraver.swift in Sources */,
 				2E3E9640839400CA3864B8A8 /* ZipReader.swift in Sources */,
 			);
@@ -551,6 +558,7 @@
 				C30EC66063AA58D60F923F1F /* RenderOutput.swift in Sources */,
 				FA379FE0D2838E71017A5D01 /* TextAndFillTests.swift in Sources */,
 				9173E0D4267A293A5B6E6EC1 /* ThicknessRenderTests.swift in Sources */,
+				3F8CB360E3A9BB44E3952B76 /* TranspositionTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

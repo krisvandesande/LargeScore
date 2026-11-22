@@ -69,6 +69,7 @@ private struct LibraryGrid: View {
     @State private var restoring: Score?
     @State private var comparing: Score?
     @State private var fixing: Score?
+    @State private var transposing: Score?
 
     init(sort: LibraryView.Sort, search: String, addMusic: @escaping () -> Void) {
         self.addMusic = addMusic
@@ -110,6 +111,9 @@ private struct LibraryGrid: View {
             }
             .sheet(item: $changingPart) { score in
                 PartChooser(score: score)
+            }
+            .sheet(item: $transposing) { score in
+                TransposeSheet(score: score)
             }
             .confirmationDialog(Text("Delete \(deleting?.title ?? "")?"), isPresented: isPresent($deleting), titleVisibility: .visible) {
                 Button("Delete", role: .destructive) {
@@ -153,6 +157,7 @@ private struct LibraryGrid: View {
                 Button("Compare with PDF", systemImage: "doc.on.doc") { comparing = score }
             }
             Button("Fix Notes", systemImage: "pencil") { fixing = score }
+            Button("Transpose", systemImage: "arrow.up.arrow.down") { transposing = score }
             if score.needsCheck {
                 Button("Mark as Checked", systemImage: "checkmark") {
                     score.needsCheck = false
@@ -170,6 +175,7 @@ private struct LibraryGrid: View {
         .accessibilityAction(named: Text("Change Parts")) { changingPart = score }
         .accessibilityAction(named: Text("Delete")) { deleting = score }
         .accessibilityAction(named: Text("Fix Notes")) { fixing = score }
+        .accessibilityAction(named: Text("Transpose")) { transposing = score }
         .accessibilityAction(named: Text("Compare with PDF")) { if score.pdf != nil { comparing = score } }
     }
 
@@ -202,6 +208,82 @@ private struct LibraryGrid: View {
 }
 
 /// Other parts of a piece already in the library; more than one reads together.
+/// Reading a part written for another instrument: what it's written for, what
+/// plays it, and an octave either way.
+private struct TransposeSheet: View {
+    let score: Score
+    @Environment(\.modelContext) private var context
+    @Environment(\.dismiss) private var dismiss
+    /// What the reader plays, remembered for the next piece.
+    @AppStorage("transposePlayedOn") private var playedOn: WrittenFor = .bFlat
+    @State private var writtenFor: WrittenFor = .eFlat
+    @State private var octaves = 0
+
+    private var transposition: Transposition {
+        Transposition(from: writtenFor, to: playedOn, octaves: octaves)
+    }
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section {
+                    FittingPicker(String(localized: "Written For"), value: String(localized: writtenFor.title), selection: $writtenFor) {
+                        ForEach(WrittenFor.allCases) { Text($0.title).tag($0) }
+                    }
+                    FittingPicker(String(localized: "Played On"), value: String(localized: playedOn.title), selection: $playedOn) {
+                        ForEach(WrittenFor.allCases) { Text($0.title).tag($0) }
+                    }
+                    FittingPicker(String(localized: "Octave"), value: String(localized: octaveTitle(octaves)), selection: $octaves) {
+                        ForEach([1, 0, -1], id: \.self) { Text(octaveTitle($0)).tag($0) }
+                    }
+                }
+                Section {
+                    Text(verbatim: transposition.description + (transposition.changesClef ? ", " + (transposition.to.bassClef ? String(localized: "bass clef") : String(localized: "treble clef")) : ""))
+                        .font(.title3.weight(.semibold))
+                }
+            }
+            .font(.title3)
+            .navigationTitle(score.title)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
+                if score.transposition != nil {
+                    ToolbarItem(placement: .destructiveAction) {
+                        Button("As Written") {
+                            score.transposition = nil
+                            try? context.save()
+                            dismiss()
+                        }
+                    }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") {
+                        score.transposition = transposition
+                        try? context.save()
+                        dismiss()
+                    }
+                    .fontWeight(.semibold)
+                }
+            }
+        }
+        .onAppear {
+            if let current = score.transposition {
+                writtenFor = current.from
+                playedOn = current.to
+                octaves = current.octaves
+            }
+        }
+    }
+
+    private func octaveTitle(_ octaves: Int) -> LocalizedStringResource {
+        switch octaves {
+        case 1: "An Octave Higher"
+        case -1: "An Octave Lower"
+        default: "Nearest"
+        }
+    }
+}
+
 private struct PartChooser: View {
     let score: Score
     @Environment(\.modelContext) private var context

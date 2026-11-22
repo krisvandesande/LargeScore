@@ -235,4 +235,10 @@ struct FixNotesTests {
         #expect(throws: MusicXMLEdit.Failure.cannot) { try e.addDynamic("loud", bar: "ls-m1", at: nil) }
         #expect(e.barsThatDontAddUp().isEmpty)
     }
+
+    @Test func symbolWordsFromRecognitionGo() {
+        let xml = #"<measure id="m"><direction><direction-type><words>.&gt; . .</words></direction-type></direction><direction><direction-type><words>Poco più mosso</words></direction-type></direction><note><lyric><text>-</text></lyric><lyric><text>mf</text></lyric></note></measure>"#
+        let tidy = MusicXMLEdit.withoutSymbolWords(xml)
+        #expect(tidy == #"<measure id="m"><direction><direction-type><words>Poco più mosso</words></direction-type></direction><note><lyric><text>mf</text></lyric></note></measure>"#)
+    }
 }

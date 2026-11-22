@@ -35,7 +35,7 @@ xcodebuild -project LargeScore.xcodeproj -scheme LargeScore \
 
 ## Accessibility sweep
 
-`scripts/sweep.sh` makes (or reuses) its own simulators "LS iPad mini", "LS iPad" and "LS iPad Pro 13" on iOS 27.2, warms new ones up, runs `LargeScoreUITests` on each at standard size and AX5, light and dark, and checks crash reports after each run. Screenshots go to `build/sweep/<date>/`, audit lines to its logs, reading-order trees to `docs/voiceover/` (tracked: a run changes them). Write the verdicts into `docs/accessibility-findings.md`.
+Use one simulator at a time, "LS iPad mini", for everyday test runs (Kris, 2026-11-22: "use less simulators"). `scripts/sweep.sh` runs on it alone; `scripts/sweep.sh --all` adds "LS iPad" and "LS iPad Pro 13" (iOS 27.2), for the sweep before a TestFlight build. It warms new ones up, runs `LargeScoreUITests` on each at standard size and AX5, light and dark, and checks crash reports after each run. Screenshots go to `build/sweep/<date>/`, audit lines to its logs, reading-order trees to `docs/voiceover/` (tracked: a run changes them). Write the verdicts into `docs/accessibility-findings.md`.
 
 ## Gotchas
 

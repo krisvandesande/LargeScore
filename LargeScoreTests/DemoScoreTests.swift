@@ -89,5 +89,17 @@ struct DemoScoreTests {
             }
             try image.pngData()!.write(to: renderOutput("demo-ragtime-fixed.png"))
         }
+        if let url = Self.files.first(where: { $0.lastPathComponent.hasPrefix("Cherie") }) {
+            let file = try MusicFile.read(try Data(contentsOf: url), fileName: url.lastPathComponent)
+            var piece = Piece(id: "c", title: "c", partIDs: [], source: .stored(Data(file.xml.utf8)))
+            piece.transposition = Transposition(from: .eFlat, to: .bFlat)
+            let size = CGSize(width: 1200, height: 1700)
+            let laidOut = try await ScoreLoader().layOut(piece, request: LayoutRequest(pageSize: size, staffHeight: 40, bold: false, lineGap: 4))
+            let image = UIGraphicsImageRenderer(size: size).image { ctx in
+                UIColor.white.setFill(); ctx.fill(CGRect(origin: .zero, size: size))
+                ScoreCanvas.draw(laidOut.pages[0], in: ctx.cgContext, size: size, ink: UIColor.black.cgColor)
+            }
+            try image.pngData()!.write(to: renderOutput("demo-cherie-for-baritone.png"))
+        }
     }
 }

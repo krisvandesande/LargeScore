@@ -1,6 +1,6 @@
 #!/bin/bash
-# Runs the screen sweep on fresh simulators made for the run: iPad mini upright, the
-# standard iPad and iPad Pro 13-inch. Screenshots land in build/sweep/<date>/, audit lines in the log.
+# Runs the screen sweep on the iPad mini (the smallest iPad), one simulator at a time.
+# --all adds the standard iPad and iPad Pro 13-inch: before a TestFlight build only. Screenshots land in build/sweep/<date>/, audit lines in the log.
 # Crash reports from the simulators' own processes are checked after each run.
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -34,12 +34,14 @@ check_crashes() { # udid since
   return $bad
 }
 
-MINI=$(fresh_simulator "iPad mini" com.apple.CoreSimulator.SimDeviceType.iPad-mini-A17-Pro)
-PRO=$(fresh_simulator "iPad Pro 13" com.apple.CoreSimulator.SimDeviceType.iPad-Pro-13-inch-M5-12GB)
-IPAD=$(fresh_simulator "iPad" com.apple.CoreSimulator.SimDeviceType.iPad-A16)
+DEVICES=$(fresh_simulator "iPad mini" com.apple.CoreSimulator.SimDeviceType.iPad-mini-A17-Pro)
+if [ "${1:-}" = "--all" ]; then
+  DEVICES="$DEVICES $(fresh_simulator "iPad" com.apple.CoreSimulator.SimDeviceType.iPad-A16)"
+  DEVICES="$DEVICES $(fresh_simulator "iPad Pro 13" com.apple.CoreSimulator.SimDeviceType.iPad-Pro-13-inch-M5-12GB)"
+fi
 STAMP=$(mktemp); touch "$STAMP"
 
-for UDID in $MINI $IPAD $PRO; do
+for UDID in $DEVICES; do
   xcrun simctl boot "$UDID" 2>/dev/null || true
   xcrun simctl bootstatus "$UDID" -b >/dev/null
   TEST_RUNNER_SWEEP_DIR="$PWD/$OUT" TEST_RUNNER_VOICEOVER_DIR="$PWD/docs/voiceover" xcodebuild -project LargeScore.xcodeproj -scheme LargeScore \

@@ -80,3 +80,11 @@ Run with Apple's `accessibility-dynamic-type-specialist` and `accessibility-suff
 - Choosing a note is a tap on the music, which needs sight; the music is one element with direct interaction ("Music to fix") for Voice Control and Switch Control users who can see. Written down as intended, like placing notes.
 - Checked: iPad (A16) upright, standard size, light. Still to run in the sweep: AX5, dark, the iPad mini.
 - Second round, same day: Add Note After, Delete Note, Add Note, Time Signature (a menu), Bars of Rest (a number field) and the bar's words, each with Change and Delete buttons whose spoken names include the words ("Delete Poco pifl"). More than five bars that don't add up are counted in the sentence rather than listed.
+
+## Sweep, 2026-11-22 (iPad mini, iPad, iPad Pro 13; standard and AX5, light and dark)
+
+- **The fix buttons filled the screen at AX5.** On the iPad mini the music and the PDF disappeared and the lower buttons (Tempo, Time Signature) were off the screen, out of reach. The fix buttons now stop growing at xxxLarge like the reader's strip and the notes palette (touch and hold shows each one in the Large Content Viewer), scroll inside at most half of the music's pane, and upright the PDF takes a third of the height while fixing. Checked again on the iPad mini at AX5, light and dark: every button reachable.
+- **"Text clipped" on the selected note's name** came from a spoken label longer than the words shown; the label is gone, the words are read as they are.
+- **"Dynamic Type partially unsupported" on Cancel, Undo, Save Fixes, Done:** the navigation bar's own buttons, written down as the platform's.
+- **The notes test failed once on the standard iPad:** it tapped the palette's Done while the written-note sheet was still closing. The test now waits for the sheet to close; not an app fault.
+- Everyday runs now use the iPad mini alone; all three sizes before a TestFlight build (`scripts/sweep.sh --all`).

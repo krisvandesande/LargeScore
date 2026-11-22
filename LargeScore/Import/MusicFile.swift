@@ -42,10 +42,7 @@ nonisolated struct MusicFile: Sendable, Identifiable {
 
     /// Read from a PDF or a scan by a recognition program: to be checked against
     /// the original before playing from it.
-    var isRecognised: Bool {
-        guard let software = software?.lowercased() else { return false }
-        return Self.recognisers.contains { software.contains($0) }
-    }
+    var isRecognised: Bool { Metadata.isRecogniser(software) }
 
     /// Reads a file from any source: compressed or not, UTF-8 or UTF-16.
     static func read(_ data: Data, fileName: String) throws -> MusicFile {
@@ -54,12 +51,13 @@ nonisolated struct MusicFile: Sendable, Identifiable {
             throw raw.contains("<score-timewise") ? Failure.timewise : Failure.notMusicXML
         }
         // Every note and bar gets an id, so a note tapped on the page can be fixed.
-        let xml = MusicXMLEdit.withIDs(raw)
+        var xml = MusicXMLEdit.withIDs(raw)
         let info = Metadata.read(xml)
         let fallback = (fileName as NSString).deletingPathExtension
         let title = [info.workTitle, info.movementTitle, info.creditTitle]
             .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
             .first { !$0.isEmpty } ?? fallback
+        if Metadata.isRecogniser(info.software) { xml = MusicXMLEdit.withoutSymbolWords(xml) }
         return MusicFile(fileName: fileName, xml: xml, title: title,
                          composer: info.composer, arranger: info.arranger,
                          parts: PartSplitter.parts(in: xml), software: info.software)
@@ -143,6 +141,11 @@ nonisolated private final class Metadata: NSObject, XMLParserDelegate {
     private var firstCreditWords: String?
     private var text = ""
 
+    static func isRecogniser(_ software: String?) -> Bool {
+        guard let software = software?.lowercased() else { return false }
+        return MusicFile.recognisers.contains { software.contains($0) }
+    }
+
     static func read(_ xml: String) -> Metadata {
         let reader = Metadata()
         let parser = XMLParser(data: Data(xml.utf8))
@@ -197,6 +200,7 @@ extension Instrument {
         case .horn: ["horn", "hoorn", "cor ", "corno", "hn."]
         case .trumpet: ["trumpet", "trompet", "trompete", "trompette", "tromba", "tpt"]
         case .trombone: ["trombone", "posaune", "tbn"]
+        case .baritone: ["baritone", "bariton", "euphonium", "euph"]
         case .tuba: ["tuba"]
         case .violin: ["violin", "viool", "violine", "violon", "violino", "vln", "vl."]
         case .viola: ["viola", "altviool", "bratsche", "alto", "vla"]
@@ -219,6 +223,7 @@ extension Instrument {
         case .horn: ["brass.french-horn", "brass.horn"]
         case .trumpet: ["brass.trumpet"]
         case .trombone: ["brass.trombone"]
+        case .baritone: ["brass.baritone", "brass.euphonium"]
         case .tuba: ["brass.tuba"]
         case .violin: ["strings.violin"]
         case .viola: ["strings.viola"]
@@ -238,6 +243,8 @@ extension Instrument {
         let names = ([part.name, part.abbreviation] + part.instrumentNames).map { $0.lowercased() }
         let exclusions = ["contrabassoon", "contrafagot", "kontrafagott", "bass clarinet", "basklarinet", "bassklarinette"]
         if names.contains(where: { name in exclusions.contains { name.contains($0) } }) { return false }
+        // A baritone saxophone is a saxophone.
+        if self == .baritone, names.contains(where: { $0.contains("sax") }) { return false }
         if self == .violin, names.contains(where: { $0.contains("violoncel") }) { return false }
         let englishHorn = ["english horn", "engelse hoorn", "cor anglais", "englischhorn", "corno inglese"]
         if self == .horn, names.contains(where: { name in englishHorn.contains { name.contains($0) } }) { return false }

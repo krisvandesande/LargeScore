@@ -38,6 +38,8 @@ actor VerovioEngraver: Engraver {
             "font": "Leipzig",
             "spacingSystem": request.lineGap,
         ]
+        // Always set: the toolkit keeps options between pieces, and an empty value is none.
+        options["transpose"] = request.transpose ?? ""
         // Thin is Verovio's own, close to print. Bold takes every line to near the
         // top of what Verovio allows, so the difference is plain at a glance.
         if request.bold {

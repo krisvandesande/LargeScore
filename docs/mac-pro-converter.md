@@ -55,7 +55,8 @@ Large Score, Settings, Music Folder, Choose Folder: iCloud Drive, "Large Score".
 
 Tested 2026-11-22 on a one-voice test part and three real band parts written in
 MuseScore (Alaaf 2, baritone; Carnaval de Paris, trombone 1; A Klezmer karnival,
-trombone 2; Alexander's Ragtime Band, trombone 2). Each took under a minute on an Apple silicon Mac; the Mac Pro will
+trombone 2; Alexander's Ragtime Band, trombone 2; Alte Kameraden, baritone and
+trombone 1; Celebration, trombone; Chérie, baritone sax). Each took under a minute on an Apple silicon Mac; the Mac Pro will
 be slower.
 
 - Notes, rhythms, bar lines, slurs, ties, dynamics, accents, staccato, repeats,
@@ -71,5 +72,10 @@ be slower.
   trill and a stray second voice added, misread words ("P000 pifJ mosso" for
   "Poco più mosso", "If" for ff) and bar numbers read as words. Bars that don't
   add up are outlined in Fix Notes, which finds most of the rhythm mistakes.
+- Accents and staccato read as words (".> . .", "§", rows of dashes): Large Score
+  drops words with no letter or digit from converted files when it reads them.
+- A part written for another instrument (Chérie, for E♭ baritone sax, played on a
+  B♭ baritone): touch and hold the card, Transpose. Written For E♭, Played On B♭:
+  up a fourth. Compare and Fix Notes keep showing it as written, like the PDF.
 
 The Mac Pro must be on and logged in for conversion; nothing else needs to stay open.

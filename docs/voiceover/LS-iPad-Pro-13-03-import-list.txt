@@ -1,5 +1,5 @@
             Button: Cancel
-            Button: Add 3 Pieces
+            Button: Add 4 Pieces
             Text: Add Music
             Button: Evening Air for Four, Fagot
             Text: Evening Air for Four
@@ -10,3 +10,6 @@
             Button: Long Evening Air, Bassoon
             Text: Long Evening Air
             Text: Bassoon
+            Button: converted-by-audiveris, Voice
+            Text: converted-by-audiveris
+            Text: Voice

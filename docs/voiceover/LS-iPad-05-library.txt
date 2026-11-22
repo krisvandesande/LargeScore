@@ -1,6 +1,9 @@
             Button: More [TopOverflowBarButtonItem]
             Button: Search
             Text: Library
+            Button: converted-by-audiveris, Check against the PDF
+            Text: converted-by-audiveris
+            Text: Check against the PDF
             Button: Evening Air for Four, Test piece
             Text: Evening Air for Four
             Text: Test piece

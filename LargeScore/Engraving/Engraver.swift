@@ -15,6 +15,8 @@ nonisolated struct LayoutRequest: Hashable, Sendable {
     /// Room under the last line, in Verovio units. Tight first; more only when what
     /// hangs below the last line (dynamics, lyrics, chord names) would run off.
     var bottomRoom: Int = 40
+    /// An interval to move every note by ("+P4"), for a part written for another instrument.
+    var transpose: String?
 }
 
 /// One engraved page.

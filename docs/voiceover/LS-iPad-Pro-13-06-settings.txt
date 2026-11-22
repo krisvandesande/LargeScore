@@ -19,7 +19,6 @@
             Text: Instruments
             Text: Instruments, Bassoon
             Button: Language
-            Text: Music Folder
             Text: Music Folder, None
             Text: Music Folder
             Button: Choose Folder
