@@ -175,7 +175,8 @@ nonisolated private final class Metadata: NSObject, XMLParserDelegate {
         case "credit-words":
             if creditType == "title", creditTitle == nil, !value.isEmpty { creditTitle = value }
             if creditType == "composer", composer == nil, !value.isEmpty { composer = value }
-            if firstCreditWords == nil, !value.isEmpty { firstCreditWords = value }
+            // An untyped credit with words, not a page number ("1/2") or bar number.
+            if firstCreditWords == nil, creditType == nil, value.filter(\.isLetter).count >= 3 { firstCreditWords = value }
         default: break
         }
         path.removeLast()

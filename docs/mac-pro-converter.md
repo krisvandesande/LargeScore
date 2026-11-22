@@ -51,20 +51,21 @@ Large Score, Settings, Music Folder, Choose Folder: iCloud Drive, "Large Score".
 
 ## What to expect
 
-Tested 2026-11-22 on three clean digital PDFs: a one-voice test part, and two
-real band parts written in MuseScore (Alaaf 2, baritone, 146 bars; Carnaval de
-Paris, trombone, 77 bars).
+Tested 2026-11-22 on a one-voice test part and three real band parts written in
+MuseScore (Alaaf 2, baritone; Carnaval de Paris, trombone 1; A Klezmer karnival,
+trombone 2). Each took under a minute on an Apple silicon Mac; the Mac Pro will
+be slower.
 
-- Notes, rhythms, bar lines, slurs, ties, dynamics, accents, repeats and voltas
-  come through mostly right.
-- Whole notes were all missing until the converter told Audiveris to expect
-  MuseScore's music font (Leland); it does that now. For parts from Finale or
-  Dorico, set `MUSIC_FONT=Bravura` in `convert-pdfs.sh`.
-- Words (tempo, section names such as "Bostella", rehearsal marks) are missing
-  until Audiveris's text reading has its language files.
-- Seen in the real parts: a missed time signature change (2/4), a missed
-  multi-bar rest, dotted half notes read as staccato, a trill and a stray second
-  voice added. Bars that don't add up are outlined in Fix Notes, which finds most
-  of these.
+- Notes, rhythms, bar lines, slurs, ties, dynamics, accents, staccato, repeats,
+  voltas, titles and most words come through. The Klezmer part came out best.
+- Whole notes need Audiveris told to expect MuseScore's music font (Leland); the
+  converter does that. For parts from Finale or Dorico, set `MUSIC_FONT=Bravura`
+  in `convert-pdfs.sh`.
+- Words need Tesseract's English language file; `install.sh` downloads it (23 MB).
+- Seen in the real parts: missed changes to 2/4, multi-bar rests read as one bar
+  (so bar numbers drift from the PDF's), dotted half notes read as staccato, a
+  trill and a stray second voice added, misread words ("P000 pifJ mosso" for
+  "Poco più mosso", "If" for ff) and bar numbers read as words. Bars that don't
+  add up are outlined in Fix Notes, which finds most of the rhythm mistakes.
 
 The Mac Pro must be on and logged in for conversion; nothing else needs to stay open.

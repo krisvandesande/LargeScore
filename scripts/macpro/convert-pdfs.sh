@@ -42,7 +42,11 @@ for pdf in "$INBOX"/*.pdf "$INBOX"/*.PDF; do
   log "converting $name"
   # Leland is MuseScore's music font: with Audiveris's default (Bravura) it missed
   # every whole note in MuseScore parts. MUSIC_FONT=Bravura for parts from Finale or Dorico.
+  # Reading words takes Audiveris past its 2-minute limit per step on a busy page,
+  # and this Mac is slower than the one it was tested on: allow 20 minutes.
+  TESSDATA_PREFIX="${TESSDATA_PREFIX:-$HOME/Library/Application Support/LargeScoreConverter/tessdata}" \
   "$AUDIVERIS" -batch -export -option "org.audiveris.omr.ui.symbol.MusicFont.defaultMusicFamily=${MUSIC_FONT:-Leland}" \
+    -option org.audiveris.omr.Main.sheetStepTimeOut=1200 \
     -output "$work" -- "$pdf" >> "$LOG" 2>&1
   # Audiveris names its output after the PDF, but may tidy the name; take what it made.
   result=$(find "$work" -name "*.mxl" -print | head -n 1)

@@ -29,6 +29,22 @@ fi
 
 mkdir -p "$HOME_DIR" "$HOME/Library/LaunchAgents" "$LARGE_SCORE/PDF in"
 cp "$(dirname "$0")/convert-pdfs.sh" "$HOME_DIR/convert-pdfs.sh"
+
+# Audiveris reads words (tempo, section names, rehearsal marks) with Tesseract,
+# which needs a language file; without it every word in the PDF is lost.
+TESSDATA="$HOME_DIR/tessdata"
+ENG_SHA=daa0c97d651c19fba3b25e81317cd697e9908c8208090c94c3905381c23fc047
+mkdir -p "$TESSDATA"
+if [ "$(shasum -a 256 "$TESSDATA/eng.traineddata" 2>/dev/null | cut -d' ' -f1)" != "$ENG_SHA" ]; then
+  echo "Downloading the English language file for reading words (23 MB)..."
+  curl -fsSL -o "$TESSDATA/eng.traineddata.part" https://github.com/tesseract-ocr/tessdata/raw/main/eng.traineddata
+  if [ "$(shasum -a 256 "$TESSDATA/eng.traineddata.part" | cut -d' ' -f1)" != "$ENG_SHA" ]; then
+    rm -f "$TESSDATA/eng.traineddata.part"
+    echo "The language file didn't match what was expected; words won't be read. Ask Kris."
+  else
+    mv "$TESSDATA/eng.traineddata.part" "$TESSDATA/eng.traineddata"
+  fi
+fi
 chmod +x "$HOME_DIR/convert-pdfs.sh"
 
 cat > "$PLIST" <<PLIST
