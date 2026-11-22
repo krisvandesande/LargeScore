@@ -69,5 +69,25 @@ struct DemoScoreTests {
             }
             try image.pngData()!.write(to: renderOutput("demo-klezmer-fixed-1.png"))
         }
+        if var ragtime = try load("Alexander") {
+            let numbers = ragtime.barNumbers()
+            let byNumber = Dictionary(numbers.map { ($0.value, $0.key) }, uniquingKeysWith: { a, _ in a })
+            let bar1 = try #require(byNumber[1]), bar5 = try #require(byNumber[5])
+            // The word "Mf" sits in whichever bar Audiveris put it: find it.
+            let wordBar = try #require(numbers.keys.first { ragtime.words(inBar: $0).contains { $0.text == "Mf" } })
+            let index = try #require(ragtime.words(inBar: wordBar).firstIndex { $0.text == "Mf" })
+            try ragtime.setWords(inBar: wordBar, at: index, to: "")
+            try ragtime.addDynamic("f", bar: bar1, at: nil)
+            try ragtime.addDynamic("mf", bar: bar5, at: nil)
+            print("FIX Ragtime: Mf word in bar \(numbers[wordBar] ?? 0) removed, f and mf added; bars that don't add up: \(ragtime.barsThatDontAddUp().count)")
+            let piece = Piece(id: "r", title: "r", partIDs: [], source: .stored(Data(ragtime.xml.utf8)))
+            let size = CGSize(width: 1200, height: 500)
+            let laidOut = try await ScoreLoader().layOut(piece, request: LayoutRequest(pageSize: size, staffHeight: 40, bold: false, lineGap: 4))
+            let image = UIGraphicsImageRenderer(size: size).image { ctx in
+                UIColor.white.setFill(); ctx.fill(CGRect(origin: .zero, size: size))
+                ScoreCanvas.draw(laidOut.pages[0], in: ctx.cgContext, size: size, ink: UIColor.black.cgColor)
+            }
+            try image.pngData()!.write(to: renderOutput("demo-ragtime-fixed.png"))
+        }
     }
 }

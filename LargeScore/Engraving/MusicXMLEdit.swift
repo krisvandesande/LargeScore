@@ -197,6 +197,28 @@ nonisolated struct MusicXMLEdit {
         xml.replaceSubrange(range, with: bar)
     }
 
+    /// Dynamics a part can carry, as MusicXML names them.
+    static let dynamics = ["ppp", "pp", "p", "mp", "mf", "f", "ff", "fff", "fp", "sf", "sfz", "fz"]
+
+    /// A dynamic under the music, at the given note or else at the bar's start.
+    mutating func addDynamic(_ mark: String, bar id: String, at note: String?) throws {
+        guard Self.dynamics.contains(mark) else { throw Failure.cannot }
+        let direction = #"<direction placement="below"><direction-type><dynamics><"# + mark + "></" + mark + "></dynamics></direction-type></direction>"
+        if let note, let range = elementRange("note", id: note) {
+            guard !String(xml[range]).contains("<chord") else { throw Failure.cannot }
+            xml.insert(contentsOf: direction, at: range.lowerBound)
+            return
+        }
+        guard let range = elementRange("measure", id: id) else { throw Failure.notFound }
+        var bar = String(xml[range])
+        if let first = bar.range(of: #"<note[\s>]"#, options: .regularExpression) {
+            bar.insert(contentsOf: direction, at: first.lowerBound)
+        } else if let end = bar.range(of: "</measure>", options: .backwards) {
+            bar.insert(contentsOf: direction, at: end.lowerBound)
+        }
+        xml.replaceSubrange(range, with: bar)
+    }
+
     /// Bars whose notes don't add up to the time signature, by id: a pickup bar
     /// (`implicit="yes"`) and the last bar of a part may be short.
     func barsThatDontAddUp() -> [String] {

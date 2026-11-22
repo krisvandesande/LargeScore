@@ -223,4 +223,16 @@ struct FixNotesTests {
         let pickup = MusicXMLEdit.withIDs(Self.piece.replacingOccurrences(of: #"<measure number="1">"#, with: #"<measure number="0" implicit="yes">"#))
         #expect(MusicXMLEdit(xml: pickup).barNumbers() == ["ls-m1": 0, "ls-m2": 1])
     }
+
+    @Test func dynamicsGoUnderANoteOrTheBar() throws {
+        var e = edit()
+        try e.addDynamic("f", bar: "ls-m1", at: "ls-n2")
+        try e.addDynamic("mf", bar: "ls-m2", at: nil)
+        let bar1 = String(e.xml[try #require(e.elementRange("measure", id: "ls-m1"))])
+        #expect(bar1.range(of: "<f></f>")!.lowerBound > bar1.range(of: #"id="ls-n1""#)!.lowerBound)
+        #expect(bar1.range(of: "<f></f>")!.lowerBound < bar1.range(of: #"id="ls-n2""#)!.lowerBound)
+        #expect(e.xml.contains(#"<direction placement="below"><direction-type><dynamics><mf></mf></dynamics></direction-type></direction><note id="ls-n4""#))
+        #expect(throws: MusicXMLEdit.Failure.cannot) { try e.addDynamic("loud", bar: "ls-m1", at: nil) }
+        #expect(e.barsThatDontAddUp().isEmpty)
+    }
 }

@@ -60,6 +60,12 @@ final class FixSession {
         perform(problem: "These words can't be changed.") { try $0.setWords(inBar: bar, at: index, to: text) }
     }
 
+    func addDynamic(_ mark: String) {
+        guard let bar = selectedBar else { return }
+        let note = selectedNote
+        perform(problem: "This bar can't be changed that way.") { try $0.addDynamic(mark, bar: bar, at: note) }
+    }
+
     func setTime(beats: Int, beatType: Int) {
         guard let bar = selectedBar else { return }
         perform(problem: "This bar can't be changed that way.") { try $0.setTime(beats: beats, beatType: beatType, bar: bar) }
@@ -284,6 +290,15 @@ struct FixBar: View {
                 fixButton("Rehearsal Mark") { words = ""; asking = .rehearsal }
                 fixButton("Tempo") { words = ""; asking = .tempo }
                 fixButton("Fermata") { session.add(.fermata) }
+                Menu {
+                    ForEach(MusicXMLEdit.dynamics, id: \.self) { mark in
+                        Button { session.addDynamic(mark) } label: { Text(verbatim: mark) }
+                    }
+                } label: {
+                    Text("Dynamic")
+                }
+                .menuStyle(.button)
+                .buttonStyle(.large)
                 Menu {
                     ForEach(0..<Self.times.count, id: \.self) { index in
                         let time = Self.times[index]

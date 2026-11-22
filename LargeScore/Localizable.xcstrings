@@ -718,6 +718,16 @@
         }
       }
     },
+    "Dynamic": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dynamiek"
+          }
+        }
+      }
+    },
     "Eighth": {
       "localizations": {
         "nl": {

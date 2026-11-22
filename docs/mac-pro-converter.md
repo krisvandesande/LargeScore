@@ -41,7 +41,7 @@ Large Score, Settings, Music Folder, Choose Folder: iCloud Drive, "Large Score".
 4. Something wrong: on the iPad, Fix Notes (on the compare screen, or touch and
    hold the card). Tap a note to change its pitch (Higher, Lower, Sharp, Flat,
    Natural), its length, a dot, a tie or a rest, add a note after it or delete
-   it; tap a bar to add a rehearsal mark, a tempo word, a fermata or a note, set
+   it; tap a bar to add a rehearsal mark, a tempo word, a dynamic, a fermata or a note, set
    the time signature, set how many bars a rest lasts, or change or delete the
    words written in it. Bars whose notes don't add up to the time
    signature are outlined. Save Fixes keeps the version before, for Restore
@@ -55,11 +55,13 @@ Large Score, Settings, Music Folder, Choose Folder: iCloud Drive, "Large Score".
 
 Tested 2026-11-22 on a one-voice test part and three real band parts written in
 MuseScore (Alaaf 2, baritone; Carnaval de Paris, trombone 1; A Klezmer karnival,
-trombone 2). Each took under a minute on an Apple silicon Mac; the Mac Pro will
+trombone 2; Alexander's Ragtime Band, trombone 2). Each took under a minute on an Apple silicon Mac; the Mac Pro will
 be slower.
 
 - Notes, rhythms, bar lines, slurs, ties, dynamics, accents, staccato, repeats,
-  voltas, titles and most words come through. The Klezmer part came out best.
+  voltas, titles and most words come through. Alexander's Ragtime Band came out
+  best: every bar right but three, where a note was stacked into a chord, and
+  three missing f dynamics.
 - Whole notes need Audiveris told to expect MuseScore's music font (Leland); the
   converter does that. For parts from Finale or Dorico, set `MUSIC_FONT=Bravura`
   in `convert-pdfs.sh`.
