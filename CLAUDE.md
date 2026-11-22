@@ -39,6 +39,7 @@ Use one simulator at a time, "LS iPad mini", for everyday test runs (Kris, 2026-
 
 ## Gotchas
 
+- **Verovio's toolkit keeps options between pieces:** set every option on every engrave (an empty `transpose` is none), or one piece's setting leaks into the next.
 - **Verovio's page units are 9/8 of a point,** not points. Notes landed off their bars until everything was drawn inside the music's own transform.
 - **Test with real files.** Kris's first real piece (The Entertainer) exposed text, chord-name and page-fill bugs the generated test pieces never showed.
 - Notes are stored in staff spaces from their bar's staff, so they stay on their bar at any size and through a new version of the piece.
