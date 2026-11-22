@@ -2,9 +2,6 @@
             Button: Music Size, Size 4 of 7
             Text: Music Size
             Text: Music Size, Size 4 of 7
-            Button: Space Between Lines, Normal
-            Text: Normal
-            Text: Space Between Lines
             Button: Lines, Bold
             Text: Bold
             Text: Lines

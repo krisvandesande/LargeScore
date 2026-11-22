@@ -88,3 +88,11 @@ Run with Apple's `accessibility-dynamic-type-specialist` and `accessibility-suff
 - **"Dynamic Type partially unsupported" on Cancel, Undo, Save Fixes, Done:** the navigation bar's own buttons, written down as the platform's.
 - **The notes test failed once on the standard iPad:** it tapped the palette's Done while the written-note sheet was still closing. The test now waits for the sheet to close; not an app fault.
 - Everyday runs now use the iPad mini alone; all three sizes before a TestFlight build (`scripts/sweep.sh --all`).
+
+## Sweep before build 5, 2026-11-22 (iPad Pro 13, iPad, iPad mini; standard and AX5, light and dark)
+
+- All UI tests passed on all three; no app, PosterBoard or SpringBoard crashes.
+- Music Size is now a Settings screen (preview at the reader's width, a size slider along the foot, the spacing slider upright at the right edge); the reader's strip has no Size button. Each slider has its own spoken name and value ("Music size, Size 4 of 7"; "Space between lines, 2 of 7").
+- "Text clipped" on the fix screen at AX5 (iPad mini): the fix buttons scroll inside half the pane, and the audit reports the rows below the fold as clipped. Written down as the audit's; the screenshots show every button reachable by scrolling.
+- "Potentially inaccessible text" on the Transpose sheet: the pickers' menu labels, read whole by VoiceOver (as Rosie's fitting pickers).
+- "Dynamic Type partially unsupported" on navigation-bar buttons and the capped fix buttons: the platform's, and intended (capped at xxxLarge with the Large Content Viewer).

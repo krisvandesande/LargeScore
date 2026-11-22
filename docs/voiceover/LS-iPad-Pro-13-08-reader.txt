@@ -2,6 +2,5 @@
           Button: Back to Library
             Text: Library
           Button: Notes
-          Button: Music Size
           Text: Evening Air for Four
           Text: Page 1 of 1

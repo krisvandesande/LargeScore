@@ -1,4 +1,4 @@
-          Other: Evening Air for Four = Page 1 of 3, bars 1 to 6 [page]
+          Other: Evening Air for Four = Page 1 of 2, bars 1 to 8 [page]
           Button: Pen
             Text: Pen
           Button: Eraser
@@ -17,4 +17,4 @@
           Button: Previous Page
           Button: Next Page
           Button: Done
-          Text: Page 1 of 3
+          Text: Page 1 of 2

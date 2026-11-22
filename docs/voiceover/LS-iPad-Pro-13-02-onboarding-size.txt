@@ -2,7 +2,6 @@
             Text: Back
             Text: Choose the music size
             Text: Put the iPad on your stand and pick the size you read without effort.
-            Button: Smaller
-            Button: Larger
-            Text: Size 4 of 7
+            Slider: Space between lines = 2 of 7
+            Slider: Music size = Size 4 of 7 [sizeStepper]
             Button: Continue

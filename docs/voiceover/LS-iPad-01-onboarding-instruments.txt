@@ -7,6 +7,7 @@
             Button: Horn
             Button: Trumpet
             Button: Trombone
+            Button: Baritone
             Button: Tuba
             Button: Violin
             Button: Viola
