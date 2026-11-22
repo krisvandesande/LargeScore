@@ -40,7 +40,10 @@ for pdf in "$INBOX"/*.pdf "$INBOX"/*.PDF; do
   name=$(basename "$pdf"); base="${name%.*}"
   work=$(mktemp -d)
   log "converting $name"
-  "$AUDIVERIS" -batch -export -output "$work" -- "$pdf" >> "$LOG" 2>&1
+  # Leland is MuseScore's music font: with Audiveris's default (Bravura) it missed
+  # every whole note in MuseScore parts. MUSIC_FONT=Bravura for parts from Finale or Dorico.
+  "$AUDIVERIS" -batch -export -option "org.audiveris.omr.ui.symbol.MusicFont.defaultMusicFamily=${MUSIC_FONT:-Leland}" \
+    -output "$work" -- "$pdf" >> "$LOG" 2>&1
   # Audiveris names its output after the PDF, but may tidy the name; take what it made.
   result=$(find "$work" -name "*.mxl" -print | head -n 1)
   if [ -n "$result" ]; then

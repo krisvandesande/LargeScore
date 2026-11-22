@@ -51,9 +51,20 @@ Large Score, Settings, Music Folder, Choose Folder: iCloud Drive, "Large Score".
 
 ## What to expect
 
-Tested on a clean digital PDF of a one-voice part (2026-11-22): every note, bar,
-slur, dynamic, hairpin and repeat right; rehearsal marks, the tempo word and a
-fermata missing. Check those first. Chords, several voices, triplets and lyrics
-are harder and haven't been tested on real files yet.
+Tested 2026-11-22 on three clean digital PDFs: a one-voice test part, and two
+real band parts written in MuseScore (Alaaf 2, baritone, 146 bars; Carnaval de
+Paris, trombone, 77 bars).
+
+- Notes, rhythms, bar lines, slurs, ties, dynamics, accents, repeats and voltas
+  come through mostly right.
+- Whole notes were all missing until the converter told Audiveris to expect
+  MuseScore's music font (Leland); it does that now. For parts from Finale or
+  Dorico, set `MUSIC_FONT=Bravura` in `convert-pdfs.sh`.
+- Words (tempo, section names such as "Bostella", rehearsal marks) are missing
+  until Audiveris's text reading has its language files.
+- Seen in the real parts: a missed time signature change (2/4), a missed
+  multi-bar rest, dotted half notes read as staccato, a trill and a stray second
+  voice added. Bars that don't add up are outlined in Fix Notes, which finds most
+  of these.
 
 The Mac Pro must be on and logged in for conversion; nothing else needs to stay open.
