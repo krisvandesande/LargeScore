@@ -227,6 +227,266 @@ nonisolated struct MusicXMLEdit {
         return result
     }
 
+    // MARK: Adding and deleting notes
+
+    /// Removes a note or rest. A chord's lowest note hands the chord on to the next one.
+    mutating func delete(note id: String) throws {
+        guard let range = elementRange("note", id: id) else { throw Failure.notFound }
+        let note = String(xml[range])
+        if !note.contains("<chord"), let next = followingNote(range.upperBound), String(xml[next]).contains("<chord") {
+            let promoted = String(xml[next]).removingAll(#"<chord>\s*</chord>"#)
+            xml.replaceSubrange(next, with: promoted)
+        }
+        xml.removeSubrange(range)
+    }
+
+    /// A copy of the note (or rest) after it and its chord, without ties, slurs,
+    /// marks or words, for a note the recognition missed. Returns the new note's id.
+    @discardableResult
+    mutating func addNote(after id: String) throws -> String {
+        guard let range = elementRange("note", id: id) else { throw Failure.notFound }
+        var end = range.upperBound
+        while let next = followingNote(end), String(xml[next]).contains("<chord") { end = next.upperBound }
+        let newID = nextID("ls-n")
+        var copy = String(xml[range])
+            .removingAll(#"<chord>\s*</chord>"#)
+            .removingAll(#"<tie [^>]*>\s*</tie>"#)
+            .removingAll(#"<notations>[\s\S]*?</notations>"#)
+            .removingAll(#"<lyric\b[^>]*>[\s\S]*?</lyric>"#)
+            .removingAll(#"<beam\b[^>]*>[^<]*</beam>"#)
+            .removingAll(#"<accidental[^>]*>[\s\S]*?</accidental>"#)
+        copy = copy.replacingFirst(#"\bid="[^"]*""#, with: "id=\"\(newID)\"")
+        copy = copy.replacingFirst(#"\s(default-x|relative-x)="[^"]*""#, with: "")
+        xml.insert(contentsOf: copy, at: end)
+        return newID
+    }
+
+    /// A quarter note on the staff's middle line, for a bar the recognition left
+    /// empty. Returns its id.
+    @discardableResult
+    mutating func addNote(toBar id: String) throws -> String {
+        guard let range = elementRange("measure", id: id) else { throw Failure.notFound }
+        let context = Context(xml: xml, upTo: range.upperBound)
+        let newID = nextID("ls-n")
+        let note = "<note id=\"\(newID)\">" + Pitch.middleLine(clef: context.clef).xml
+            + "<duration>\(context.divisions)</duration><voice>1</voice><type>quarter</type></note>"
+        var bar = String(xml[range])
+        if let backup = bar.range(of: "<backup") {
+            bar.insert(contentsOf: note, at: backup.lowerBound)
+        } else if let end = bar.range(of: "</measure>", options: .backwards) {
+            bar.insert(contentsOf: note, at: end.lowerBound)
+        }
+        xml.replaceSubrange(range, with: bar)
+        return newID
+    }
+
+    private func followingNote(_ position: String.Index) -> Range<String.Index>? {
+        let rest = xml[position...]
+        let trimmed = rest.drop { $0.isWhitespace }
+        guard trimmed.hasPrefix("<note"), let end = xml.range(of: "</note>", range: trimmed.startIndex..<xml.endIndex) else { return nil }
+        return trimmed.startIndex..<end.upperBound
+    }
+
+    /// An id not yet in the file: the prefix and one more than the highest number used with it.
+    func nextID(_ prefix: String) -> String {
+        var highest = 0
+        let pattern = "id=\"" + NSRegularExpression.escapedPattern(for: prefix) + "(\\d+)\""
+        if let regex = try? NSRegularExpression(pattern: pattern) {
+            for match in regex.matches(in: xml, range: NSRange(xml.startIndex..., in: xml)) {
+                if let r = Range(match.range(at: 1), in: xml), let n = Int(xml[r]) { highest = max(highest, n) }
+            }
+        }
+        return "\(prefix)\(highest + 1)"
+    }
+
+    // MARK: Words
+
+    struct Words: Equatable, Identifiable {
+        var index: Int
+        var text: String
+        var id: Int { index }
+    }
+
+    /// Words written in a bar, in file order: directions, rehearsal marks and lyrics.
+    func words(inBar id: String) -> [Words] {
+        guard let range = elementRange("measure", id: id) else { return [] }
+        let bar = String(xml[range])
+        return Self.wordRanges(in: bar).enumerated().map { index, item in
+            Words(index: index, text: Self.unescape(String(bar[item.text])))
+        }
+    }
+
+    /// Changes words in a bar; empty text removes them (and a direction left with nothing).
+    mutating func setWords(inBar id: String, at index: Int, to text: String) throws {
+        guard let range = elementRange("measure", id: id) else { throw Failure.notFound }
+        var bar = String(xml[range])
+        let items = Self.wordRanges(in: bar)
+        guard items.indices.contains(index) else { throw Failure.notFound }
+        let item = items[index]
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !trimmed.isEmpty {
+            bar.replaceSubrange(item.text, with: Self.escape(trimmed))
+        } else if item.lyric {
+            bar.removeSubrange(item.whole)
+        } else {
+            bar.removeSubrange(item.whole)
+            bar = bar.removingAll(#"<direction-type>\s*</direction-type>"#)
+            // A direction with no direction-type left is gone too (sound and offset with it).
+            bar = bar.replacingMatches(of: #"(<direction(?:\s[^>]*)?>(?:(?!<direction-type)[\s\S])*?</direction>)"#) { _ in "" }
+        }
+        xml.replaceSubrange(range, with: bar)
+    }
+
+    private struct WordRange {
+        var whole: Range<String.Index>
+        var text: Range<String.Index>
+        var lyric: Bool
+    }
+
+    private static func wordRanges(in bar: String) -> [WordRange] {
+        let pattern = #"<(words|rehearsal)\b[^>]*>([^<]*)</\1>|<lyric\b[^>]*>(?:(?!</lyric>)[\s\S])*?<text\b[^>]*>([^<]*)</text>[\s\S]*?</lyric>"#
+        guard let regex = try? NSRegularExpression(pattern: pattern) else { return [] }
+        return regex.matches(in: bar, range: NSRange(bar.startIndex..., in: bar)).compactMap { match in
+            guard let whole = Range(match.range, in: bar) else { return nil }
+            if let text = Range(match.range(at: 2), in: bar) { return WordRange(whole: whole, text: text, lyric: false) }
+            if let text = Range(match.range(at: 3), in: bar) { return WordRange(whole: whole, text: text, lyric: true) }
+            return nil
+        }.filter { !bar[$0.text].trimmingCharacters(in: .whitespaces).isEmpty }
+    }
+
+    static func unescape(_ text: String) -> String {
+        text.replacingOccurrences(of: "&lt;", with: "<").replacingOccurrences(of: "&gt;", with: ">")
+            .replacingOccurrences(of: "&quot;", with: "\"").replacingOccurrences(of: "&amp;", with: "&")
+    }
+
+    // MARK: Time signatures and rests
+
+    /// Sets the time signature from this bar on.
+    mutating func setTime(beats: Int, beatType: Int, bar id: String) throws {
+        guard let range = elementRange("measure", id: id) else { throw Failure.notFound }
+        var bar = String(xml[range])
+        let time = "<time><beats>\(beats)</beats><beat-type>\(beatType)</beat-type></time>"
+        if bar.range(of: #"<time\b[^>]*>[\s\S]*?</time>"#, options: .regularExpression) != nil {
+            bar = bar.replacingFirst(#"<time\b[^>]*>[\s\S]*?</time>"#, with: time)
+        } else {
+            bar = Self.addAttribute(time, before: ["<staves", "<part-symbol", "<instruments", "<clef", "<staff-details", "<transpose", "<measure-style"], to: bar)
+        }
+        xml.replaceSubrange(range, with: bar)
+    }
+
+    /// How many bars of rest start at this bar (a multi-bar rest such as "7"): adds
+    /// or removes empty bars after it to match. Only for bars holding nothing but rests.
+    mutating func setRestBars(_ count: Int, bar id: String) throws {
+        guard count >= 1, count <= 999, let range = elementRange("measure", id: id) else { throw Failure.notFound }
+        var bar = String(xml[range])
+        guard Self.onlyRests(bar) else { throw Failure.cannot }
+        let current = bar.firstMatch(#"<multiple-rest\b[^>]*>(\d+)</multiple-rest>"#).flatMap(Int.init) ?? 1
+
+        // The bars after this one that belong to it now.
+        var group: [Range<String.Index>] = []
+        var position = range.upperBound
+        while group.count < current - 1, let next = nextMeasure(after: position) {
+            guard Self.onlyRests(String(xml[next])) else { break }
+            group.append(next)
+            position = next.upperBound
+        }
+        let insertAt = group.last?.upperBound ?? range.upperBound
+        let delta = count - 1 - group.count
+
+        // Shift later bar numbers first, while the ranges still hold.
+        if delta != 0 { renumber(after: insertAt, by: delta) }
+        if delta > 0 {
+            let context = Context(xml: xml, upTo: range.upperBound)
+            let duration = context.divisions * 4 * context.beats / context.beatType
+            let lastNumber = Int(String(xml[group.last ?? range]).firstMatch(#"<measure\b[^>]*\bnumber="(\d+)""#) ?? "") ?? 0
+            var added = ""
+            var ids = self
+            for n in 1...delta {
+                let newID = ids.nextID("ls-m")
+                let measure = "<measure id=\"\(newID)\" number=\"\(lastNumber + n)\"><note><rest measure=\"yes\"></rest><duration>\(duration)</duration><voice>1</voice></note></measure>"
+                ids.xml += measure // reserve the id
+                added += measure
+            }
+            xml.insert(contentsOf: added, at: insertAt)
+        } else if delta < 0 {
+            for removed in group.suffix(-delta).reversed() { xml.removeSubrange(removed) }
+        }
+
+        // The first bar says how many.
+        guard let start = elementRange("measure", id: id) else { throw Failure.notFound }
+        bar = String(xml[start])
+        bar = bar.removingAll(#"<measure-style>\s*<multiple-rest\b[^>]*>\d+</multiple-rest>\s*</measure-style>"#)
+        bar = bar.removingAll(#"<attributes>\s*</attributes>"#)
+        if count > 1 {
+            bar = Self.addAttribute("<measure-style><multiple-rest>\(count)</multiple-rest></measure-style>", before: [], to: bar)
+        }
+        xml.replaceSubrange(start, with: bar)
+    }
+
+    private static func onlyRests(_ bar: String) -> Bool {
+        bar.count(of: #"<note[\s>]"#) == bar.count(of: #"<rest[\s>/]"#)
+    }
+
+    private func nextMeasure(after position: String.Index) -> Range<String.Index>? {
+        guard let start = xml.range(of: "<measure", range: position..<xml.endIndex),
+              let partEnd = xml.range(of: "</part>", range: position..<xml.endIndex),
+              start.lowerBound < partEnd.lowerBound,
+              let end = xml.range(of: "</measure>", range: start.upperBound..<xml.endIndex) else { return nil }
+        return start.lowerBound..<end.upperBound
+    }
+
+    private mutating func renumber(after position: String.Index, by delta: Int) {
+        let partEnd = xml.range(of: "</part>", range: position..<xml.endIndex)?.lowerBound ?? xml.endIndex
+        let tail = String(xml[position..<partEnd]).replacingMatches(of: #"(<measure\b[^>]*\bnumber="\d+")"#) { tag in
+            tag.replacingMatches(of: #"number="(\d+)""#) { "number=\"\(Int($0)! + delta)\"" }
+        }
+        xml.replaceSubrange(position..<partEnd, with: tail)
+    }
+
+    /// Puts an element in the bar's attributes before the first of the given tags
+    /// (MusicXML's order), making the attributes if the bar has none.
+    private static func addAttribute(_ element: String, before tags: [String], to bar: String) -> String {
+        var bar = bar
+        if let open = bar.range(of: "<attributes>"), let close = bar.range(of: "</attributes>", range: open.upperBound..<bar.endIndex) {
+            let inside = open.upperBound..<close.lowerBound
+            for tag in tags {
+                if let at = bar.range(of: tag, range: inside) {
+                    bar.insert(contentsOf: element, at: at.lowerBound)
+                    return bar
+                }
+            }
+            bar.insert(contentsOf: element, at: close.lowerBound)
+            return bar
+        }
+        let attributes = "<attributes>\(element)</attributes>"
+        if let print = bar.range(of: "</print>") {
+            bar.insert(contentsOf: attributes, at: print.upperBound)
+        } else if let open = bar.range(of: ">") {
+            bar.insert(contentsOf: attributes, at: open.upperBound)
+        }
+        return bar
+    }
+
+    /// Each bar's number counted from 1 within its part (a pickup bar is 0), the way
+    /// parts number them; every bar of a multi-bar rest counts.
+    func barNumbers() -> [String: Int] {
+        var result: [String: Int] = [:]
+        var search = xml.startIndex
+        var count = 0
+        var first = true
+        while let start = xml.range(of: #"<(measure|part)(?:\s[^>]*)?>"#, options: .regularExpression, range: search..<xml.endIndex) {
+            let tag = String(xml[start])
+            search = start.upperBound
+            if tag.hasPrefix("<part ") || tag == "<part>" { count = 0; first = true; continue }
+            guard tag.hasPrefix("<measure") else { continue }
+            if first && tag.contains(#"implicit="yes""#) { count = -1 }
+            first = false
+            count += 1
+            if let id = tag.firstMatch(#"\bid="([^"]+)""#) { result[id] = count }
+        }
+        return result
+    }
+
     // MARK: Helpers
 
     func elementRange(_ element: String, id: String) -> Range<String.Index>? {
@@ -363,6 +623,10 @@ nonisolated private final class IDWriter: NSObject, XMLParserDelegate {
 }
 
 nonisolated extension String {
+    func count(of pattern: String) -> Int {
+        (try? NSRegularExpression(pattern: pattern))?.numberOfMatches(in: self, range: NSRange(startIndex..., in: self)) ?? 0
+    }
+
     func firstMatch(_ pattern: String) -> String? {
         guard let regex = try? NSRegularExpression(pattern: pattern),
               let match = regex.firstMatch(in: self, range: NSRange(startIndex..., in: self)),

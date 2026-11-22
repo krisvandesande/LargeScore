@@ -9,6 +9,8 @@ final class FixSession {
     private(set) var version = Date()
     /// Bars whose notes don't add up to the time signature, worked out after each change.
     private(set) var wrongBars: [String] = []
+    /// Each bar's number as parts count them (every bar of a multi-bar rest counts).
+    private(set) var barNumbers: [String: Int] = [:]
     var selectedNote: String?
     var selectedBar: String?
     var problem: LocalizedStringResource?
@@ -16,6 +18,7 @@ final class FixSession {
     init(xml: String) {
         edit = MusicXMLEdit(xml: MusicXMLEdit.withIDs(xml))
         wrongBars = edit.barsThatDontAddUp()
+        barNumbers = edit.barNumbers()
     }
 
     var hasChanges: Bool { !undoStack.isEmpty }
@@ -31,6 +34,52 @@ final class FixSession {
     func add(_ addition: MusicXMLEdit.BarAddition) {
         guard let id = selectedBar else { return }
         perform(problem: "This bar has no note to put a fermata on.") { try $0.add(addition, toBar: id) }
+    }
+
+    func deleteNote() {
+        guard let id = selectedNote else { return }
+        perform(problem: "This note can't be changed that way.") { try $0.delete(note: id) }
+    }
+
+    func addNote() {
+        var added: String?
+        if let id = selectedNote {
+            perform(problem: "This note can't be changed that way.") { added = try $0.addNote(after: id) }
+        } else if let bar = selectedBar {
+            perform(problem: "This note can't be changed that way.") { added = try $0.addNote(toBar: bar) }
+        }
+        if let added { selectedNote = added }
+    }
+
+    var selectedWords: [MusicXMLEdit.Words] {
+        selectedBar.map { edit.words(inBar: $0) } ?? []
+    }
+
+    func setWords(at index: Int, to text: String) {
+        guard let bar = selectedBar else { return }
+        perform(problem: "These words can't be changed.") { try $0.setWords(inBar: bar, at: index, to: text) }
+    }
+
+    func setTime(beats: Int, beatType: Int) {
+        guard let bar = selectedBar else { return }
+        perform(problem: "This bar can't be changed that way.") { try $0.setTime(beats: beats, beatType: beatType, bar: bar) }
+    }
+
+    /// The bar holds only rests, so it can become a rest of several bars.
+    var selectedBarIsRest: Bool {
+        guard let bar = selectedBar, let range = edit.elementRange("measure", id: bar) else { return false }
+        let xml = String(edit.xml[range])
+        return xml.count(of: #"<note[\s>]"#) == xml.count(of: #"<rest[\s>/]"#)
+    }
+
+    var selectedRestBars: Int {
+        guard let bar = selectedBar, let range = edit.elementRange("measure", id: bar) else { return 1 }
+        return String(edit.xml[range]).firstMatch(#"<multiple-rest\b[^>]*>(\d+)</multiple-rest>"#).flatMap(Int.init) ?? 1
+    }
+
+    func setRestBars(_ count: Int) {
+        guard let bar = selectedBar else { return }
+        perform(problem: "Only a bar of rests can become a rest of several bars.") { try $0.setRestBars(count, bar: bar) }
     }
 
     func undo() {
@@ -55,7 +104,9 @@ final class FixSession {
     private func changed() {
         version = .now
         wrongBars = edit.barsThatDontAddUp()
+        barNumbers = edit.barNumbers()
         if let note = selectedNote, edit.elementRange("note", id: note) == nil { selectedNote = nil }
+        if let bar = selectedBar, edit.elementRange("measure", id: bar) == nil { selectedBar = nil }
     }
 
     // MARK: The selected note
@@ -109,11 +160,14 @@ struct FixBar: View {
     var barNumber: Int?
     @State private var asking: Question?
 
-    private enum Question: Identifiable {
-        case rehearsal, tempo
-        var id: Self { self }
+    private enum Question: Identifiable, Equatable {
+        case rehearsal, tempo, restBars
+        case change(Int)
+        var id: String { "\(self)" }
     }
     @State private var words = ""
+
+    static let times: [(Int, Int)] = [(2, 4), (3, 4), (4, 4), (5, 4), (2, 2), (3, 8), (6, 8), (9, 8), (12, 8)]
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -136,14 +190,42 @@ struct FixBar: View {
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(.bar)
-        .alert(asking == .tempo ? "Tempo" : "Rehearsal Mark", isPresented: Binding(get: { asking != nil }, set: { if !$0 { asking = nil } })) {
-            TextField(asking == .tempo ? "Words above the bar" : "Letter or number", text: $words)
-            Button("Add") {
+        .alert(alertTitle, isPresented: Binding(get: { asking != nil }, set: { if !$0 { asking = nil } })) {
+            switch asking {
+            case .restBars:
+                TextField("Number of bars", text: $words)
+                    .keyboardType(.numberPad)
+            case .change:
+                TextField("Words", text: $words)
+            default:
+                TextField(asking == .tempo ? "Words above the bar" : "Letter or number", text: $words)
+            }
+            Button(asking == .restBars || asking.map({ if case .change = $0 { true } else { false } }) == true ? "Change" : "Add") {
                 let text = words.trimmingCharacters(in: .whitespacesAndNewlines)
-                if !text.isEmpty { session.add(asking == .tempo ? .tempo(text) : .rehearsal(text)) }
+                switch asking {
+                case .restBars:
+                    if let count = Int(text), count >= 1 { session.setRestBars(count) }
+                case .change(let index):
+                    if !text.isEmpty { session.setWords(at: index, to: text) }
+                case .tempo:
+                    if !text.isEmpty { session.add(.tempo(text)) }
+                case .rehearsal:
+                    if !text.isEmpty { session.add(.rehearsal(text)) }
+                case nil:
+                    break
+                }
                 asking = nil
             }
             Button("Cancel", role: .cancel) { asking = nil }
+        }
+    }
+
+    private var alertTitle: LocalizedStringResource {
+        switch asking {
+        case .tempo: "Tempo"
+        case .restBars: "Bars of Rest"
+        case .change: "Change Words"
+        default: "Rehearsal Mark"
         }
     }
 
@@ -186,6 +268,8 @@ struct FixBar: View {
                     fixButton(session.selectedIsTied ? "Remove Tie" : "Tie to Next") { session.apply(.toggleTie) }
                 }
                 fixButton(session.selectedIsRest ? "Make Note" : "Make Rest") { session.apply(.toggleRest) }
+                fixButton("Add Note After") { session.addNote() }
+                fixButton("Delete Note") { session.deleteNote() }
             }
         }
     }
@@ -200,6 +284,34 @@ struct FixBar: View {
                 fixButton("Rehearsal Mark") { words = ""; asking = .rehearsal }
                 fixButton("Tempo") { words = ""; asking = .tempo }
                 fixButton("Fermata") { session.add(.fermata) }
+                Menu {
+                    ForEach(0..<Self.times.count, id: \.self) { index in
+                        let time = Self.times[index]
+                        Button { session.setTime(beats: time.0, beatType: time.1) } label: { Text(verbatim: "\(time.0)/\(time.1)") }
+                    }
+                } label: {
+                    Text("Time Signature")
+                }
+                .menuStyle(.button)
+                .buttonStyle(.large)
+                if session.selectedNote == nil {
+                    fixButton("Add Note") { session.addNote() }
+                }
+                if session.selectedBarIsRest {
+                    fixButton("Bars of Rest") { words = "\(session.selectedRestBars)"; asking = .restBars }
+                        .accessibilityValue(Text("\(session.selectedRestBars)"))
+                }
+            }
+            ForEach(session.selectedWords) { item in
+                FlowLayout(spacing: 8, lineSpacing: 8) {
+                    Text(item.text)
+                        .font(.body.weight(.semibold))
+                        .frame(minHeight: 48)
+                    fixButton("Change") { words = item.text; asking = .change(item.index) }
+                        .accessibilityLabel(Text("Change \(item.text)"))
+                    fixButton("Delete") { session.setWords(at: item.index, to: "") }
+                        .accessibilityLabel(Text("Delete \(item.text)"))
+                }
             }
         }
     }

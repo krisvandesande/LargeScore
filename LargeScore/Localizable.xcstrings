@@ -238,6 +238,26 @@
         }
       }
     },
+    "Add Note": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voeg noot toe"
+          }
+        }
+      }
+    },
+    "Add Note After": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voeg noot toe erna"
+          }
+        }
+      }
+    },
     "Add Pieces": {
       "localizations": {
         "nl": {
@@ -308,6 +328,16 @@
         }
       }
     },
+    "Bars of Rest": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maten rust"
+          }
+        }
+      }
+    },
     "Bassoon": {
       "localizations": {
         "nl": {
@@ -358,12 +388,42 @@
         }
       }
     },
+    "Change": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wijzig"
+          }
+        }
+      }
+    },
+    "Change %@": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wijzig %@"
+          }
+        }
+      }
+    },
     "Change Parts": {
       "localizations": {
         "nl": {
           "stringUnit": {
             "state": "translated",
             "value": "Wijzig partijen"
+          }
+        }
+      }
+    },
+    "Change Words": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wijzig woorden"
           }
         }
       }
@@ -558,12 +618,32 @@
         }
       }
     },
+    "Delete %@": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verwijder %@"
+          }
+        }
+      }
+    },
     "Delete %@?": {
       "localizations": {
         "nl": {
           "stringUnit": {
             "state": "translated",
             "value": "%@ verwijderen?"
+          }
+        }
+      }
+    },
+    "Delete Note": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verwijder noot"
           }
         }
       }
@@ -1278,12 +1358,32 @@
         }
       }
     },
+    "Number of bars": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aantal maten"
+          }
+        }
+      }
+    },
     "Oboe": {
       "localizations": {
         "nl": {
           "stringUnit": {
             "state": "translated",
             "value": "Hobo"
+          }
+        }
+      }
+    },
+    "Only a bar of rests can become a rest of several bars.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alleen een maat met rusten kan een rust van meerdere maten worden."
           }
         }
       }
@@ -1810,6 +1910,22 @@
         }
       }
     },
+    "The notes in %lld bars don't add up to the time signature, from bar %@.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "The notes in %1$lld bars don't add up to the time signature, from bar %2$@."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De noten in %1$lld maten kloppen niet met de maatsoort, vanaf maat %2$@."
+          }
+        }
+      }
+    },
     "The notes in bar %@ don't add up to the time signature.": {
       "localizations": {
         "nl": {
@@ -1860,6 +1976,16 @@
         }
       }
     },
+    "These words can't be changed.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deze woorden kunnen niet gewijzigd worden."
+          }
+        }
+      }
+    },
     "Thin": {
       "localizations": {
         "nl": {
@@ -1876,6 +2002,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Deze MusicXML is per maat geschreven in plaats van per partij. Exporteer het opnieuw als standaard MusicXML-bestand."
+          }
+        }
+      }
+    },
+    "This bar can't be changed that way.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deze maat kan zo niet veranderd worden."
           }
         }
       }
@@ -1972,6 +2108,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Verbind met volgende"
+          }
+        }
+      }
+    },
+    "Time Signature": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maatsoort"
           }
         }
       }
@@ -2152,6 +2298,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Hele"
+          }
+        }
+      }
+    },
+    "Words": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Woorden"
           }
         }
       }

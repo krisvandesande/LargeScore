@@ -79,3 +79,4 @@ Run with Apple's `accessibility-dynamic-type-specialist` and `accessibility-suff
 - Bars that don't add up are outlined dashed in the notes red and also named in a sentence above the music, so colour isn't the only signal.
 - Choosing a note is a tap on the music, which needs sight; the music is one element with direct interaction ("Music to fix") for Voice Control and Switch Control users who can see. Written down as intended, like placing notes.
 - Checked: iPad (A16) upright, standard size, light. Still to run in the sweep: AX5, dark, the iPad mini.
+- Second round, same day: Add Note After, Delete Note, Add Note, Time Signature (a menu), Bars of Rest (a number field) and the bar's words, each with Change and Delete buttons whose spoken names include the words ("Delete Poco pifl"). More than five bars that don't add up are counted in the sentence rather than listed.

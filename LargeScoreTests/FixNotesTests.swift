@@ -134,4 +134,93 @@ struct FixNotesTests {
         #expect(file.xml.contains(#" id="ls-n1""#))
         #expect(MusicXMLEdit(xml: file.xml).barsThatDontAddUp().isEmpty)
     }
+
+    // MARK: What the real parts needed
+
+    @Test func deleteAndAddNotes() throws {
+        var e = edit()
+        try e.delete(note: "ls-n2")
+        #expect(e.elementRange("note", id: "ls-n2") == nil)
+        #expect(e.barsThatDontAddUp() == ["ls-m1"])
+        let added = try e.addNote(after: "ls-n1")
+        #expect(added == "ls-n5")
+        #expect(try note("ls-n5", in: e).contains("<step>F</step>"))
+        #expect(e.barsThatDontAddUp().isEmpty)
+        // Order kept: n1, the copy, n3.
+        let order = e.xml.components(separatedBy: #"<note id=""#).dropFirst().map { $0.prefix(5) }
+        #expect(order.prefix(3) == ["ls-n1", "ls-n5", "ls-n3"])
+    }
+
+    @Test func deletingAChordsFirstNoteKeepsTheRest() throws {
+        let chord = Self.piece.replacingOccurrences(
+            of: "<note><pitch><step>C</step><octave>5</octave></pitch><duration>4</duration><voice>1</voice><type>whole</type></note>",
+            with: "<note><pitch><step>C</step><octave>5</octave></pitch><duration>4</duration><voice>1</voice><type>whole</type></note><note><chord></chord><pitch><step>E</step><octave>5</octave></pitch><duration>4</duration><voice>1</voice><type>whole</type></note>")
+        var e = MusicXMLEdit(xml: MusicXMLEdit.withIDs(chord))
+        try e.delete(note: "ls-n4")
+        #expect(try note("ls-n5", in: e).contains("<chord") == false)
+        #expect(e.barsThatDontAddUp().isEmpty)
+    }
+
+    @Test func anEmptyBarGetsANote() throws {
+        let empty = Self.piece.replacingOccurrences(
+            of: "<note><pitch><step>C</step><octave>5</octave></pitch><duration>4</duration><voice>1</voice><type>whole</type></note>", with: "")
+        var e = MusicXMLEdit(xml: MusicXMLEdit.withIDs(empty))
+        let id = try e.addNote(toBar: "ls-m2")
+        #expect(try note(id, in: e).contains("<step>B</step><octave>4</octave>"))
+        try e.edit(note: id, .length(.whole))
+        #expect(e.barsThatDontAddUp().isEmpty)
+    }
+
+    @Test func wordsCanBeCorrectedOrRemoved() throws {
+        var e = edit()
+        try e.add(.tempo("P000 pifJ mosso"), toBar: "ls-m1")
+        try e.add(.rehearsal("B"), toBar: "ls-m1")
+        let lyric = e.xml.replacingOccurrences(of: "<type>half</type></note>", with: "<type>half</type><lyric number=\"1\"><syllabic>single</syllabic><text>If</text></lyric></note>")
+        e = MusicXMLEdit(xml: lyric)
+        #expect(e.words(inBar: "ls-m1").map(\.text) == ["P000 pifJ mosso", "B", "If"])
+        try e.setWords(inBar: "ls-m1", at: 0, to: "Poco più mosso")
+        #expect(e.words(inBar: "ls-m1").first?.text == "Poco più mosso")
+        try e.setWords(inBar: "ls-m1", at: 2, to: "")
+        try e.setWords(inBar: "ls-m1", at: 1, to: "")
+        #expect(e.words(inBar: "ls-m1").map(\.text) == ["Poco più mosso"])
+        #expect(!e.xml.contains("<lyric"))
+        #expect(e.xml.components(separatedBy: "<direction ").count == 2)
+        #expect(!e.xml.contains("<direction-type></direction-type>"))
+    }
+
+    @Test func timeSignatureChangesFromABar() throws {
+        var e = edit()
+        try e.setTime(beats: 2, beatType: 4, bar: "ls-m2")
+        let bar2 = String(e.xml[try #require(e.elementRange("measure", id: "ls-m2"))])
+        #expect(bar2.contains("<attributes><time><beats>2</beats><beat-type>4</beat-type></time></attributes>"))
+        // The whole note is now too long for 2/4.
+        #expect(e.barsThatDontAddUp() == ["ls-m2"])
+        try e.setTime(beats: 3, beatType: 4, bar: "ls-m1")
+        #expect(e.xml.contains("<time><beats>3</beats><beat-type>4</beat-type></time><clef>"))
+    }
+
+    @Test func multiBarRestsGrowAndShrink() throws {
+        let rests = Self.piece.replacingOccurrences(
+            of: "<note><pitch><step>C</step><octave>5</octave></pitch><duration>4</duration><voice>1</voice><type>whole</type></note>",
+            with: "<note><rest measure=\"yes\"></rest><duration>4</duration><voice>1</voice></note></measure><measure number=\"3\"><note><pitch><step>D</step><octave>5</octave></pitch><duration>4</duration><voice>1</voice><type>whole</type></note>")
+        var e = MusicXMLEdit(xml: MusicXMLEdit.withIDs(rests))
+        #expect(throws: MusicXMLEdit.Failure.cannot) { try e.setRestBars(6, bar: "ls-m1") }
+        try e.setRestBars(6, bar: "ls-m2")
+        #expect(e.xml.contains("<multiple-rest>6</multiple-rest>"))
+        #expect(e.xml.components(separatedBy: "<measure ").count - 1 == 8)
+        #expect(e.barNumbers()["ls-m3"] == 8)
+        #expect(e.xml.contains(#"id="ls-m3" number="8""#))
+        #expect(e.barsThatDontAddUp().isEmpty)
+        try e.setRestBars(2, bar: "ls-m2")
+        #expect(e.xml.contains("<multiple-rest>2</multiple-rest>"))
+        #expect(e.barNumbers()["ls-m3"] == 4)
+        try e.setRestBars(1, bar: "ls-m2")
+        #expect(!e.xml.contains("multiple-rest"))
+        #expect(e.barNumbers()["ls-m3"] == 3)
+    }
+
+    @Test func barNumbersStartAtZeroAfterAPickup() {
+        let pickup = MusicXMLEdit.withIDs(Self.piece.replacingOccurrences(of: #"<measure number="1">"#, with: #"<measure number="0" implicit="yes">"#))
+        #expect(MusicXMLEdit(xml: pickup).barNumbers() == ["ls-m1": 0, "ls-m2": 1])
+    }
 }

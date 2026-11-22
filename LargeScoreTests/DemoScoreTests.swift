@@ -37,4 +37,37 @@ struct DemoScoreTests {
             }
         }
     }
+
+    /// The fixes the real parts need, applied to their conversions.
+    @Test(.enabled(if: !files.isEmpty)) func fixTheRealParts() async throws {
+        func load(_ prefix: String) throws -> MusicXMLEdit? {
+            guard let url = Self.files.first(where: { $0.lastPathComponent.hasPrefix(prefix) }) else { return nil }
+            return MusicXMLEdit(xml: try MusicFile.read(try Data(contentsOf: url), fileName: url.lastPathComponent).xml)
+        }
+        if var alaaf = try load("Alaaf") {
+            let before = alaaf.barsThatDontAddUp().count
+            let bar = try #require(alaaf.barsThatDontAddUp().first { (alaaf.barNumbers()[$0] ?? 0) > 25 })
+            try alaaf.setTime(beats: 2, beatType: 4, bar: bar)
+            print("FIX Alaaf: 2/4 at bar \(alaaf.barNumbers()[bar] ?? 0): bars that don't add up \(before) → \(alaaf.barsThatDontAddUp().count)")
+            #expect(alaaf.barsThatDontAddUp().count < before - 20)
+        }
+        if var klezmer = try load("A Klezmer") {
+            let rest = try #require(klezmer.xml.range(of: "<multiple-rest>1</multiple-rest>"))
+            let start = try #require(klezmer.xml.range(of: "<measure ", options: .backwards, range: klezmer.xml.startIndex..<rest.lowerBound))
+            let id = try #require(String(klezmer.xml[start.lowerBound...].prefix(80)).firstMatch(#"\bid="([^"]+)""#))
+            let bars = klezmer.barNumbers()
+            let last = bars.values.max() ?? 0
+            try klezmer.setRestBars(6, bar: id)
+            print("FIX Klezmer: rest at bar \(bars[id] ?? 0) made 6 bars; last bar \(last) → \(klezmer.barNumbers().values.max() ?? 0)")
+            #expect(klezmer.barNumbers().values.max() == last + 5)
+            let piece = Piece(id: "k", title: "k", partIDs: [], source: .stored(Data(klezmer.xml.utf8)))
+            let size = CGSize(width: 1200, height: 1700)
+            let laidOut = try await ScoreLoader().layOut(piece, request: LayoutRequest(pageSize: size, staffHeight: 40, bold: false, lineGap: 4))
+            let image = UIGraphicsImageRenderer(size: size).image { ctx in
+                UIColor.white.setFill(); ctx.fill(CGRect(origin: .zero, size: size))
+                ScoreCanvas.draw(laidOut.pages[0], in: ctx.cgContext, size: size, ink: UIColor.black.cgColor)
+            }
+            try image.pngData()!.write(to: renderOutput("demo-klezmer-fixed-1.png"))
+        }
+    }
 }

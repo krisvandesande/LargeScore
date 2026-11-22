@@ -166,6 +166,7 @@ struct CompareView: View {
 
     /// A bar's number counted from 1, as the reader shows it.
     private func barNumber(_ id: String) -> Int? {
+        if let number = session?.barNumbers[id] { return number }
         guard let laidOut else { return nil }
         for (index, page) in laidOut.pages.enumerated() {
             if let i = page.measureIDs.firstIndex(of: id) { return laidOut.firstBars[index] + i }
@@ -176,6 +177,9 @@ struct CompareView: View {
     private func wrongBarsText(_ ids: [String]) -> String {
         let numbers = ids.compactMap(barNumber).map(String.init)
         guard !numbers.isEmpty else { return "" }
+        if numbers.count > 5 {
+            return String(localized: "The notes in \(numbers.count) bars don't add up to the time signature, from bar \(numbers[0]).")
+        }
         let list = numbers.formatted(.list(type: .and))
         return numbers.count == 1
             ? String(localized: "The notes in bar \(list) don't add up to the time signature.")

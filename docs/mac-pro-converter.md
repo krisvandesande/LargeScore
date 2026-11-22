@@ -40,11 +40,13 @@ Large Score, Settings, Music Folder, Choose Folder: iCloud Drive, "Large Score".
    engraving side by side. Mark as Checked when it matches.
 4. Something wrong: on the iPad, Fix Notes (on the compare screen, or touch and
    hold the card). Tap a note to change its pitch (Higher, Lower, Sharp, Flat,
-   Natural), its length, a dot, a tie or a rest; tap a bar to add a rehearsal
-   mark, a tempo word or a fermata. Bars whose notes don't add up to the time
+   Natural), its length, a dot, a tie or a rest, add a note after it or delete
+   it; tap a bar to add a rehearsal mark, a tempo word, a fermata or a note, set
+   the time signature, set how many bars a rest lasts, or change or delete the
+   words written in it. Bars whose notes don't add up to the time
    signature are outlined. Save Fixes keeps the version before, for Restore
    Previous Version.
-5. Anything Fix Notes can't do (adding bars, chords, a second voice, lyrics):
+5. Anything Fix Notes can't do (adding bars, building chords, a second voice):
    open the `.mxl` from "Large Score" in MuseScore Studio on the Mac Pro, fix it,
    and export it as MusicXML over the same file. The iPad takes the new version,
    keeps the notes written on it, and counts it as checked.
