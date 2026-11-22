@@ -232,6 +232,11 @@ struct WrittenNoteSheet: View {
 }
 
 extension Palette {
+    /// Text on the notes colour: white on the red (6.5:1), black on the light red (9.2:1).
+    static let onNotes = Color(UIColor { traits in
+        traits.userInterfaceStyle == .dark ? .black : .white
+    })
+
     /// Notes in a colour of their own, apart from the printed music: 6.4:1 on white,
     /// 8:1 on black.
     static let notes = Color(UIColor { traits in

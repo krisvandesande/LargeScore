@@ -24,6 +24,10 @@ final class Score {
     @Attribute(.externalStorage) var previousMusicXML: Data?
     var previousPartID: String?
     var replacedAt: Date?
+    /// The PDF the music was converted from, to compare against.
+    @Attribute(.externalStorage) var pdf: Data?
+    /// Converted by a recognition program and not yet checked against the PDF.
+    var needsCheck: Bool = false
     /// A note in words about the whole piece.
     var note: String = ""
     /// Bars in the first part shown, to warn when a new version changes them.
@@ -51,6 +55,8 @@ final class Score {
         partCount = file.parts.count
         musicXML = Data(file.xml.utf8)
         barCount = file.barCount
+        pdf = file.pdf
+        needsCheck = file.isRecognised
     }
 
     /// Takes the new version's music, keeping the old one for Restore. Parts chosen in
@@ -65,6 +71,10 @@ final class Score {
         musicXML = Data(file.xml.utf8)
         partCount = file.parts.count
         barCount = file.barCount
+        // A fresh conversion is checked again; a version saved from a notation
+        // program (a fix in MuseScore) counts as checked. The PDF stays for comparing.
+        needsCheck = file.isRecognised
+        pdf = file.pdf ?? pdf
         composer = file.composer ?? composer
         arranger = file.arranger ?? arranger
         let kept = file.parts.filter { oldIDs.contains($0.id) }

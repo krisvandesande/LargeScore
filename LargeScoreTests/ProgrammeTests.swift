@@ -7,7 +7,7 @@ import SwiftData
 struct ProgrammeTests {
     private func setUp() throws -> (ModelContext, [Score]) {
         let container = try ModelContainer(for: Score.self, Programme.self, ProgrammeEntry.self, Annotation.self,
-                                           configurations: ModelConfiguration(isStoredInMemoryOnly: true))
+                                           configurations: ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none))
         let context = ModelContext(container)
         let url = try #require(Bundle.main.url(forResource: "evening-air-quartet.musicxml", withExtension: nil))
         let file = try MusicFile.read(try Data(contentsOf: url), fileName: "q.musicxml")

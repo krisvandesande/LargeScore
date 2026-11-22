@@ -26,7 +26,7 @@ final class AccessibilityTreeTests: XCTestCase {
 
     private func libraryApp(dark: Bool = false) -> XCUIApplication {
         let app = launch(["-skipOnboarding", "-importSamples"], dark: dark)
-        let add = app.buttons["Add 3 Pieces"]
+        let add = app.buttons["Add 4 Pieces"]
         XCTAssertTrue(add.waitForExistence(timeout: 15))
         add.tap()
         XCTAssertTrue(card(app).waitForExistence(timeout: 10))
@@ -81,7 +81,7 @@ final class AccessibilityTreeTests: XCTestCase {
         first.terminate()
 
         let importing = launch(["-skipOnboarding", "-importSamples"])
-        XCTAssertTrue(importing.buttons["Add 3 Pieces"].waitForExistence(timeout: 15))
+        XCTAssertTrue(importing.buttons["Add 4 Pieces"].waitForExistence(timeout: 15))
         record(importing, "03-import-list")
         importing.cells.firstMatch.tap()
         sleep(1)

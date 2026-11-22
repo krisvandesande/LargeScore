@@ -101,7 +101,7 @@ struct MusicFileTests {
 @MainActor
 struct ImportSessionTests {
     private func context() throws -> ModelContext {
-        let container = try ModelContainer(for: Score.self, Programme.self, ProgrammeEntry.self, Annotation.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true))
+        let container = try ModelContainer(for: Score.self, Programme.self, ProgrammeEntry.self, Annotation.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none))
         return ModelContext(container)
     }
 

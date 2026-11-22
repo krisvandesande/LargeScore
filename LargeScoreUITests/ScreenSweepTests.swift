@@ -72,7 +72,7 @@ final class ScreenSweepTests: XCTestCase {
     /// Launches with the bundled four-part piece added through the import sheet.
     private func launchWithLibrary(size: String = "UICTContentSizeCategoryL", dark: Bool = false) -> XCUIApplication {
         let app = launch(size: size, dark: dark, onboarding: false, importing: true)
-        let add = app.buttons["Add 3 Pieces"]
+        let add = app.buttons["Add 4 Pieces"]
         XCTAssertTrue(add.waitForExistence(timeout: 15))
         add.tap()
         XCTAssertTrue(card(app).waitForExistence(timeout: 10))
@@ -121,7 +121,7 @@ final class ScreenSweepTests: XCTestCase {
                 empty.terminate()
 
                 let app = launch(size: size, dark: dark, onboarding: false, importing: true)
-                XCTAssertTrue(app.buttons["Add 3 Pieces"].waitForExistence(timeout: 15))
+                XCTAssertTrue(app.buttons["Add 4 Pieces"].waitForExistence(timeout: 15))
                 shot(app, "05-import-list", variant: variant)
                 if !dark { audit(app, "import-list-\(sizeName)") }
                 app.cells.firstMatch.tap()
@@ -129,7 +129,7 @@ final class ScreenSweepTests: XCTestCase {
                 shot(app, "06-import-detail", variant: variant)
                 if !dark { audit(app, "import-detail-\(sizeName)") }
                 app.navigationBars.buttons.firstMatch.tap()
-                app.buttons["Add 3 Pieces"].tap()
+                app.buttons["Add 4 Pieces"].tap()
                 XCTAssertTrue(card(app).waitForExistence(timeout: 10))
                 shot(app, "10-library", variant: variant)
                 if !dark {
@@ -310,9 +310,11 @@ final class ScreenSweepTests: XCTestCase {
         app.buttons["Written Note"].tap()
         let editor = app.textViews.firstMatch
         XCTAssertTrue(editor.waitForExistence(timeout: 5))
-        if !app.keyboards.firstMatch.waitForExistence(timeout: 3) { editor.tap() }
-        XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 5))
-        app.typeText("Breathe before B")
+        sleep(1)
+        // Typing into the field itself works whether or not the on-screen keyboard
+        // shows (the simulator may count a hardware keyboard as connected).
+        editor.tap()
+        editor.typeText("Breathe before B")
         shot(app, "605-written-note", variant: "standard-light")
         app.navigationBars.buttons["Done"].firstMatch.tap()
         sleep(1)
@@ -331,5 +333,22 @@ final class ScreenSweepTests: XCTestCase {
         sleep(1)
         shot(app, "63-card-with-note", variant: "standard-light")
         XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Breathe before B")).firstMatch.exists)
+    }
+
+    func testConvertedPieceCompare() {
+        let app = launchWithLibrary()
+        let converted = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Check against the PDF")).firstMatch
+        XCTAssertTrue(converted.waitForExistence(timeout: 10))
+        shot(app, "70-library-converted", variant: "standard-light")
+        converted.press(forDuration: 1.2)
+        let compare = app.descendants(matching: .any)["Compare with PDF"].firstMatch
+        XCTAssertTrue(compare.waitForExistence(timeout: 5))
+        compare.tap()
+        sleep(3)
+        shot(app, "71-compare", variant: "standard-light")
+        audit(app, "compare-standard")
+        app.buttons["Mark as Checked"].tap()
+        sleep(1)
+        XCTAssertFalse(app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Check against the PDF")).firstMatch.exists)
     }
 }

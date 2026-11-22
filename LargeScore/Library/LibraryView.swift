@@ -67,6 +67,7 @@ private struct LibraryGrid: View {
     @State private var changingPart: Score?
     @State private var deleting: Score?
     @State private var restoring: Score?
+    @State private var comparing: Score?
 
     init(sort: LibraryView.Sort, search: String, addMusic: @escaping () -> Void) {
         self.addMusic = addMusic
@@ -100,6 +101,9 @@ private struct LibraryGrid: View {
             .fullScreenCover(item: $open) { score in
                 ReaderView(piece: score.piece, backTitle: "Library")
             }
+            .fullScreenCover(item: $comparing) { score in
+                CompareView(score: score)
+            }
             .sheet(item: $changingPart) { score in
                 PartChooser(score: score)
             }
@@ -127,7 +131,7 @@ private struct LibraryGrid: View {
             try? context.save()
             open = score
         } label: {
-            PieceCard(title: score.title, composer: score.composer, note: score.note)
+            PieceCard(title: score.title, composer: score.composer, note: score.note, needsCheck: score.needsCheck)
         }
         .buttonStyle(.plain)
         .contextMenu {
@@ -141,6 +145,15 @@ private struct LibraryGrid: View {
                     }
                 }
             }
+            if score.pdf != nil {
+                Button("Compare with PDF", systemImage: "doc.on.doc") { comparing = score }
+            }
+            if score.needsCheck {
+                Button("Mark as Checked", systemImage: "checkmark") {
+                    score.needsCheck = false
+                    try? context.save()
+                }
+            }
             if score.partCount > 1 {
                 Button("Change Parts", systemImage: "music.note.list") { changingPart = score }
             }
@@ -151,6 +164,7 @@ private struct LibraryGrid: View {
         }
         .accessibilityAction(named: Text("Change Parts")) { changingPart = score }
         .accessibilityAction(named: Text("Delete")) { deleting = score }
+        .accessibilityAction(named: Text("Compare with PDF")) { if score.pdf != nil { comparing = score } }
     }
 
     @ViewBuilder
@@ -238,6 +252,7 @@ struct PieceCard: View {
     let title: String
     let composer: String?
     var note: String = ""
+    var needsCheck = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -248,6 +263,16 @@ struct PieceCard: View {
                 Text(composer)
                     .font(.title3)
                     .foregroundStyle(.secondary)
+            }
+            if needsCheck {
+                // Converted from a PDF by a recognition program and not checked yet.
+                Text("Check against the PDF")
+                    .font(.headline)
+                    .foregroundStyle(Palette.onNotes)
+                    .padding(.horizontal, 12)
+                    .air(.vertical, 4)
+                    .background(Palette.notes, in: PillShape(radius: 14))
+                    .padding(.top, 4)
             }
             if !note.isEmpty {
                 Text(note)

@@ -97,7 +97,9 @@ struct ReaderView: View {
             }
         }
         .environment(\.colorScheme, scheme)
-        .background { PedalKeys(forward: { turn(forward: true) }, back: { turn(forward: false) }, close: { dismiss() }) }
+        // The pedal's keys, except while a sheet over the reader needs the keyboard.
+        .background { PedalKeys(active: !writingNote && !choosingSize,
+                                forward: { turn(forward: true) }, back: { turn(forward: false) }, close: { dismiss() }) }
         .onAppear {
             UIApplication.shared.isIdleTimerDisabled = true
             notes = NotesStore(pieceID: piece.id, context: context)
@@ -275,6 +277,8 @@ struct ReaderView: View {
 /// first-responder view as key commands: they work wherever the reader is, and the
 /// titles show in the iPad's shortcut overlay.
 private struct PedalKeys: UIViewRepresentable {
+    /// False while something else (the written note's field) must keep the keyboard.
+    let active: Bool
     let forward: () -> Void
     let back: () -> Void
     let close: () -> Void
@@ -289,7 +293,8 @@ private struct PedalKeys: UIViewRepresentable {
         view.forward = forward
         view.back = back
         view.close = close
-        view.claimKeys()
+        view.active = active
+        if active { view.claimKeys() } else if view.isFirstResponder { view.resignFirstResponder() }
     }
 }
 
@@ -297,8 +302,9 @@ final class KeyCatcherView: UIView {
     var forward: () -> Void = {}
     var back: () -> Void = {}
     var close: () -> Void = {}
+    var active = true
 
-    override var canBecomeFirstResponder: Bool { true }
+    override var canBecomeFirstResponder: Bool { active }
 
     override func didMoveToWindow() {
         super.didMoveToWindow()
@@ -306,7 +312,7 @@ final class KeyCatcherView: UIView {
     }
 
     func claimKeys() {
-        guard window != nil, !isFirstResponder else { return }
+        guard active, window != nil, !isFirstResponder else { return }
         DispatchQueue.main.async { [weak self] in self?.becomeFirstResponder() }
     }
 

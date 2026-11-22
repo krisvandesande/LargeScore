@@ -73,7 +73,10 @@ final class ImportSession: Identifiable {
     nonisolated static func read(_ urls: [URL]) async -> (files: [MusicFile], failures: [Failure]) {
         var files: [MusicFile] = []
         var failures: [Failure] = []
-        for url in urls {
+        // PDFs picked with their MusicXML are kept with it, matched by name.
+        let pdfs = urls.filter { $0.pathExtension.lowercased() == "pdf" }
+        var usedPDFs: Set<URL> = []
+        for url in urls where url.pathExtension.lowercased() != "pdf" {
             let name = url.lastPathComponent
             let scoped = url.startAccessingSecurityScopedResource()
             defer { if scoped { url.stopAccessingSecurityScopedResource() } }
@@ -88,14 +91,39 @@ final class ImportSession: Identifiable {
                 continue
             }
             do {
-                files.append(try MusicFile.read(data, fileName: name))
+                var file = try MusicFile.read(data, fileName: name)
+                let base = url.deletingPathExtension().lastPathComponent
+                if let picked = pdfs.first(where: { $0.deletingPathExtension().lastPathComponent == base }) {
+                    file.pdf = readPDF(picked)
+                    usedPDFs.insert(picked)
+                } else {
+                    // In a music folder the PDF sits beside the file.
+                    file.pdf = readPDF(url.deletingPathExtension().appendingPathExtension("pdf"))
+                }
+                files.append(file)
             } catch let failure as MusicFile.Failure {
                 failures.append(Failure(fileName: name, reason: failure))
             } catch {
                 failures.append(Failure(fileName: name, reason: .notMusicXML))
             }
         }
+        for pdf in pdfs where !usedPDFs.contains(pdf) {
+            failures.append(Failure(fileName: pdf.lastPathComponent, reason: .pdf))
+        }
         return (files, failures)
+    }
+
+    /// The PDF at `url` if there is one and it can be read; nil otherwise.
+    nonisolated private static func readPDF(_ url: URL) -> Data? {
+        let scoped = url.startAccessingSecurityScopedResource()
+        defer { if scoped { url.stopAccessingSecurityScopedResource() } }
+        var data: Data?
+        var error: NSError?
+        NSFileCoordinator().coordinate(readingItemAt: url, options: .withoutChanges, error: &error) { readURL in
+            data = try? Data(contentsOf: readURL)
+        }
+        guard let data, data.starts(with: Array("%PDF".utf8)) else { return nil }
+        return data
     }
 }
 
@@ -165,6 +193,7 @@ extension MusicFile.Failure {
         case .notMusicXML: "This isn't a MusicXML file."
         case .timewise: "This MusicXML is written bar by bar instead of part by part. Export it again as a standard MusicXML file."
         case .damaged: "This compressed MusicXML file can't be opened. Export it again."
+        case .pdf: "This is a PDF. Large Score reads MusicXML: convert the PDF on the Mac first, or add it together with its MusicXML."
         }
     }
 }

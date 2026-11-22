@@ -8,7 +8,7 @@ import SwiftData
 struct NotesTests {
     private func context() throws -> ModelContext {
         ModelContext(try ModelContainer(for: Score.self, Programme.self, ProgrammeEntry.self, Annotation.self,
-                                        configurations: ModelConfiguration(isStoredInMemoryOnly: true)))
+                                        configurations: ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none)))
     }
 
     private func quartet() throws -> MusicFile {

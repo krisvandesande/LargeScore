@@ -73,7 +73,8 @@ struct RootView: View {
             }
             .task {
                 guard LaunchOptions.importSamples else { return }
-                let urls = ["evening-air-quartet.mxl", "evening-air-quartet.musicxml", "long-piece.musicxml"]
+                let urls = ["evening-air-quartet.mxl", "evening-air-quartet.musicxml", "long-piece.musicxml",
+                            "converted-by-audiveris.mxl", "converted-by-audiveris.pdf"]
                     .compactMap { Bundle.main.url(forResource: $0, withExtension: nil) }
                 await importer.receive(urls, instruments: settings.instruments, context: context)
             }

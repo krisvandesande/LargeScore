@@ -153,10 +153,21 @@ final class MusicFolder {
                 try? FileManager.default.startDownloadingUbiquitousItem(at: url)
                 continue
             }
-            guard kinds.contains(url.pathExtension.lowercased()) else { continue }
+            let kind = url.pathExtension.lowercased()
+            guard kinds.contains(kind) || kind == "pdf" else { continue }
             let date = (try? url.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate)?.timeIntervalSince1970 ?? 0
             stamps[name] = date
-            if seen[name] != date { changed.append(url) }
+            guard seen[name] != date else { continue }
+            if kind == "pdf" {
+                // A PDF that arrives after its MusicXML: bring that file in again with it.
+                let base = url.deletingPathExtension()
+                if let music = urls.first(where: { kinds.contains($0.pathExtension.lowercased()) && $0.deletingPathExtension() == base }),
+                   !changed.contains(music) {
+                    changed.append(music)
+                }
+            } else if !changed.contains(url) {
+                changed.append(url)
+            }
         }
         return (changed, stamps)
     }

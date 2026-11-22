@@ -338,6 +338,16 @@
         }
       }
     },
+    "Check against the PDF": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vergelijk met de pdf"
+          }
+        }
+      }
+    },
     "Choose Another Folder": {
       "localizations": {
         "nl": {
@@ -454,6 +464,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ingeklapt"
+          }
+        }
+      }
+    },
+    "Compare with PDF": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vergelijk met pdf"
           }
         }
       }
@@ -738,6 +758,26 @@
         }
       }
     },
+    "Large Score": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Large Score"
+          }
+        }
+      }
+    },
+    "Large Score's engraving": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De zetting van Large Score"
+          }
+        }
+      }
+    },
     "Larger": {
       "localizations": {
         "nl": {
@@ -804,6 +844,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "MIT-licentie"
+          }
+        }
+      }
+    },
+    "Mark as Checked": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Markeer als nagekeken"
           }
         }
       }
@@ -1094,6 +1144,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Overig"
+          }
+        }
+      }
+    },
+    "PDF": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pdf"
           }
         }
       }
@@ -1460,6 +1520,16 @@
         }
       }
     },
+    "The original PDF": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De oorspronkelijke pdf"
+          }
+        }
+      }
+    },
     "The piece and your notes on it are removed from this iPad.": {
       "localizations": {
         "nl": {
@@ -1506,6 +1576,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Dit gecomprimeerde MusicXML-bestand kan niet worden geopend. Exporteer het opnieuw."
+          }
+        }
+      }
+    },
+    "This is a PDF. Large Score reads MusicXML: convert the PDF on the Mac first, or add it together with its MusicXML.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dit is een pdf. Large Score leest MusicXML: zet de pdf eerst om op de Mac, of voeg hem samen met zijn MusicXML toe."
           }
         }
       }

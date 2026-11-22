@@ -20,6 +20,8 @@ nonisolated struct MusicFile: Sendable, Identifiable {
         case timewise
         /// A compressed file that couldn't be opened.
         case damaged
+        /// A PDF on its own: it has to be converted to MusicXML first.
+        case pdf
     }
 
     var id = UUID()
@@ -29,6 +31,21 @@ nonisolated struct MusicFile: Sendable, Identifiable {
     var composer: String?
     var arranger: String?
     var parts: [ScorePart]
+    /// The program that wrote the file, from its `encoding` (for example
+    /// "Audiveris 5.11.0" or "MuseScore 4.7.7").
+    var software: String?
+    /// The PDF it was converted from, when that PDF came with it.
+    var pdf: Data?
+
+    /// Programs that read printed music and so may have got something wrong.
+    static let recognisers = ["audiveris", "playscore", "smartscore", "photoscore", "scanscore", "maestria", "sharpeye"]
+
+    /// Read from a PDF or a scan by a recognition program: to be checked against
+    /// the original before playing from it.
+    var isRecognised: Bool {
+        guard let software = software?.lowercased() else { return false }
+        return Self.recognisers.contains { software.contains($0) }
+    }
 
     /// Reads a file from any source: compressed or not, UTF-8 or UTF-16.
     static func read(_ data: Data, fileName: String) throws -> MusicFile {
@@ -43,7 +60,7 @@ nonisolated struct MusicFile: Sendable, Identifiable {
             .first { !$0.isEmpty } ?? fallback
         return MusicFile(fileName: fileName, xml: xml, title: title,
                          composer: info.composer, arranger: info.arranger,
-                         parts: PartSplitter.parts(in: xml))
+                         parts: PartSplitter.parts(in: xml), software: info.software)
     }
 
     static func text(of data: Data) throws -> String {
@@ -116,6 +133,7 @@ nonisolated private final class Metadata: NSObject, XMLParserDelegate {
     var creditTitle: String?
     var composer: String?
     var arranger: String?
+    var software: String?
 
     private var path: [String] = []
     private var creatorType: String?
@@ -146,6 +164,7 @@ nonisolated private final class Metadata: NSObject, XMLParserDelegate {
         let value = text.trimmingCharacters(in: .whitespacesAndNewlines)
         switch element {
         case "work-title": workTitle = value
+        case "software": if software == nil, !value.isEmpty { software = value }
         case "movement-title": movementTitle = value
         case "creator":
             if creatorType == "composer", composer == nil, !value.isEmpty { composer = value }

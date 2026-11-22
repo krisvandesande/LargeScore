@@ -45,7 +45,8 @@ xcodebuild -project LargeScore.xcodeproj -scheme LargeScore \
 - Version and build come from the build settings (`MARKETING_VERSION`, `CURRENT_PROJECT_VERSION` in `project.yml`); XcodeGen once wrote fixed values into Info.plist and build 2 archived as 1.
 - Local builds are named "Large Score (Debug)" / "Large Score (Test)"; archives keep the plain name and `release.sh` refuses a tagged one.
 - `.onKeyPress` doesn't reach a full-screen cover; pedal keys go through a first-responder view with key commands. Page Up/Down never arrive from the simulator's runner.
-- iCloud sync is ready but off until the container `iCloud.com.kvds.LargeScore` exists: `docs/icloud-setup.md`, then `scripts/enable-icloud.sh` (it edits entitlements and `project.yml` and remakes the profiles).
+- iCloud sync is on (container `iCloud.com.kvds.LargeScore`, 2026-11-22); the CloudKit schema still needs deploying to production once (`docs/icloud-setup.md`, step 3). Xcode's agent tools build headless and see "No Accounts": anything that needs Kris's account (registering a container) needs a build in his Xcode window.
+- PDFs go through Audiveris on the grandfather's Mac Pro (2013, Intel, Monterey): `scripts/macpro/` (converter and installer, bash 3.2), guide in `docs/mac-pro-converter.md`. Files a recognition program wrote (`encoding/software`) are marked "Check against the PDF" until checked; a version saved from MuseScore counts as checked. The Large Score Mac app can't run on that Mac (macOS 26, Apple silicon).
 
 ## TestFlight
 
