@@ -35,7 +35,7 @@ xcodebuild -project LargeScore.xcodeproj -scheme LargeScore \
 
 ## Accessibility sweep
 
-Use one simulator at a time, "LS iPad mini", for everyday test runs (Kris, 2026-11-22: "use less simulators"). `scripts/sweep.sh` runs on it alone; `scripts/sweep.sh --all` adds "LS iPad" and "LS iPad Pro 13" (iOS 27.2), for the sweep before a TestFlight build. It warms new ones up, runs `LargeScoreUITests` on each at standard size and AX5, light and dark, and checks crash reports after each run. Screenshots go to `build/sweep/<date>/`, audit lines to its logs, reading-order trees to `docs/voiceover/` (tracked: a run changes them). Write the verdicts into `docs/accessibility-findings.md`.
+Use one simulator at a time, "LS iPad Pro 13", for everyday test runs (Kris, 2026-11-22: "use less simulators"; "noone plays on a mini": the app is for the larger iPads, to be said on the App Store). `scripts/sweep.sh` runs on it alone; `scripts/sweep.sh --all` adds "LS iPad" and "LS iPad mini" (iOS 27.2), for the sweep before a TestFlight build; the mini only has to work, not to be optimised for. It warms new ones up, runs `LargeScoreUITests` on each at standard size and AX5, light and dark, and checks crash reports after each run. Screenshots go to `build/sweep/<date>/`, audit lines to its logs, reading-order trees to `docs/voiceover/` (tracked: a run changes them). Write the verdicts into `docs/accessibility-findings.md`.
 
 ## Gotchas
 
@@ -46,7 +46,7 @@ Use one simulator at a time, "LS iPad mini", for everyday test runs (Kris, 2026-
 - Version and build come from the build settings (`MARKETING_VERSION`, `CURRENT_PROJECT_VERSION` in `project.yml`); XcodeGen once wrote fixed values into Info.plist and build 2 archived as 1.
 - Local builds are named "Large Score (Debug)" / "Large Score (Test)"; archives keep the plain name and `release.sh` refuses a tagged one.
 - `.onKeyPress` doesn't reach a full-screen cover; pedal keys go through a first-responder view with key commands. Page Up/Down never arrive from the simulator's runner.
-- iCloud sync is on (container `iCloud.com.kvds.LargeScore`, 2026-11-22); the CloudKit schema still needs deploying to production once (`docs/icloud-setup.md`, step 3). Xcode's agent tools build headless and see "No Accounts": anything that needs Kris's account (registering a container) needs a build in his Xcode window.
+- iCloud sync is on (container `iCloud.com.kvds.LargeScore`, 2026-11-22); the CloudKit schema was deployed to production on 2026-11-22; after the model gains fields, run a Debug build on My Mac (Mac Catalyst) and deploy again (`docs/icloud-setup.md`, step 3). Xcode's agent tools build headless and see "No Accounts": anything that needs Kris's account (registering a container) needs a build in his Xcode window.
 - PDFs go through Audiveris on the grandfather's Mac Pro (2013, Intel, Monterey): `scripts/macpro/` (converter and installer, bash 3.2), guide in `docs/mac-pro-converter.md`. Files a recognition program wrote (`encoding/software`) are marked "Check against the PDF" until checked; a version saved from MuseScore counts as checked. The Large Score Mac app can't run on that Mac (macOS 26, Apple silicon).
 - Fix Notes edits the MusicXML itself (`MusicXMLEdit`): every note and bar gets an id on import (`ls-n…`, `ls-m…`), Verovio keeps those ids on what it draws, and `SVGScene.noteBoxes` maps a tap back to the note. Edits assume the echo writer's form (opening and closing tags, no self-closing).
 

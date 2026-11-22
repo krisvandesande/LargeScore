@@ -1,6 +1,7 @@
 #!/bin/bash
-# Runs the screen sweep on the iPad mini (the smallest iPad), one simulator at a time.
-# --all adds the standard iPad and iPad Pro 13-inch: before a TestFlight build only. Screenshots land in build/sweep/<date>/, audit lines in the log.
+# Runs the screen sweep on the iPad Pro 13-inch, one simulator at a time. Large Score
+# is made for the larger iPads (people with low vision don't read music on a mini).
+# --all adds the standard iPad and the iPad mini: before a TestFlight build only. Screenshots land in build/sweep/<date>/, audit lines in the log.
 # Crash reports from the simulators' own processes are checked after each run.
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -34,10 +35,10 @@ check_crashes() { # udid since
   return $bad
 }
 
-DEVICES=$(fresh_simulator "iPad mini" com.apple.CoreSimulator.SimDeviceType.iPad-mini-A17-Pro)
+DEVICES=$(fresh_simulator "iPad Pro 13" com.apple.CoreSimulator.SimDeviceType.iPad-Pro-13-inch-M5-12GB)
 if [ "${1:-}" = "--all" ]; then
   DEVICES="$DEVICES $(fresh_simulator "iPad" com.apple.CoreSimulator.SimDeviceType.iPad-A16)"
-  DEVICES="$DEVICES $(fresh_simulator "iPad Pro 13" com.apple.CoreSimulator.SimDeviceType.iPad-Pro-13-inch-M5-12GB)"
+  DEVICES="$DEVICES $(fresh_simulator "iPad mini" com.apple.CoreSimulator.SimDeviceType.iPad-mini-A17-Pro)"
 fi
 STAMP=$(mktemp); touch "$STAMP"
 

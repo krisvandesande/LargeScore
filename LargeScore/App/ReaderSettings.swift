@@ -65,8 +65,8 @@ final class ReaderSettings {
         onboardingDone = store.bool(forKey: Key.onboardingDone)
     }
 
-    func layoutRequest(for area: CGSize) -> LayoutRequest {
-        LayoutRequest(pageSize: area, staffHeight: staffHeight, bold: boldLines, lineGap: lineSpacing.gap)
+    func layoutRequest(for area: CGSize, centred: Bool = false) -> LayoutRequest {
+        LayoutRequest(pageSize: area, staffHeight: staffHeight, bold: boldLines, lineGap: lineSpacing.gap, centred: centred)
     }
 
     /// Bold also thickens the glyphs a little: 7% of a staff space all round.
@@ -98,9 +98,9 @@ nonisolated enum LineSpacing: String, CaseIterable, Identifiable {
     /// Half staff spaces added between lines.
     var gap: Int {
         switch self {
-        case .less: 1
-        case .normal: 4
-        case .more: 10
+        case .less: 0
+        case .normal: 1
+        case .more: 4
         }
     }
 }

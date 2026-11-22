@@ -125,8 +125,7 @@ struct ImportDetail: View {
                 Section {
                     SampleCard(piece: Piece(id: "import-\(candidate.id)", title: candidate.title, composer: nil,
                                             partIDs: candidate.parts.map(\.id), source: .stored(Data(candidate.file.xml.utf8))),
-                               description: "Preview of the first page")
-                        .frame(height: 320)
+                               description: "Preview of the first page", maxHeight: 360)
                         .listRowInsets(EdgeInsets())
                 } header: {
                     Text("Preview").formHeading()

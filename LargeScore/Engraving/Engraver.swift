@@ -11,12 +11,15 @@ nonisolated struct LayoutRequest: Hashable, Sendable {
     var bold: Bool = true
     /// Room between lines of music, in half staff spaces on top of what Verovio
     /// already leaves for slurs and dynamics.
-    var lineGap: Int = 4
+    var lineGap: Int = 1
     /// Room under the last line, in Verovio units. Tight first; more only when what
     /// hangs below the last line (dynamics, lyrics, chord names) would run off.
     var bottomRoom: Int = 40
     /// An interval to move every note by ("+P4"), for a part written for another instrument.
     var transpose: String?
+    /// Pages with room left but not enough for another line get their music
+    /// centred top to bottom (the reader); otherwise it starts at the top.
+    var centred = false
 }
 
 /// One engraved page.

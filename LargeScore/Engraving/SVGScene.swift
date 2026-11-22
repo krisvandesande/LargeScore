@@ -41,6 +41,23 @@ nonisolated struct SVGScene: @unchecked Sendable {
         noteBoxes = builder.noteBoxes
     }
 
+    /// Everything on the page moved down by `dy` viewBox units.
+    func shifted(by dy: CGFloat) -> SVGScene {
+        var copy = self
+        var t = CGAffineTransform(translationX: 0, y: dy)
+        copy.items = items.map { item in
+            switch item {
+            case .fill(let path): .fill(path.copy(using: &t) ?? path)
+            case .stroke(let path, let width, let round): .stroke(path.copy(using: &t) ?? path, width: width, round: round)
+            case .text(let line, let origin): .text(line, origin: CGPoint(x: origin.x, y: origin.y + dy))
+            }
+        }
+        copy.systems = systems.map { $0.isNull ? $0 : $0.offsetBy(dx: 0, dy: dy) }
+        copy.measures = measures.map { $0.isNull ? $0 : $0.offsetBy(dx: 0, dy: dy) }
+        copy.noteBoxes = noteBoxes.mapValues { $0.offsetBy(dx: 0, dy: dy) }
+        return copy
+    }
+
     /// The note or rest drawn nearest a point (viewBox units), within `reach`.
     func note(at point: CGPoint, reach: CGFloat) -> String? {
         noteBoxes

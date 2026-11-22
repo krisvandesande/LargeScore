@@ -141,7 +141,7 @@ struct CompareView: View {
     private func engrave(width: CGFloat) async {
         guard width > 100 else { return }
         let area = CGSize(width: width - 24, height: (width - 24) * 1.414)
-        let request = LayoutRequest(pageSize: area, staffHeight: max(width / 22, 24), bold: false, lineGap: 4)
+        let request = LayoutRequest(pageSize: area, staffHeight: max(width / 22, 24), bold: false, lineGap: 1)
         var piece = score.piece
         // As written, so it matches the PDF and the notes being fixed.
         piece.transposition = nil

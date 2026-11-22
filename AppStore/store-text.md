@@ -31,6 +31,8 @@ Write on the music with Apple Pencil or a finger, or add breath marks, fermatas,
 
 Works with VoiceOver, Voice Control and larger text. In English and Dutch.
 
+Made for the 11-inch and 13-inch iPad. [New line, 2026-11-22, for Kris to approve]
+
 Large Score is open source: github.com/krisvandesande/LargeScore. Music is engraved with Verovio.
 
 **Keywords** [100]: sheet music,MusicXML,score,low vision,large print,page turner,setlist,band,orchestra,choir
@@ -62,6 +64,8 @@ Maak programma's voor repetities en concerten. Wie voorbij de laatste pagina van
 Schrijf op de muziek met Apple Pencil of een vinger, of voeg ademtekens, fermates, vingerzettingen en omcirkelde of gemarkeerde maten toe. Notities blijven bij hun maat, op elke grootte.
 
 Werkt met VoiceOver, Spraakbediening en grotere tekst. In het Engels en het Nederlands.
+
+Gemaakt voor de iPad van 11 en 13 inch. [Nieuwe regel, 2026-11-22, ter goedkeuring]
 
 Large Score is open source: github.com/krisvandesande/LargeScore. De muziek wordt gezet met Verovio.
 

@@ -138,3 +138,38 @@ struct LaidOutPieceTests {
         #expect(laidOut.pages.allSatisfy { !$0.systems.isEmpty && $0.systems.allSatisfy { !$0.isNull } })
     }
 }
+
+/// Pages with room for less than another line have their music centred.
+@MainActor
+struct CentredPageTests {
+    @Test func fullPagesAreCentredTheLastIsNot() async throws {
+        let url = try #require(Bundle.main.url(forResource: "long-piece", withExtension: "musicxml"))
+        let xml = try String(contentsOf: url, encoding: .utf8)
+        let piece = Piece(id: "long", title: "long", source: .stored(Data(xml.utf8)))
+        var request = LayoutRequest(pageSize: CGSize(width: 1008, height: 1262), staffHeight: 64)
+        request.centred = true
+        let laidOut = try await ScoreLoader().layOut(piece, request: request)
+        let plain = try await ScoreLoader().layOut(piece, request: LayoutRequest(pageSize: request.pageSize, staffHeight: 64))
+        func gaps(_ page: SVGScene) -> (above: CGFloat, below: CGFloat) {
+            let lines = page.systems.filter { !$0.isNull }
+            let content = lines.dropFirst().reduce(lines[0]) { $0.union($1) }
+            return (content.minY - page.viewBox.minY, page.viewBox.maxY - content.maxY)
+        }
+        for (i, page) in plain.pages.enumerated() {
+            let g = gaps(page), c = gaps(laidOut.pages[i])
+            print("CENTRE page \(i + 1): lines \(page.systems.count) plain above \(Int(g.above)) below \(Int(g.below)) → centred above \(Int(c.above)) below \(Int(c.below))")
+        }
+        for page in laidOut.pages.dropLast() {
+            let g = gaps(page)
+            #expect(abs(g.above - g.below) < 1)
+        }
+        // Moved, not re-engraved: the same lines, lower down.
+        #expect(laidOut.pages[1].systems.count == plain.pages[1].systems.count)
+        #expect(laidOut.pages[1].measures[0].minY > plain.pages[1].measures[0].minY)
+        // The last page, mostly empty, keeps its music at the top.
+        let last = try #require(laidOut.pages.last), plainLast = try #require(plain.pages.last)
+        if gaps(plainLast).below > 600 {
+            #expect(last.measures[0].minY == plainLast.measures[0].minY)
+        }
+    }
+}

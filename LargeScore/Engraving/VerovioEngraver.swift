@@ -37,6 +37,9 @@ actor VerovioEngraver: Engraver {
             "footer": "none",
             "font": "Leipzig",
             "spacingSystem": request.lineGap,
+            // Verovio's own minimum between staves (12) stacks on top of what hangs
+            // between them: at 0 a page of 64 pt staves holds 7 lines, not 6.
+            "spacingStaff": 0,
         ]
         // Always set: the toolkit keeps options between pieces, and an empty value is none.
         options["transpose"] = request.transpose ?? ""

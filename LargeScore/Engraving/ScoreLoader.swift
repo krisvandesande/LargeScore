@@ -101,7 +101,10 @@ final class ScoreLoader {
 
     @concurrent
     nonisolated private static func read(_ score: EngravedScore) async -> LaidOutPiece {
-        let pages = score.pages.compactMap { SVGScene(svg: $0.svg) }
+        var pages = score.pages.compactMap { SVGScene(svg: $0.svg) }
+        if score.request.centred {
+            pages = pages.enumerated().map { index, page in Self.centred(page, last: index == pages.count - 1) }
+        }
         var firstBars: [Int] = []
         var next = 1
         for page in pages {
@@ -109,5 +112,21 @@ final class ScoreLoader {
             next += page.measureCount
         }
         return LaidOutPiece(request: score.request, pages: pages, firstBars: firstBars)
+    }
+
+    /// The page's music moved to sit in the middle, top to bottom. Every page but the
+    /// last is full (the next line didn't fit, even if the room looks close); the last
+    /// is centred only when the room under it is less than another line, so the end
+    /// of a piece keeps its music at the top, where reading starts.
+    nonisolated static func centred(_ page: SVGScene, last isLastPage: Bool) -> SVGScene {
+        let lines = page.systems.filter { !$0.isNull }
+        guard let first = lines.first, let lastLine = lines.last else { return page }
+        let content = lines.reduce(first) { $0.union($1) }
+        let above = content.minY - page.viewBox.minY
+        let below = page.viewBox.maxY - content.maxY
+        // One more line: the distance from one line's top to the next, or a line's own height.
+        let pitch = lines.count > 1 ? (lastLine.minY - first.minY) / CGFloat(lines.count - 1) : content.height
+        guard !isLastPage || below < pitch else { return page }
+        return page.shifted(by: (below - above) / 2)
     }
 }

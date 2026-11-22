@@ -88,12 +88,13 @@ struct SizeSettingsView: View {
     @Environment(ReaderSettings.self) private var settings
 
     var body: some View {
-        VStack(spacing: 32) {
-            SampleCard(piece: .sample(for: settings.instrument), description: "Sample music")
-                .frame(minHeight: 280)
-            SizeStepper()
+        ScrollView {
+            VStack(spacing: 24) {
+                SampleCard(piece: .sample(for: settings.instrument), description: "Sample music", maxHeight: 600)
+                MusicSizePanel(rows: [.size])
+            }
+            .air(.all, 32)
         }
-        .air(.all, 32)
         .background(Palette.ground)
         .navigationTitle("Music Size")
     }

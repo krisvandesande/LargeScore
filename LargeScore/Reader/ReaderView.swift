@@ -70,7 +70,7 @@ struct ReaderView: View {
                         if value.translation.width < -40 { turn(forward: true) }
                         else if value.translation.width > 40 { turn(forward: false) }
                     })
-                    .task(id: ReaderKey(request: settings.layoutRequest(for: area), piece: piece)) {
+                    .task(id: ReaderKey(request: settings.layoutRequest(for: area, centred: true), piece: piece)) {
                         await layOut(area: area)
                     }
             }
@@ -113,7 +113,7 @@ struct ReaderView: View {
             turner.update(pageCount: turner.pageCount, halfPageTurns: half)
         }
         .sheet(isPresented: $choosingSize) {
-            SizeSheet(piece: piece)
+            SizeSheet(piece: piece, page: turner.page)
         }
         .persistentSystemOverlays(.hidden)
     }
@@ -249,7 +249,7 @@ struct ReaderView: View {
         guard area.width > 100, area.height > 100 else { return }
         do {
             let shown = piece
-            let result = try await loader.layOut(shown, request: settings.layoutRequest(for: area))
+            let result = try await loader.layOut(shown, request: settings.layoutRequest(for: area, centred: true))
             let page: Int
             if laidOutPieceID == shown.id {
                 // Same piece, new size or orientation: keep the place by bar.
@@ -262,7 +262,7 @@ struct ReaderView: View {
             laidOutPieceID = shown.id
             if let next = nextPiece {
                 // Engrave the next piece ahead, so turning into it is immediate.
-                let request = settings.layoutRequest(for: area)
+                let request = settings.layoutRequest(for: area, centred: true)
                 Task { _ = try? await loader.layOut(next, request: request) }
             }
             turner = PageTurner(pageCount: result.pages.count, halfPageTurns: settings.halfPageTurns, page: page)
@@ -467,18 +467,18 @@ struct ReaderStrip: View {
 /// The size, changed while reading: the same choice as at the start.
 struct SizeSheet: View {
     let piece: Piece
+    /// The page being read: the preview is that page, as the reader draws it.
+    var page = 0
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 32) {
-                SampleCard(piece: piece, description: "The music at this size")
-                    .frame(minHeight: 280)
-                SizeStepper()
-                SpacingChoice()
-                LineChoice()
+            VStack(spacing: 24) {
+                SampleCard(piece: piece, description: "The music at this size", page: page, fills: true)
+                MusicSizePanel()
             }
-            .air(.all, 32)
+            .air(.all, 24)
+            .background(Palette.ground)
             .navigationTitle("Music Size")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

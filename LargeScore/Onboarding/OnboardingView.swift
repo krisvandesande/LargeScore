@@ -49,23 +49,20 @@ struct OnboardingView: View {
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
-            SampleCard(piece: .sample(for: settings.instrument), description: "Sample music")
-                .frame(height: max(viewport.height * 0.42, 280))
-            SizeStepper()
-                .frame(maxWidth: .infinity)
+            SampleCard(piece: .sample(for: settings.instrument), description: "Sample music",
+                       maxHeight: max(viewport.height * 0.5, 280))
+            MusicSizePanel(rows: [.size])
         case .spacing:
             ScreenTitle(text: "Choose the space between lines")
             // Tall enough for two lines at any size, so the space between them shows.
-            SampleCard(piece: .sample(for: settings.instrument), description: "Sample music")
-                .frame(height: max(viewport.height * 0.6, 420))
-            SpacingChoice()
-                .frame(maxWidth: .infinity)
+            SampleCard(piece: .sample(for: settings.instrument), description: "Sample music",
+                       maxHeight: max(viewport.height * 0.6, 420))
+            MusicSizePanel(rows: [.spacing])
         case .lines:
             ScreenTitle(text: "Choose the line thickness")
-            SampleCard(piece: .sample(for: settings.instrument), description: "Sample music")
-                .frame(height: max(viewport.height * 0.42, 280))
-            LineChoice()
-                .frame(maxWidth: .infinity)
+            SampleCard(piece: .sample(for: settings.instrument), description: "Sample music",
+                       maxHeight: max(viewport.height * 0.5, 280))
+            MusicSizePanel(rows: [.lines])
         }
     }
 
