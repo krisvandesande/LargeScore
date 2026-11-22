@@ -326,8 +326,9 @@ final class ScreenSweepTests: XCTestCase {
         XCTAssertTrue((page.value as? String ?? "").contains("notes"))
         // A larger size: the notes go with their bars.
         app.buttons["Music Size"].tap()
-        app.buttons["Larger"].tap()
-        app.buttons["Larger"].tap()
+        let slider = app.sliders["Music size"]
+        XCTAssertTrue(slider.waitForExistence(timeout: 5))
+        slider.adjust(toNormalizedSliderPosition: 0.84)
         app.buttons["Done"].firstMatch.tap()
         sleep(2)
         shot(app, "62-notes-larger", variant: "standard-light")

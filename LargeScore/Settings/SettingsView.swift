@@ -20,15 +20,6 @@ struct SettingsView: View {
                             Text("Size \(settings.sizeStep + 1) of \(ReaderSettings.staffHeights.count)")
                         }
                     }
-                    FittingPicker(String(localized: "Space Between Lines"), value: String(localized: settings.lineSpacing.title), selection: $settings.lineSpacing) {
-                        ForEach(LineSpacing.allCases) { spacing in
-                            Text(spacing.title).tag(spacing)
-                        }
-                    }
-                    FittingPicker(String(localized: "Lines"), value: settings.boldLines ? String(localized: "Bold") : String(localized: "Thin"), selection: $settings.boldLines) {
-                        Text("Thin").tag(false)
-                        Text("Bold").tag(true)
-                    }
                     FittingPicker(String(localized: "Page"), value: String(localized: settings.pageColour.title), selection: $settings.pageColour) {
                         ForEach(ReaderSettings.PageColour.allCases) { colour in
                             Text(colour.title).tag(colour)
@@ -88,13 +79,11 @@ struct SizeSettingsView: View {
     @Environment(ReaderSettings.self) private var settings
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 24) {
-                SampleCard(piece: .sample(for: settings.instrument), description: "Sample music", maxHeight: 600)
-                MusicSizePanel(rows: [.size])
-            }
-            .air(.all, 32)
+        VStack(spacing: 24) {
+            SampleCard(piece: .sample(for: settings.instrument), description: "Sample music", fills: true)
+            MusicSizePanel()
         }
+        .air(.all, 32)
         .background(Palette.ground)
         .navigationTitle("Music Size")
     }

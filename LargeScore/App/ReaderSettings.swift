@@ -21,7 +21,9 @@ final class ReaderSettings {
     }
 
     var sizeStep: Int { didSet { store.set(sizeStep, forKey: Key.sizeStep) } }
-    var lineSpacing: LineSpacing { didSet { store.set(lineSpacing.rawValue, forKey: Key.lineSpacing) } }
+    /// Room between lines of music, in Verovio's half staff spaces: 0 to `maxLineGap`.
+    var lineGap: Int { didSet { store.set(lineGap, forKey: Key.lineGap) } }
+    static let maxLineGap = 6
     var boldLines: Bool { didSet { store.set(boldLines, forKey: Key.boldLines) } }
     var pageColour: PageColour { didSet { store.set(pageColour.rawValue, forKey: Key.pageColour) } }
     var halfPageTurns: Bool { didSet { store.set(halfPageTurns, forKey: Key.halfPageTurns) } }
@@ -39,6 +41,7 @@ final class ReaderSettings {
     private enum Key {
         static let sizeStep = "sizeStep"
         static let lineSpacing = "lineSpacing"
+        static let lineGap = "lineGap"
         static let boldLines = "boldLines"
         static let pageColour = "pageColour"
         static let halfPageTurns = "halfPageTurns"
@@ -52,7 +55,14 @@ final class ReaderSettings {
         let step = store.object(forKey: Key.sizeStep) as? Int ?? Self.defaultSizeStep
         sizeStep = min(max(step, 0), Self.staffHeights.count - 1)
         boldLines = store.object(forKey: Key.boldLines) as? Bool ?? true
-        lineSpacing = store.string(forKey: Key.lineSpacing).flatMap(LineSpacing.init) ?? .normal
+        // Earlier versions kept Less, Normal or More: their gaps were 0, 1 and 4.
+        let earlier: Int? = switch store.string(forKey: Key.lineSpacing) {
+        case "less": 0
+        case "more": 4
+        case "normal": 1
+        default: nil
+        }
+        lineGap = min(max(store.object(forKey: Key.lineGap) as? Int ?? earlier ?? 1, 0), Self.maxLineGap)
         // The page follows the iPad: white on black in dark mode, unless chosen otherwise.
         pageColour = store.string(forKey: Key.pageColour).flatMap(PageColour.init) ?? .system
         halfPageTurns = store.bool(forKey: Key.halfPageTurns)
@@ -66,7 +76,7 @@ final class ReaderSettings {
     }
 
     func layoutRequest(for area: CGSize, centred: Bool = false) -> LayoutRequest {
-        LayoutRequest(pageSize: area, staffHeight: staffHeight, bold: boldLines, lineGap: lineSpacing.gap, centred: centred)
+        LayoutRequest(pageSize: area, staffHeight: staffHeight, bold: boldLines, lineGap: lineGap, centred: centred)
     }
 
     /// Bold also thickens the glyphs a little: 7% of a staff space all round.
@@ -82,28 +92,6 @@ final class ReaderSettings {
     }
 }
 
-/// The room between lines of music.
-nonisolated enum LineSpacing: String, CaseIterable, Identifiable {
-    case less, normal, more
-    var id: String { rawValue }
-
-    var title: LocalizedStringResource {
-        switch self {
-        case .less: "Less"
-        case .normal: "Normal"
-        case .more: "More"
-        }
-    }
-
-    /// Half staff spaces added between lines.
-    var gap: Int {
-        switch self {
-        case .less: 0
-        case .normal: 1
-        case .more: 4
-        }
-    }
-}
 
 /// The instruments offered in setup. Chooses the sample's clef now, and the part to
 /// preselect when music is added.

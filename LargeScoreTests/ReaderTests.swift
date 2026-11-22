@@ -90,14 +90,14 @@ struct ReaderSettingsTests {
         settings.sizeStep = 6
         settings.instruments = [.viola, .cello]
         settings.pageColour = .dark
-        settings.lineSpacing = .more
+        settings.lineGap = 4
         let again = ReaderSettings(store: suite)
         #expect(again.sizeStep == 6)
         #expect(again.instruments == [.viola, .cello])
         #expect(again.instrument == .viola)
         #expect(again.pageColour == .dark)
-        #expect(again.lineSpacing == .more)
-        #expect(again.layoutRequest(for: CGSize(width: 900, height: 1200)).lineGap == LineSpacing.more.gap)
+        #expect(again.lineGap == 4)
+        #expect(again.layoutRequest(for: CGSize(width: 900, height: 1200)).lineGap == 4)
         #expect(again.staffHeight == 88)
     }
 
@@ -170,6 +170,18 @@ struct CentredPageTests {
         let last = try #require(laidOut.pages.last), plainLast = try #require(plain.pages.last)
         if gaps(plainLast).below > 600 {
             #expect(last.measures[0].minY == plainLast.measures[0].minY)
+        }
+    }
+}
+
+@MainActor
+struct SpacingMigrationTests {
+    @Test func earlierChoicesBecomeGaps() throws {
+        for (choice, gap) in [("less", 0), ("normal", 1), ("more", 4)] {
+            let suite = try #require(UserDefaults(suiteName: "spacing-\(choice)"))
+            suite.removePersistentDomain(forName: "spacing-\(choice)")
+            suite.set(choice, forKey: "lineSpacing")
+            #expect(ReaderSettings(store: suite).lineGap == gap)
         }
     }
 }

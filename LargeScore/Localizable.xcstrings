@@ -60,6 +60,22 @@
         }
       }
     },
+    "%lld of %lld": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$lld of %2$lld"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld van %2$lld"
+          }
+        }
+      }
+    },
     "%lld, %@": {
       "localizations": {
         "en": {
@@ -1088,32 +1104,12 @@
         }
       }
     },
-    "Larger": {
-      "localizations": {
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Groter"
-          }
-        }
-      }
-    },
     "Length": {
       "localizations": {
         "nl": {
           "stringUnit": {
             "state": "translated",
             "value": "Duur"
-          }
-        }
-      }
-    },
-    "Less": {
-      "localizations": {
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Minder"
           }
         }
       }
@@ -1224,16 +1220,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Zoals iPad"
-          }
-        }
-      }
-    },
-    "More": {
-      "localizations": {
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Meer"
           }
         }
       }
@@ -1434,16 +1420,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Geen"
-          }
-        }
-      }
-    },
-    "Normal": {
-      "localizations": {
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Normaal"
           }
         }
       }
@@ -1916,16 +1892,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Grootte %lld van %lld"
-          }
-        }
-      }
-    },
-    "Smaller": {
-      "localizations": {
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kleiner"
           }
         }
       }

@@ -21,7 +21,9 @@ struct OnboardingView: View {
                         .buttonStyle(.large)
                     }
                     content(viewport: proxy.size)
-                    Spacer(minLength: 0)
+                    // The sample fills the room above the button; the instrument
+                    // grid leaves it empty.
+                    if step == .instrument { Spacer(minLength: 0) }
                     footer
                 }
                 .air(.horizontal, 48)
@@ -49,19 +51,18 @@ struct OnboardingView: View {
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
-            SampleCard(piece: .sample(for: settings.instrument), description: "Sample music",
-                       maxHeight: max(viewport.height * 0.5, 280))
+            SampleCard(piece: .sample(for: settings.instrument), description: "Sample music", fills: true)
+                .frame(minHeight: 320)
             MusicSizePanel(rows: [.size])
         case .spacing:
             ScreenTitle(text: "Choose the space between lines")
-            // Tall enough for two lines at any size, so the space between them shows.
-            SampleCard(piece: .sample(for: settings.instrument), description: "Sample music",
-                       maxHeight: max(viewport.height * 0.6, 420))
+            SampleCard(piece: .sample(for: settings.instrument), description: "Sample music", fills: true)
+                .frame(minHeight: 320)
             MusicSizePanel(rows: [.spacing])
         case .lines:
             ScreenTitle(text: "Choose the line thickness")
-            SampleCard(piece: .sample(for: settings.instrument), description: "Sample music",
-                       maxHeight: max(viewport.height * 0.5, 280))
+            SampleCard(piece: .sample(for: settings.instrument), description: "Sample music", fills: true)
+                .frame(minHeight: 320)
             MusicSizePanel(rows: [.lines])
         }
     }

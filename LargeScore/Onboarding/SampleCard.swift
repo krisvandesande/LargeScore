@@ -96,51 +96,41 @@ struct BigSegments<Value: Hashable>: View {
     }
 }
 
-/// Smaller and Larger, with the size between them, in the same capsule as the other
-/// choices. One adjustable element for VoiceOver.
+/// The music size as a slider of seven steps, smaller to the left.
 struct SizeStepper: View {
     @Environment(ReaderSettings.self) private var settings
-    @ScaledMetric(relativeTo: .title3) private var height: CGFloat = 56
     private var count: Int { ReaderSettings.staffHeights.count }
 
     var body: some View {
-        HStack(spacing: 4) {
-            step("Smaller", enabled: settings.sizeStep > 0) { settings.sizeStep -= 1 }
-            Text("\(settings.sizeStep + 1) of \(count)")
-                .font(.title3.weight(.semibold))
-                .monospacedDigit()
-                .fixedSize()
-                .padding(.horizontal, 8)
-            step("Larger", enabled: settings.sizeStep < count - 1) { settings.sizeStep += 1 }
+        StepSlider(value: settings.sizeStep, count: count,
+                   smaller: "textformat.size.smaller", larger: "textformat.size.larger") {
+            settings.sizeStep = $0
         }
-        .padding(4)
-        .background(Palette.buttonFill, in: Capsule())
-        .accessibilityElement(children: .contain)
         .accessibilityLabel("Music size")
         .accessibilityValue(Text("Size \(settings.sizeStep + 1) of \(count)"))
-        .accessibilityAdjustableAction { direction in
-            switch direction {
-            case .increment: if settings.sizeStep < count - 1 { settings.sizeStep += 1 }
-            case .decrement: if settings.sizeStep > 0 { settings.sizeStep -= 1 }
-            @unknown default: break
-            }
-        }
         .accessibilityIdentifier("sizeStepper")
     }
+}
 
-    private func step(_ title: LocalizedStringResource, enabled: Bool, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            Text(title)
-                .font(.title3.weight(.semibold))
-                .foregroundStyle(Palette.accent)
-                .padding(.horizontal, 12)
-                .frame(maxWidth: .infinity, minHeight: height)
-                .background(Palette.card, in: Capsule())
-                .contentShape(Capsule())
+/// A slider that moves in whole steps, with a symbol at each end.
+struct StepSlider: View {
+    let value: Int
+    let count: Int
+    let smaller: String
+    let larger: String
+    let change: (Int) -> Void
+
+    var body: some View {
+        Slider(value: Binding(get: { Double(value) }, set: { change(Int($0.rounded())) }),
+               in: 0...Double(count - 1), step: 1) {
+            EmptyView()
+        } minimumValueLabel: {
+            Image(systemName: smaller).imageScale(.large).foregroundStyle(.secondary).accessibilityHidden(true)
+        } maximumValueLabel: {
+            Image(systemName: larger).imageScale(.large).foregroundStyle(.secondary).accessibilityHidden(true)
         }
-        .buttonStyle(.plain)
-        .disabled(!enabled)
-        .opacity(enabled ? 1 : 0.4)
+        .tint(Palette.accent)
+        .frame(minHeight: 56)
     }
 }
 
@@ -157,16 +147,18 @@ struct LineChoice: View {
     }
 }
 
-/// Less, Normal or More room between lines.
+/// The room between lines as a slider, tight to the left.
 struct SpacingChoice: View {
     @Environment(ReaderSettings.self) private var settings
 
     var body: some View {
-        BigSegments(options: LineSpacing.allCases.map { ($0, $0.title) }, selection: settings.lineSpacing) {
-            settings.lineSpacing = $0
+        StepSlider(value: settings.lineGap, count: ReaderSettings.maxLineGap + 1,
+                   smaller: "arrow.down.and.line.horizontal.and.arrow.up",
+                   larger: "arrow.up.and.line.horizontal.and.arrow.down") {
+            settings.lineGap = $0
         }
-        .accessibilityElement(children: .contain)
         .accessibilityLabel("Space between lines")
+        .accessibilityValue(Text("\(settings.lineGap + 1) of \(ReaderSettings.maxLineGap + 1)"))
     }
 }
 
@@ -174,6 +166,7 @@ struct SpacingChoice: View {
 /// on the right, all controls the same width; at large text the name goes above.
 struct MusicSizePanel: View {
     var rows: Set<Row> = [.size, .spacing, .lines]
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     enum Row { case size, spacing, lines }
 
@@ -192,14 +185,20 @@ struct MusicSizePanel: View {
     private func row<Control: View>(_ title: LocalizedStringResource, @ViewBuilder control: () -> Control) -> some View {
         let name = Text(title).font(.title3).fixedSize(horizontal: false, vertical: true)
         let control = control()
-        return ViewThatFits(in: .horizontal) {
-            HStack(spacing: 16) {
-                name.frame(maxWidth: .infinity, alignment: .leading)
-                control.frame(width: 460)
-            }
-            VStack(alignment: .leading, spacing: 12) {
-                name
-                control
+        // Side by side at the standard sizes, the controls in one column; at the
+        // accessibility sizes the name goes above and the control takes the width,
+        // so no word in it breaks ("Sma / ller").
+        return Group {
+            if dynamicTypeSize.isAccessibilitySize {
+                VStack(alignment: .leading, spacing: 12) {
+                    name
+                    control
+                }
+            } else {
+                HStack(spacing: 16) {
+                    name.frame(maxWidth: .infinity, alignment: .leading)
+                    control.frame(width: 460)
+                }
             }
         }
         .air(.vertical, 14)
