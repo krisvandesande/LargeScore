@@ -107,6 +107,10 @@ targets:
         MARKETING_VERSION: "1.0"
         CURRENT_PROJECT_VERSION: "5"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        # iPad (2) and Mac Catalyst (6) only. Set here, on the target: XcodeGen's
+        # iOS app template puts iPhone and iPad ("1,2") on the target, which
+        # overrode the project-wide setting, and build 5 shipped for iPhone too.
+        TARGETED_DEVICE_FAMILY: "2,6"
   LargeScoreTests:
     type: bundle.unit-test
     platform: iOS
