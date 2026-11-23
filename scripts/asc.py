@@ -238,7 +238,11 @@ def distribute(bundle_id, build_version, submit, note, platform="IOS"):
         for _, name in groups:
             print(f"  added to {name}")
 
-    if submit:
+    if submit and not groups:
+        # Beta review is only for external testers; with none there is nothing to
+        # review, and App Store Connect refuses it until a Beta App Description exists.
+        print("Not submitted for Beta App Review: no external testers yet.")
+    elif submit:
         # Already-submitted builds return a conflict rather than succeeding quietly,
         # which is why this is the last step: everything above is safe to re-run.
         request(
