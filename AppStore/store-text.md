@@ -72,3 +72,13 @@ Large Score is open source: github.com/krisvandesande/LargeScore. De muziek word
 **Trefwoorden**: bladmuziek,MusicXML,partituur,slechtziend,grote letters,omslaan,programma,fanfare,harmonie,koor
 
 **Nieuw**: Eerste versie.
+
+## TestFlight: Beta App Description (draft for Kris, 2026-11-23)
+
+Needed before a build can go to external testers. In Kris's own voice, from his store paragraph.
+
+Large Score is an app we made for my grandfather, who in his nineties is still a passionate musician. His eyesight is going, and the parts on his music stand have become too small to read. Large Score takes the MusicXML of a piece and shows only his part, at the size he needs, with as many bars on a line as fit.
+
+You choose the size by looking at real music. Turn pages with a tap, a swipe or a Bluetooth pedal, and make programmes for rehearsals and concerts. Pieces that only exist as a PDF can be converted on a Mac, checked against the original and corrected in the app.
+
+We'd love to hear what works for you and what doesn't, most of all how the music reads on your stand. Use Send Beta Feedback in TestFlight, or send a screenshot.
