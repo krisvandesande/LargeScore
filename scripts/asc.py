@@ -238,25 +238,24 @@ def distribute(bundle_id, build_version, submit, note, platform="IOS"):
         for _, name in groups:
             print(f"  added to {name}")
 
-    if submit and not groups:
-        # Beta review is only for external testers; with none there is nothing to
-        # review, and App Store Connect refuses it until a Beta App Description exists.
-        print("Not submitted for Beta App Review: no external testers yet.")
-    elif submit:
-        # Already-submitted builds return a conflict rather than succeeding quietly,
-        # which is why this is the last step: everything above is safe to re-run.
-        request(
-            "POST",
-            "/betaAppReviewSubmissions",
-            body={
-                "data": {
-                    "type": "betaAppReviewSubmissions",
-                    "relationships": {"build": {"data": {"type": "builds", "id": build_id}}},
-                }
-            },
-            bearer=bearer,
-        )
-        print("Submitted for Beta App Review.")
+    if submit:
+        # Already-submitted builds, or a build while another of the same version is
+        # in review, are refused; say so and carry on, so the Mac half still runs.
+        try:
+            request(
+                "POST",
+                "/betaAppReviewSubmissions",
+                body={
+                    "data": {
+                        "type": "betaAppReviewSubmissions",
+                        "relationships": {"build": {"data": {"type": "builds", "id": build_id}}},
+                    }
+                },
+                bearer=bearer,
+            )
+            print("Submitted for Beta App Review.")
+        except SystemExit:
+            print("Not submitted for Beta App Review (see the reason above); submit it later.")
 
 
 if __name__ == "__main__":
