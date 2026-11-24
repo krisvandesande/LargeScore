@@ -125,7 +125,9 @@ enum LaunchOptions {
         }
     }
 
-    static var store: UserDefaults {
+    /// Made once per launch: SwiftUI may build the app's state again (when the iPad
+    /// turns), and wiping the test store each time sent a test run back to setup.
+    static let store: UserDefaults = {
         let arguments = ProcessInfo.processInfo.arguments
         if arguments.contains("-resetSettings"), let suite = UserDefaults(suiteName: "uitest") {
             suite.removePersistentDomain(forName: "uitest")
@@ -136,5 +138,5 @@ enum LaunchOptions {
             return suite
         }
         return .standard
-    }
+    }()
 }

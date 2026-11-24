@@ -488,4 +488,26 @@ final class ScreenSweepTests: XCTestCase {
         sleep(3)
         shot(app, "79-transposed-reader", variant: "standard-light")
     }
+
+    func testMusicSizeTurning() {
+        let app = launchWithLibrary()
+        app.buttons["Settings"].firstMatch.tap()
+        let sizeRow = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Music Size")).firstMatch
+        XCTAssertTrue(sizeRow.waitForExistence(timeout: 5))
+        sizeRow.tap()
+        sleep(2)
+        shot(app, "80-size-portrait", variant: "standard-light")
+        XCUIDevice.shared.orientation = .landscapeLeft
+        sleep(3)
+        shot(app, "81-size-landscape", variant: "standard-light")
+        XCUIDevice.shared.orientation = .portrait
+        sleep(2)
+        app.sliders["Music size"].adjust(toNormalizedSliderPosition: 1)
+        sleep(3)
+        shot(app, "82-size-portrait-largest", variant: "standard-light")
+        XCUIDevice.shared.orientation = .landscapeLeft
+        sleep(3)
+        shot(app, "83-size-landscape-largest", variant: "standard-light")
+        XCUIDevice.shared.orientation = .portrait
+    }
 }

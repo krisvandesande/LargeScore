@@ -4,7 +4,9 @@ import SwiftUI
 @Observable
 final class ReaderSettings {
     /// Staff heights in points, smallest to largest. Print on a 13-inch iPad is about 36.
-    static let staffHeights: [CGFloat] = [40, 48, 56, 64, 72, 80, 88]
+    /// Up to 120 pt: past that, a bar of sixteenths is wider than an upright 13-inch
+    /// iPad and Verovio crushes it (2026-11-24, measured on real parts).
+    static let staffHeights: [CGFloat] = [40, 48, 56, 64, 72, 80, 88, 100, 110, 120]
     static let defaultSizeStep = 3
 
     enum PageColour: String, CaseIterable, Identifiable {

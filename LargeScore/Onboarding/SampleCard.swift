@@ -47,14 +47,18 @@ struct SampleCard: View {
 
     var body: some View {
         let dark = settings.pageScheme(system: systemScheme) == .dark
-        ZStack(alignment: .topLeading) {
-            dark ? Color.black : Color.white
-            if let page = scene {
-                ScoreCanvas(scene: page, ink: dark ? .white : .black, glyphWeight: settings.glyphWeight)
-                    .frame(width: area.width, height: area.height)
-                    .padding(margins)
+        // The paper alone sets the card's size; the music is drawn over it. Before, the
+        // music's fixed frame from the last layout held the card at the old size when
+        // the iPad turned, so the next layout used it too and ran off the screen.
+        (dark ? Color.black : Color.white)
+            .overlay(alignment: .topLeading) {
+                if let page = scene {
+                    ScoreCanvas(scene: page, ink: dark ? .white : .black, glyphWeight: settings.glyphWeight)
+                        .frame(width: area.width, height: area.height)
+                        .padding(margins)
+                }
             }
-        }
+            .clipped()
         .frame(maxWidth: .infinity, maxHeight: fills ? .infinity : nil)
         .frame(height: fills ? nil : cardHeight, alignment: .top)
         .clipShape(RoundedRectangle(cornerRadius: asPage ? 0 : 26))

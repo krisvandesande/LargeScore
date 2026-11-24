@@ -57,6 +57,12 @@ actor VerovioEngraver: Engraver {
             options["tieMidpointThickness"] = 0.75
             options["tupletBracketThickness"] = 0.35
         }
+        // Above 88 pt a busy bar nears the page's width; Verovio's tighter spacing keeps
+        // whole bars on the page up to 120 pt on an upright 13-inch iPad (measured on
+        // real parts), and puts more bars on each page. Below that, its own spacing.
+        let tight = request.staffHeight > 88
+        options["spacingLinear"] = tight ? 0.15 : 0.25
+        options["spacingNonLinear"] = tight ? 0.45 : 0.6
         return options
     }
 
