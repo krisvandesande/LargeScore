@@ -53,7 +53,7 @@ struct SampleCard: View {
         (dark ? Color.black : Color.white)
             .overlay(alignment: .topLeading) {
                 if let page = scene {
-                    ScoreCanvas(scene: page, ink: dark ? .white : .black, glyphWeight: settings.glyphWeight)
+                    ScoreCanvas(scene: page, ink: settings.pageInk(system: systemScheme), glyphWeight: settings.glyphWeight)
                         .frame(width: area.width, height: area.height)
                         .padding(margins)
                 }

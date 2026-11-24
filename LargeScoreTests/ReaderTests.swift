@@ -97,6 +97,10 @@ struct ReaderSettingsTests {
         #expect(again.instrument == .viola)
         #expect(again.pageColour == .dark)
         #expect(again.lineGap == 4)
+        again.pageColour = .yellowOnBlack
+        #expect(ReaderSettings(store: suite).pageColour == .yellowOnBlack)
+        #expect(again.pageScheme(system: .light) == .dark)
+        #expect(again.pageInk(system: .light) == ReaderSettings.yellowInk)
         #expect(again.layoutRequest(for: CGSize(width: 900, height: 1200)).lineGap == 4)
         #expect(again.staffHeight == 88)
     }

@@ -115,7 +115,7 @@ struct ReaderView: View {
 
     @ViewBuilder
     private func page(area: CGSize, scheme: ColorScheme) -> some View {
-        let ink: Color = scheme == .dark ? .white : .black
+        let ink = settings.pageInk(system: systemScheme)
         if let laidOut, laidOut.pages.indices.contains(turner.page) {
             let current = laidOut.pages[turner.page]
             let marks = notes?.marks ?? []

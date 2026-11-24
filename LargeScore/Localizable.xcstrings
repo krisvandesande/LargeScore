@@ -2468,6 +2468,16 @@
         }
       }
     },
+    "Yellow on Black": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geel op zwart"
+          }
+        }
+      }
+    },
     "Your notes and programmes stay. The previous version can be restored from the library.": {
       "localizations": {
         "nl": {

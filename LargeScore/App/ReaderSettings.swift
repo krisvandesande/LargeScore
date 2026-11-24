@@ -15,17 +15,21 @@ final class ReaderSettings {
     static let defaultSizeStep = 3
 
     enum PageColour: String, CaseIterable, Identifiable {
-        case light, dark, system
+        case light, dark, yellowOnBlack, system
         var id: String { rawValue }
 
         var title: LocalizedStringResource {
             switch self {
             case .light: "Light"
             case .dark: "Dark"
+            case .yellowOnBlack: "Yellow on Black"
             case .system: "Match iPad"
             }
         }
     }
+
+    /// Pure yellow on black, the pairing many low-vision readers use: 19.6:1.
+    static let yellowInk = Color(red: 1, green: 1, blue: 0)
 
     var sizeStep: Int { didSet { store.set(sizeStep, forKey: Key.sizeStep) } }
     /// Room between lines of music, in Verovio's half staff spaces: 0 to `maxLineGap`.
@@ -94,9 +98,15 @@ final class ReaderSettings {
     func pageScheme(system: ColorScheme) -> ColorScheme {
         switch pageColour {
         case .light: .light
-        case .dark: .dark
+        case .dark, .yellowOnBlack: .dark
         case .system: system
         }
+    }
+
+    /// The colour the music is drawn in, given the iPad's own scheme.
+    func pageInk(system: ColorScheme) -> Color {
+        if pageColour == .yellowOnBlack { return Self.yellowInk }
+        return pageScheme(system: system) == .dark ? .white : .black
     }
 }
 
