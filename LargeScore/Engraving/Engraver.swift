@@ -20,6 +20,9 @@ nonisolated struct LayoutRequest: Hashable, Sendable {
     /// Pages with room left but not enough for another line get their music
     /// centred top to bottom (the reader); otherwise it starts at the top.
     var centred = false
+    /// The whole part as one line, cut into screens (`OneLine`), for sizes where a busy
+    /// bar is wider than a page.
+    var oneLine = false
 }
 
 /// One engraved page.

@@ -86,7 +86,7 @@ final class ScoreLoader {
         var laidOut = await Self.read(try await engraver.engrave(musicXML: xml, request: request))
         // Pages are filled tightly; if anything under a page's last line runs off the
         // page, engrave again with more room at the foot, as often as needed.
-        while laidOut.overflows, request.bottomRoom < 400 {
+        while laidOut.overflows, !request.oneLine, request.bottomRoom < 400 {
             request.bottomRoom += 60
             laidOut = await Self.read(try await engraver.engrave(musicXML: xml, request: request))
         }
@@ -102,6 +102,10 @@ final class ScoreLoader {
     @concurrent
     nonisolated private static func read(_ score: EngravedScore) async -> LaidOutPiece {
         var pages = score.pages.compactMap { SVGScene(svg: $0.svg) }
+        if score.request.oneLine, let line = pages.first {
+            let screens = OneLine.screens(of: line, area: score.request.pageSize, staffHeight: score.request.staffHeight)
+            return LaidOutPiece(request: score.request, pages: screens.map(\.scene), firstBars: screens.map(\.firstBar))
+        }
         if score.request.centred {
             pages = pages.enumerated().map { index, page in Self.centred(page, last: index == pages.count - 1) }
         }

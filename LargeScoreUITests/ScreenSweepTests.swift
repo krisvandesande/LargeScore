@@ -509,5 +509,17 @@ final class ScreenSweepTests: XCTestCase {
         sleep(3)
         shot(app, "83-size-landscape-largest", variant: "standard-light")
         XCUIDevice.shared.orientation = .portrait
+        sleep(2)
+        // The reader at the largest size: one line, a screen at a time.
+        app.buttons["Library"].firstMatch.tap()
+        card(app).tap()
+        let page = app.otherElements["page"]
+        XCTAssertTrue(page.waitForExistence(timeout: 10))
+        sleep(2)
+        shot(app, "84-reader-one-line-1", variant: "standard-light")
+        page.coordinate(withNormalizedOffset: CGVector(dx: 0.85, dy: 0.5)).tap()
+        sleep(1)
+        shot(app, "85-reader-one-line-2", variant: "standard-light")
+        XCTAssertTrue((page.value as? String ?? "").contains("Page 2"))
     }
 }

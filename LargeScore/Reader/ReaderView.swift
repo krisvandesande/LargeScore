@@ -108,7 +108,7 @@ struct ReaderView: View {
         }
         .onDisappear { UIApplication.shared.isIdleTimerDisabled = false }
         .onChange(of: settings.halfPageTurns) { _, half in
-            turner.update(pageCount: turner.pageCount, halfPageTurns: half)
+            turner.update(pageCount: turner.pageCount, halfPageTurns: half && laidOut?.request.oneLine != true)
         }
         .persistentSystemOverlays(.hidden)
     }
@@ -260,7 +260,7 @@ struct ReaderView: View {
                 let request = settings.layoutRequest(for: area, centred: true)
                 Task { _ = try? await loader.layOut(next, request: request) }
             }
-            turner = PageTurner(pageCount: result.pages.count, halfPageTurns: settings.halfPageTurns, page: page)
+            turner = PageTurner(pageCount: result.pages.count, halfPageTurns: settings.halfPageTurns && !result.request.oneLine, page: page)
             failed = false
         } catch {
             failed = true

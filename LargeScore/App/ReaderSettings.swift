@@ -4,9 +4,14 @@ import SwiftUI
 @Observable
 final class ReaderSettings {
     /// Staff heights in points, smallest to largest. Print on a 13-inch iPad is about 36.
-    /// Up to 120 pt: past that, a bar of sixteenths is wider than an upright 13-inch
-    /// iPad and Verovio crushes it (2026-11-24, measured on real parts).
-    static let staffHeights: [CGFloat] = [40, 48, 56, 64, 72, 80, 88, 100, 110, 120]
+    /// Pages up to 120 pt: past that, a bar of sixteenths is wider than an upright
+    /// 13-inch iPad and Verovio crushes it (2026-11-24, measured on real parts). The
+    /// larger sizes read the part as one line, a screen at a time (`OneLine`).
+    static let staffHeights: [CGFloat] = [40, 48, 56, 64, 72, 80, 88, 100, 110, 120, 140, 165, 195, 230, 270]
+    static let largestPageSize: CGFloat = 120
+
+    /// One line instead of pages at this size.
+    var readsAsOneLine: Bool { staffHeight > Self.largestPageSize }
     static let defaultSizeStep = 3
 
     enum PageColour: String, CaseIterable, Identifiable {
@@ -78,7 +83,8 @@ final class ReaderSettings {
     }
 
     func layoutRequest(for area: CGSize, centred: Bool = false) -> LayoutRequest {
-        LayoutRequest(pageSize: area, staffHeight: staffHeight, bold: boldLines, lineGap: lineGap, centred: centred)
+        LayoutRequest(pageSize: area, staffHeight: staffHeight, bold: boldLines, lineGap: lineGap, centred: centred,
+                      oneLine: readsAsOneLine)
     }
 
     /// Bold also thickens the glyphs a little: 7% of a staff space all round.

@@ -96,3 +96,12 @@ Run with Apple's `accessibility-dynamic-type-specialist` and `accessibility-suff
 - "Text clipped" on the fix screen at AX5 (iPad mini): the fix buttons scroll inside half the pane, and the audit reports the rows below the fold as clipped. Written down as the audit's; the screenshots show every button reachable by scrolling.
 - "Potentially inaccessible text" on the Transpose sheet: the pickers' menu labels, read whole by VoiceOver (as Rosie's fitting pickers).
 - "Dynamic Type partially unsupported" on navigation-bar buttons and the capped fix buttons: the platform's, and intended (capped at xxxLarge with the Large Content Viewer).
+
+## Very large sizes, 2026-11-24
+
+A musician with 1/20 vision needed more than the largest size (88 pt staves).
+
+- Pages now go up to 120 pt, with Verovio's tighter spacing above 88 pt. Measured on the real parts on an upright 13-inch page: up to 120 pt every bar fits; from about 136 pt a bar of sixteenths is wider than the page and Verovio crushes it.
+- Above 120 pt (140, 165, 195, 230, 270 pt) the part is read as one line (`OneLine`): engraved without line breaks, then cut into screens the reader turns through like pages. A screen ends at the last bar line that fits and shows paper after it; a bar wider than the screen is split, and the next screen picks it up a little before the cut. Words and dynamics from the previous screen don't show as scraps at the left edge; staff lines, slurs and hairpins do carry over.
+- The Music Size preview no longer keeps the old layout when the iPad turns (lines ran off the edge upright, the top went under the bars in landscape).
+- Not yet checked: writing notes in the one-line mode, and the clef and key aren't repeated on later screens.

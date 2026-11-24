@@ -41,6 +41,47 @@ nonisolated struct SVGScene: @unchecked Sendable {
         noteBoxes = builder.noteBoxes
     }
 
+    /// Where an item is drawn, in viewBox units (text approximately), to leave out
+    /// what falls outside a window of a long line.
+    static func bounds(of item: Item) -> CGRect {
+        switch item {
+        case .fill(let path): return path.boundingBoxOfPath
+        case .stroke(let path, let width, _): return path.boundingBoxOfPath.insetBy(dx: -width, dy: -width)
+        case .text(let line, let origin):
+            var ascent: CGFloat = 0, descent: CGFloat = 0
+            let width = CGFloat(CTLineGetTypographicBounds(line, &ascent, &descent, nil))
+            return CGRect(x: origin.x, y: origin.y - ascent, width: width, height: ascent + descent)
+        }
+    }
+
+    /// The part of the page inside `rect` as a page of its own: its viewBox is `rect`,
+    /// with only the items, bars and notes that reach into it.
+    /// `itemBounds` is `items.map(SVGScene.bounds)`, worked out once for all windows.
+    /// Nothing that starts at or after `cutoff` is kept: a window that ends at a bar
+    /// line shows paper after it, not the start of the next bar.
+    func window(_ rect: CGRect, itemBounds: [CGRect], cutoff: CGFloat = .infinity) -> SVGScene {
+        var copy = self
+        copy.viewBox = rect
+        // The next bar's staff lines start on the bar line itself: anything starting within a
+        // hair of the cutoff belongs to the next bar.
+        let edge = cutoff - rect.width * 0.01
+        // And what mostly belongs to the screen before (the end of a word or a dynamic)
+        // stays there, rather than showing as a scrap at the left edge.
+        copy.items = items.indices.filter {
+            let box = itemBounds[$0]
+            // Long things (staff lines, slurs, hairpins) always stay.
+            let long = box.width > rect.width * 0.5
+            return box.intersects(rect) && box.minX < edge && (long || box.midX >= rect.minX)
+        }.map { items[$0] }
+        let inside = measures.indices.filter { !measures[$0].isNull && measures[$0].intersects(rect) && measures[$0].minX < edge }
+        copy.measures = inside.map { measures[$0] }
+        copy.measureIDs = inside.map { measureIDs[$0] }
+        copy.measureCount = inside.count
+        copy.systems = systems.map { $0.isNull ? $0 : $0.intersection(rect) }
+        copy.noteBoxes = noteBoxes.filter { $0.value.intersects(rect) }
+        return copy
+    }
+
     /// Everything on the page moved down by `dy` viewBox units.
     func shifted(by dy: CGFloat) -> SVGScene {
         var copy = self

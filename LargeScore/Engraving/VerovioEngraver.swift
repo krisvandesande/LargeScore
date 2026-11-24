@@ -29,8 +29,10 @@ actor VerovioEngraver: Engraver {
             "pageMarginTop": 40,
             "pageMarginBottom": request.bottomRoom,
             "scale": 100,
-            "breaks": "auto",
-            "adjustPageHeight": false,
+            // One line: no line breaks, and the page as wide and tall as the music.
+            "breaks": request.oneLine ? "none" : "auto",
+            "adjustPageHeight": request.oneLine,
+            "adjustPageWidth": request.oneLine,
             "svgViewBox": true,
             "svgRemoveXlink": true,
             "header": "none",
