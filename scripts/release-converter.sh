@@ -27,6 +27,7 @@ xcodegen generate >/dev/null
 xcodebuild -project LargeScore.xcodeproj -scheme LargeScoreConverter -configuration Release \
   -destination "generic/platform=macOS" -derivedDataPath build/ddconv \
   CODE_SIGN_IDENTITY="$identity" CODE_SIGN_STYLE=Manual OTHER_CODE_SIGN_FLAGS="--timestamp" \
+  CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO \
   build | grep -E "error:|warning: .*sign|BUILD" || true
 
 app="build/ddconv/Build/Products/Release/Large Score Converter.app"
@@ -37,7 +38,17 @@ codesign --verify --strict --deep "$app"
 zip="$out/Large Score Converter.zip"
 rm -f "$zip"
 ditto -c -k --keepParent "$app" "$zip"
-xcrun notarytool submit "$zip" --key "$ASC_KEY_PATH" --key-id "$ASC_KEY_ID" --issuer "$ASC_ISSUER_ID" --wait
+# The debugging entitlement Xcode adds would make Apple refuse it.
+if codesign -d --entitlements - "$app" 2>/dev/null | grep -q get-task-allow; then
+  echo "error: the app still asks for get-task-allow" >&2; exit 1
+fi
+result=$(xcrun notarytool submit "$zip" --key "$ASC_KEY_PATH" --key-id "$ASC_KEY_ID" --issuer "$ASC_ISSUER_ID" --wait 2>&1)
+echo "$result"
+if ! echo "$result" | grep -q "status: Accepted"; then
+  id=$(echo "$result" | sed -n 's/^ *id: //p' | head -n 1)
+  echo "error: Apple didn't accept it. Why: xcrun notarytool log $id --key … --key-id … --issuer …" >&2
+  exit 1
+fi
 xcrun stapler staple "$app"
 # The stapled app, zipped again for copying.
 rm -f "$zip"

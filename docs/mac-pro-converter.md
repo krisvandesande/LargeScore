@@ -5,6 +5,11 @@ it's signed: drag PDFs onto its window, check and fix each piece beside its PDF,
 and Send to Library. It needs Audiveris in Applications (step 2 below) and iCloud
 Drive on (step 1); the watched folder and `install.sh` are then not needed.
 
+To install it: run `scripts/release-converter.sh` on the development Mac (it signs,
+notarises and staples), copy `build/converter/Large Score Converter.zip` to the Mac
+Pro (AirDrop, iCloud Drive or a USB stick), double-click the zip and drag Large
+Score Converter into Applications. Being notarised, it opens like any other app.
+
 For pieces that only exist as a PDF. The Mac Pro (2013, Intel, macOS 12 Monterey)
 converts each PDF to MusicXML with Audiveris and puts it, with the PDF beside it,
 in a folder in iCloud Drive. The iPad reads that folder: the piece appears in the
