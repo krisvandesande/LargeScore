@@ -674,6 +674,16 @@
         }
       }
     },
+    "Color Mode": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kleurmodus"
+          }
+        }
+      }
+    },
     "Compare with PDF": {
       "localizations": {
         "nl": {
@@ -1590,16 +1600,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Pdf"
-          }
-        }
-      }
-    },
-    "Page": {
-      "localizations": {
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pagina"
           }
         }
       }

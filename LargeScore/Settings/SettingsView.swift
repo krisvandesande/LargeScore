@@ -24,7 +24,7 @@ struct SettingsView: View {
                         Text("Thin").tag(false)
                         Text("Bold").tag(true)
                     }
-                    FittingPicker(String(localized: "Page"), value: String(localized: settings.pageColour.title), selection: $settings.pageColour) {
+                    FittingPicker(String(localized: "Color Mode"), value: String(localized: settings.pageColour.title), selection: $settings.pageColour) {
                         ForEach(ReaderSettings.PageColour.allCases) { colour in
                             Text(colour.title).tag(colour)
                         }
