@@ -22,15 +22,18 @@ if [ -z "$identity" ]; then
 fi
 
 out=build/converter
+# A fresh build folder each time: macOS protects a notarised app from changes, so
+# the last release's app can't be built over.
+dd="build/ddconv-release-$(date +%Y%m%d-%H%M%S)"
 rm -rf "$out/Release" && mkdir -p "$out"
 xcodegen generate >/dev/null
 xcodebuild -project LargeScore.xcodeproj -scheme LargeScoreConverter -configuration Release \
-  -destination "generic/platform=macOS" -derivedDataPath build/ddconv \
+  -destination "generic/platform=macOS" -derivedDataPath "$dd" \
   CODE_SIGN_IDENTITY="$identity" CODE_SIGN_STYLE=Manual OTHER_CODE_SIGN_FLAGS="--timestamp" \
   CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO \
   build | grep -E "error:|warning: .*sign|BUILD" || true
 
-app="$PWD/build/ddconv/Build/Products/Release/Large Score Converter.app"
+app="$PWD/$dd/Build/Products/Release/Large Score Converter.app"
 [ -d "$app" ] || { echo "error: the build failed" >&2; exit 1; }
 lipo -info "$app/Contents/MacOS/Large Score Converter"
 
