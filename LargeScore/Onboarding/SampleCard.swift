@@ -139,12 +139,27 @@ struct StepSlider: View {
                in: 0...Double(count - 1), step: 1) {
             EmptyView()
         } minimumValueLabel: {
-            Image(systemName: smaller).imageScale(.large).foregroundStyle(.secondary).accessibilityHidden(true)
+            end(smaller) { change(max(value - 1, 0)) }
         } maximumValueLabel: {
-            Image(systemName: larger).imageScale(.large).foregroundStyle(.secondary).accessibilityHidden(true)
+            end(larger) { change(min(value + 1, count - 1)) }
         }
         .tint(Palette.accent)
         .frame(minHeight: 56)
+    }
+
+    /// A slider end: a tap moves one step that way. 44 pt to touch, without moving the
+    /// slider. VoiceOver adjusts the slider itself, so the ends stay out of its way.
+    private func end(_ symbol: String, step: @escaping () -> Void) -> some View {
+        Button(action: step) {
+            Image(systemName: symbol).imageScale(.large).foregroundStyle(.secondary)
+                // One width for every end, so sliders stacked in a list start and end together.
+                .frame(width: 28)
+                .padding(10)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .padding(-10)
+        .accessibilityHidden(true)
     }
 }
 

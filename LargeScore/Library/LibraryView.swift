@@ -74,6 +74,7 @@ private struct LibraryGrid: View {
     @State private var fixing: Score?
     @State private var transposing: Score?
     @State private var sizing: Piece?
+    @State private var editingDetails: Score?
 
     init(sort: LibraryView.Sort, search: String, addMusic: @escaping () -> Void) {
         self.addMusic = addMusic
@@ -127,6 +128,9 @@ private struct LibraryGrid: View {
         .sheet(item: $sizing) { piece in
             PieceSizeSheet(piece: piece)
         }
+        .sheet(item: $editingDetails) { score in
+            DetailsSheet(score: score)
+        }
         .confirmationDialog(Text("Delete \(deleting?.title ?? "")?"), isPresented: isPresent($deleting), titleVisibility: .visible) {
             Button("Delete", role: .destructive) {
                 if let deleting { context.delete(deleting); try? context.save() }
@@ -168,6 +172,7 @@ private struct LibraryGrid: View {
             if score.pdf != nil {
                 Button("Compare with PDF", systemImage: "doc.on.doc") { comparing = score }
             }
+            Button("Edit Details", systemImage: "character.cursor.ibeam") { editingDetails = score }
             Button("Fix Notes", systemImage: "pencil") { fixing = score }
             Button("Transpose", systemImage: "arrow.up.arrow.down") { transposing = score }
             Button("Size for This Piece", systemImage: "textformat.size") { sizing = score.piece }
@@ -193,6 +198,7 @@ private struct LibraryGrid: View {
         #endif
         .accessibilityAction(named: Text("Change Parts")) { changingPart = score }
         .accessibilityAction(named: Text("Delete")) { deleting = score }
+        .accessibilityAction(named: Text("Edit Details")) { editingDetails = score }
         .accessibilityAction(named: Text("Fix Notes")) { fixing = score }
         .accessibilityAction(named: Text("Transpose")) { transposing = score }
         .accessibilityAction(named: Text("Size for This Piece")) { sizing = score.piece }
@@ -280,6 +286,64 @@ private struct PieceSizeSheet: View {
                 }
         }
         .presentationSizing(.page)
+    }
+}
+
+/// A piece's title, composer and arranger, as the library and programmes show them.
+private struct DetailsSheet: View {
+    let score: Score
+    @Environment(\.modelContext) private var context
+    @Environment(\.dismiss) private var dismiss
+    @State private var title = ""
+    @State private var composer = ""
+    @State private var arranger = ""
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section {
+                    field("Title", text: $title, prompt: nil)
+                    field("Composer", text: $composer, prompt: "Optional")
+                    field("Arranger", text: $arranger, prompt: "Optional")
+                }
+            }
+            .font(.title3)
+            .navigationTitle("Details")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") { save() }
+                        .fontWeight(.semibold)
+                        .disabled(title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                }
+            }
+        }
+        .onAppear {
+            title = score.title
+            composer = score.composer ?? ""
+            arranger = score.arranger ?? ""
+        }
+    }
+
+    private func field(_ name: LocalizedStringKey, text: Binding<String>, prompt: LocalizedStringKey?) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(name).font(.headline).accessibilityHidden(true)
+            TextField(text: text, prompt: prompt.map { Text($0) }) { Text(name) }
+                .font(.title3)
+                .accessibilityLabel(Text(name))
+        }
+        .air(.vertical, 4)
+    }
+
+    private func save() {
+        let clean = { (text: String) in text.trimmingCharacters(in: .whitespacesAndNewlines) }
+        guard !clean(title).isEmpty else { return }
+        score.title = clean(title)
+        score.composer = clean(composer).isEmpty ? nil : clean(composer)
+        score.arranger = clean(arranger).isEmpty ? nil : clean(arranger)
+        try? context.save()
+        dismiss()
     }
 }
 

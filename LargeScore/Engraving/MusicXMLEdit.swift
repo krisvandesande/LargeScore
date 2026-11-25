@@ -879,3 +879,37 @@ nonisolated extension String {
 nonisolated extension Substring {
     func trimmingPrefixWhitespace() -> Substring { self.drop { $0.isWhitespace } }
 }
+
+extension MusicXMLEdit {
+    /// The piece's title, composer and arranger written where Large Score reads them
+    /// first (`work-title`; `creator` in `identification`), replacing what was there.
+    /// An empty composer or arranger removes it.
+    nonisolated static func settingDetails(_ xml: String, title: String, composer: String, arranger: String) -> String {
+        func escaped(_ text: String) -> String {
+            text.trimmingCharacters(in: .whitespacesAndNewlines)
+                .replacingOccurrences(of: "&", with: "&amp;").replacingOccurrences(of: "<", with: "&lt;").replacingOccurrences(of: ">", with: "&gt;")
+        }
+        func removing(_ pattern: String, from text: String) -> String {
+            guard let regex = try? NSRegularExpression(pattern: pattern, options: [.dotMatchesLineSeparators]) else { return text }
+            return regex.stringByReplacingMatches(in: text, range: NSRange(text.startIndex..., in: text), withTemplate: "")
+        }
+        var out = xml
+        // The title: a fresh <work>, first in the score as MusicXML requires.
+        out = removing(#"\s*<work>.*?</work>"#, from: out)
+        if let open = out.range(of: #"<score-partwise\b[^>]*>"#, options: .regularExpression) {
+            out.insert(contentsOf: "\n  <work>\n    <work-title>\(escaped(title))</work-title>\n  </work>", at: open.upperBound)
+        }
+        // The people: replaced inside <identification>, which is made when missing.
+        out = removing(#"\s*<creator type="(composer|arranger)">.*?</creator>"#, from: out)
+        var creators = ""
+        if !escaped(composer).isEmpty { creators += "\n    <creator type=\"composer\">\(escaped(composer))</creator>" }
+        if !escaped(arranger).isEmpty { creators += "\n    <creator type=\"arranger\">\(escaped(arranger))</creator>" }
+        if let identification = out.range(of: #"<identification\b[^>]*>"#, options: .regularExpression) {
+            out.insert(contentsOf: creators, at: identification.upperBound)
+        } else if !creators.isEmpty,
+                  let next = out.range(of: #"<(defaults|credit|part-list)\b"#, options: .regularExpression) {
+            out.insert(contentsOf: "<identification>\(creators)\n  </identification>\n  ", at: next.lowerBound)
+        }
+        return out
+    }
+}

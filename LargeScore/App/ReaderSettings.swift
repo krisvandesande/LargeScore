@@ -63,7 +63,7 @@ final class ReaderSettings {
 
     /// The reading settings a piece can have its own value for, besides its size.
     enum Choice: String, CaseIterable {
-        case boldLines, pageColour, halfPageTurns, markFirstBar, playingOrder, keyReminders
+        case boldLines, pageColour, halfPageTurns, markFirstBar, playingOrder, keyReminders, lineGap
     }
 
     /// Own values by piece id, then by `Choice`: "true", "false" or a page colour.
@@ -78,6 +78,7 @@ final class ReaderSettings {
         case .markFirstBar: String(markFirstBar)
         case .playingOrder: String(playingOrder)
         case .keyReminders: String(keyReminders)
+        case .lineGap: String(lineGap)
         }
     }
 
@@ -88,6 +89,9 @@ final class ReaderSettings {
     func bool(_ choice: Choice, for piece: String?) -> Bool { value(choice, for: piece) == "true" }
 
     func pageColour(for piece: String?) -> PageColour { PageColour(rawValue: value(.pageColour, for: piece)) ?? pageColour }
+
+    /// The room between lines a piece is read with: its own, else every piece's.
+    func lineGap(for piece: String?) -> Int { Int(value(.lineGap, for: piece)).map { min(max($0, 0), Self.maxLineGap) } ?? lineGap }
 
     /// A value for one piece; the same as every piece's removes the piece's own.
     func set(_ choice: Choice, to raw: String, for piece: String) {
@@ -168,7 +172,7 @@ final class ReaderSettings {
 
     func layoutRequest(for area: CGSize, centred: Bool = false, piece: String? = nil) -> LayoutRequest {
         let height = staffHeight(for: piece)
-        return LayoutRequest(pageSize: area, staffHeight: height, bold: bool(.boldLines, for: piece), lineGap: lineGap, centred: centred,
+        return LayoutRequest(pageSize: area, staffHeight: height, bold: bool(.boldLines, for: piece), lineGap: lineGap(for: piece), centred: centred,
                              oneLine: height > Self.largestPageSize, playingOrder: bool(.playingOrder, for: piece),
                              keyReminders: bool(.keyReminders, for: piece))
     }

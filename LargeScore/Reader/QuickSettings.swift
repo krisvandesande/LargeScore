@@ -52,6 +52,23 @@ struct QuickSettings: View {
                         .accessibilityValue(Text("Size \(step.wrappedValue + 1) of \(count)"))
                     }
                     .air(.top, 8)
+                    // The room between lines of music, from tight to roomy.
+                    let gap = gapBinding(scope)
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack {
+                            Text("Space Between Lines")
+                            Spacer(minLength: 16)
+                            Text("\(gap.wrappedValue + 1) of \(ReaderSettings.maxLineGap + 1)").foregroundStyle(.secondary)
+                        }
+                        .accessibilityHidden(true)
+                        StepSlider(value: gap.wrappedValue, count: ReaderSettings.maxLineGap + 1,
+                                   smaller: "arrow.down.and.line.horizontal.and.arrow.up",
+                                   larger: "arrow.up.and.line.horizontal.and.arrow.down") {
+                            gap.wrappedValue = $0
+                        }
+                        .accessibilityLabel("Space Between Lines")
+                        .accessibilityValue(Text("\(gap.wrappedValue + 1) of \(ReaderSettings.maxLineGap + 1)"))
+                    }
                 }
                 Section {
                     FittingPicker(String(localized: "Lines"), value: bool(.boldLines, scope).wrappedValue ? String(localized: "Bold") : String(localized: "Thin"),
@@ -85,7 +102,7 @@ struct QuickSettings: View {
             .navigationBarTitleDisplayMode(.inline)
         }
         // Tall enough for what shows, with no empty room under the last row.
-        .frame(idealWidth: 520, idealHeight: 676 + (settings.hasOwnSettings(pieceID) ? (scope == .all ? 126 : 86) : 0))
+        .frame(idealWidth: 520, idealHeight: 784 + (settings.hasOwnSettings(pieceID) ? (scope == .all ? 126 : 86) : 0))
         // Solid: the music showing through the glass makes the words hard to read.
         .presentationBackground(Color(.systemGroupedBackground))
     }
@@ -97,6 +114,15 @@ struct QuickSettings: View {
             ? Binding(get: { settings.sizeStep(for: piece) },
                       set: { settings.setSize($0 == settings.sizeStep ? nil : $0, for: piece) })
             : Binding(get: { settings.sizeStep }, set: { settings.sizeStep = $0 })
+    }
+
+    private func gapBinding(_ scope: Scope) -> Binding<Int> {
+        let settings = settings
+        let piece = pieceID
+        return scope == .piece
+            ? Binding(get: { settings.lineGap(for: piece) },
+                      set: { settings.set(.lineGap, to: String($0), for: piece) })
+            : Binding(get: { settings.lineGap }, set: { settings.lineGap = $0 })
     }
 
     private func bool(_ choice: ReaderSettings.Choice, _ scope: Scope) -> Binding<Bool> {
@@ -112,7 +138,7 @@ struct QuickSettings: View {
                 case .markFirstBar: settings.markFirstBar = on
                 case .playingOrder: settings.playingOrder = on
                 case .keyReminders: settings.keyReminders = on
-                case .pageColour: break
+                case .pageColour, .lineGap: break
                 }
             })
     }

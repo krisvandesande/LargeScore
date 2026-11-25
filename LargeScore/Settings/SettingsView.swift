@@ -67,7 +67,7 @@ struct SettingsView: View {
                     }
                 } footer: {
                     VStack(alignment: .leading, spacing: 6) {
-                        Text("New and changed MusicXML files in this folder are added to the library whenever Large Score comes to the front. A new version replaces the music of the piece and keeps your notes.")
+                        Text("Music in the Large Score folder in iCloud Drive is added by itself. A folder chosen here is read too: new and changed MusicXML files are added whenever Large Score comes to the front. A new version replaces the music of the piece and keeps your notes.")
                         if let result = folder.lastResult { Text(result) }
                     }
                     .formNote()

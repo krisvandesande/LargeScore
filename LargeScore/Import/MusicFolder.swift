@@ -2,10 +2,12 @@ import Foundation
 import SwiftData
 import UIKit
 
-/// A folder the player's notation program exports into (on the Mac, or in iCloud
-/// Drive). Whenever the app comes to the front, and every few seconds while it's open
-/// on a Mac, new and changed MusicXML files there are added to the library, or replace
-/// the music of the piece they're a new version of.
+/// Where music arrives by itself: Large Score's own folder in iCloud Drive (shown as
+/// "Large Score" on every device; the Converter on the Mac Pro puts music there), and
+/// a folder the player may choose, which a notation program exports into. Whenever the
+/// app comes to the front, and every few seconds while it's open on a Mac, new and
+/// changed MusicXML files there are added to the library, or replace the music of the
+/// piece they're a new version of.
 @Observable
 final class MusicFolder {
     private(set) var folderName: String?
@@ -19,6 +21,22 @@ final class MusicFolder {
     private enum Key {
         static let bookmark = "musicFolderBookmark"
         static let seen = "musicFolderSeen"
+        static let inboxSeen = "iCloudFolderSeen"
+    }
+
+    nonisolated static let container = "iCloud.com.kvds.LargeScore"
+
+    /// Large Score's own folder in iCloud Drive, once iCloud has answered; nil with
+    /// iCloud off. Asked for off the main thread, as Apple requires.
+    private var inbox: URL?
+    private var askedForInbox = false
+
+    @concurrent
+    nonisolated static func findInbox() async -> URL? {
+        guard let root = FileManager.default.url(forUbiquityContainerIdentifier: container) else { return nil }
+        let documents = root.appendingPathComponent("Documents", isDirectory: true)
+        try? FileManager.default.createDirectory(at: documents, withIntermediateDirectories: true)
+        return documents
     }
 
     init(store: UserDefaults = .standard) {
@@ -73,12 +91,21 @@ final class MusicFolder {
     /// Looks for new and changed files and brings them in. Pieces it can't place
     /// (no part to choose by the player's instruments) go to the import sheet.
     func look(instruments: [Instrument], context: ModelContext, importer: ImportCoordinator) async {
-        guard !looking, let folder = resolve() else { return }
+        guard !looking else { return }
         looking = true
         defer { looking = false }
-        let seen = store.dictionary(forKey: Key.seen) as? [String: Double] ?? [:]
+        if !askedForInbox {
+            askedForInbox = true
+            inbox = await Self.findInbox()
+        }
+        if let inbox { await bringIn(from: inbox, seenKey: Key.inboxSeen, instruments: instruments, context: context, importer: importer) }
+        if let folder = resolve() { await bringIn(from: folder, seenKey: Key.seen, instruments: instruments, context: context, importer: importer) }
+    }
+
+    private func bringIn(from folder: URL, seenKey: String, instruments: [Instrument], context: ModelContext, importer: ImportCoordinator) async {
+        let seen = store.dictionary(forKey: seenKey) as? [String: Double] ?? [:]
         let (changed, stamps) = await Self.changedFiles(in: folder, seen: seen)
-        store.set(stamps, forKey: Key.seen)
+        store.set(stamps, forKey: seenKey)
         guard !changed.isEmpty else { return }
 
         // The files are read through the folder's access, kept open meanwhile.

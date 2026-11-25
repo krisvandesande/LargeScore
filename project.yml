@@ -68,6 +68,14 @@ targets:
         ITSAppUsesNonExemptEncryption: false
         UIBackgroundModes: [remote-notification]
         LSSupportsOpeningDocumentsInPlace: true
+        # Large Score's own folder in iCloud Drive, shown as "Large Score" on every
+        # device: music put there (by the Converter on the Mac Pro, or by hand) is added
+        # by itself, with no folder to choose.
+        NSUbiquitousContainers:
+          iCloud.com.kvds.LargeScore:
+            NSUbiquitousContainerIsDocumentScopePublic: true
+            NSUbiquitousContainerName: Large Score
+            NSUbiquitousContainerSupportedFolderLevels: Any
         CFBundleDocumentTypes:
           - CFBundleTypeName: MusicXML
             CFBundleTypeRole: Viewer

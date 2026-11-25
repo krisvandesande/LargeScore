@@ -50,14 +50,22 @@ final class ConversionQueue: ObservableObject {
     }
 
     /// The folder in iCloud Drive the iPad reads.
-    /// `LARGESCORE_LIBRARY_FOLDER` names another, for the tests.
+    /// Large Score's own folder in iCloud Drive ("Large Score", read by every Large
+    /// Score app by itself), once iCloud has brought it to this Mac; until then the
+    /// "Large Score" folder made in iCloud Drive itself, which the apps read when it's
+    /// chosen in their Settings. `LARGESCORE_LIBRARY_FOLDER` names another, for the tests.
     nonisolated static var libraryFolder: URL {
         if let other = ProcessInfo.processInfo.environment["LARGESCORE_LIBRARY_FOLDER"] {
             return URL(fileURLWithPath: other, isDirectory: true)
         }
-        return FileManager.default.homeDirectoryForCurrentUser
-            .appendingPathComponent("Library/Mobile Documents/com~apple~CloudDocs/Large Score", isDirectory: true)
+        let mobile = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Library/Mobile Documents", isDirectory: true)
+        let own = mobile.appendingPathComponent("iCloud~com~kvds~LargeScore/Documents", isDirectory: true)
+        if FileManager.default.fileExists(atPath: own.path) { return own }
+        return mobile.appendingPathComponent("com~apple~CloudDocs/Large Score", isDirectory: true)
     }
+
+    /// Whether music sent now reaches the apps without a folder being chosen.
+    nonisolated static var sendsToOwnFolder: Bool { libraryFolder.path.contains("iCloud~com~kvds~LargeScore") }
 
     private static var listURL: URL { home.appendingPathComponent("pieces.json") }
 

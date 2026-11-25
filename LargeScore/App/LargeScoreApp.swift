@@ -60,8 +60,9 @@ struct RootView: View {
                 ImportSheet(session: session)
             }
             .onChange(of: phase, initial: true) { _, now in
-                // The music folder is looked at whenever the app comes to the front.
-                guard now == .active, folder.isSet else { folder.stopWatching(); return }
+                // Music folders are looked at whenever the app comes to the front: Large
+                // Score's own in iCloud Drive always, a chosen one too.
+                guard now == .active else { folder.stopWatching(); return }
                 let look = { Task { await folder.look(instruments: settings.instruments, context: context, importer: importer) } }
                 _ = look()
                 folder.startWatching { _ = look() }

@@ -37,6 +37,16 @@
         }
       }
     },
+    "%@ is in the Large Score folder in iCloud Drive. Choose that folder in Large Score's Settings, Music Folder, to add it.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ staat in de map Large Score in iCloud Drive. Kies die map in Large Score bij Instellingen, Muziekmap, om het toe te voegen."
+          }
+        }
+      }
+    },
     "%@ is in the library. The iPad shows it within a minute.": {
       "localizations": {
         "nl": {
@@ -1000,6 +1010,16 @@
         }
       }
     },
+    "Details": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Details"
+          }
+        }
+      }
+    },
     "Discard Fixes": {
       "localizations": {
         "nl": {
@@ -1096,6 +1116,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Elke PDF wordt omgezet naar muziek die je met de PDF kunt vergelijken, verbeteren en naar de bibliotheek op de iPad sturen."
+          }
+        }
+      }
+    },
+    "Edit Details": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Details wijzigen"
           }
         }
       }
@@ -1580,6 +1610,16 @@
         }
       }
     },
+    "Music in the Large Score folder in iCloud Drive is added by itself. A folder chosen here is read too: new and changed MusicXML files are added whenever Large Score comes to the front. A new version replaces the music of the piece and keeps your notes.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Muziek in de map Large Score in iCloud Drive wordt vanzelf toegevoegd. Een map die je hier kiest wordt ook gelezen: nieuwe en gewijzigde MusicXML-bestanden worden toegevoegd telkens Large Score op de voorgrond komt. Een nieuwe versie vervangt de muziek van het stuk en behoudt je notities."
+          }
+        }
+      }
+    },
     "Music size": {
       "localizations": {
         "nl": {
@@ -1636,16 +1676,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Nieuw programma"
-          }
-        }
-      }
-    },
-    "New and changed MusicXML files in this folder are added to the library whenever Large Score comes to the front. A new version replaces the music of the piece and keeps your notes.": {
-      "localizations": {
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nieuwe en gewijzigde MusicXML-bestanden in deze map komen in de bibliotheek telkens Large Score op de voorgrond komt. Een nieuwe versie vervangt de muziek van het stuk en houdt je notities."
           }
         }
       }
@@ -2357,7 +2387,7 @@
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ruimte tussen regels"
+            "value": "Ruimte tussen de regels"
           }
         }
       }

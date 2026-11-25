@@ -16,6 +16,7 @@
 		1269B8088591BB87021DE519 /* ConversionQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = C692B1C61581D8F2849703B4 /* ConversionQueue.swift */; };
 		13D9886FB2B8EE31F95311E9 /* Annotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA97B65AA93ABF968F556EF2 /* Annotation.swift */; };
 		15518B7968D3DD9DC0A07FCE /* evening-air-alto.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = 70789DA4CC8E4B5CFF85F2F5 /* evening-air-alto.musicxml */; };
+		17B4004738979B7D3267836B /* DetailsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE53EADD1E9CD5D7DBA28D8A /* DetailsTests.swift */; };
 		1845795E420ABF434E131392 /* CompareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E19AAC2327854B917708BCEE /* CompareView.swift */; };
 		1DD80247DAF2D1D917307950 /* KeyReminders.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7D24DD2FAB6CD2CB0C1A9A3 /* KeyReminders.swift */; };
 		1E3E694D612E7296C55AA653 /* LayoutKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = A64C9C1F5D246BD26E7EB0ED /* LayoutKit.swift */; };
@@ -202,6 +203,7 @@
 		B1D60A5D10C3B9173796CC05 /* ConversionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversionTests.swift; sourceTree = "<group>"; };
 		B770B7CA621635E8184DEDB0 /* Engraver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Engraver.swift; sourceTree = "<group>"; };
 		BC28BC7AB931DB55F6791614 /* Score.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Score.swift; sourceTree = "<group>"; };
+		BE53EADD1E9CD5D7DBA28D8A /* DetailsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailsTests.swift; sourceTree = "<group>"; };
 		BEA09A15929E52433660615B /* ImportTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportTests.swift; sourceTree = "<group>"; };
 		C0D8417E61C09893DAEEE5C3 /* RenderOutput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenderOutput.swift; sourceTree = "<group>"; };
 		C288A269A2E3EA86DD034CE5 /* MusicFolder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicFolder.swift; sourceTree = "<group>"; };
@@ -372,6 +374,7 @@
 			children = (
 				B1D60A5D10C3B9173796CC05 /* ConversionTests.swift */,
 				DD0A5935BC4C624F27CA3BDA /* DemoScoreTests.swift */,
+				BE53EADD1E9CD5D7DBA28D8A /* DetailsTests.swift */,
 				619AF0CC40BEA89874498859 /* EngravingTests.swift */,
 				11987A0C4C4B64976C2055A3 /* FixNotesTests.swift */,
 				55357AD4C01A37DA6BAE963E /* harmony-and-tempo.musicxml */,
@@ -802,6 +805,7 @@
 			files = (
 				227C58F7FEF2C1E1115D5CBE /* ConversionTests.swift in Sources */,
 				6C5230809976AF506D9F3CBE /* DemoScoreTests.swift in Sources */,
+				17B4004738979B7D3267836B /* DetailsTests.swift in Sources */,
 				4B55282274225FC6D37EF85D /* EngravingTests.swift in Sources */,
 				7F531218DC3CF616015B717C /* FixNotesTests.swift in Sources */,
 				2AD6FA9985243F747B68EB9B /* ImportTests.swift in Sources */,
