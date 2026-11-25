@@ -14,7 +14,6 @@ struct FixPanel: View {
     }
 
     static let times: [(Int, Int)] = [(2, 4), (3, 4), (4, 4), (5, 4), (2, 2), (3, 8), (6, 8), (9, 8), (12, 8)]
-    private let grid = [GridItem(.adaptive(minimum: 140), spacing: 8, alignment: .leading)]
 
     var body: some View {
         ScrollView {
@@ -63,14 +62,17 @@ struct FixPanel: View {
             if let summary = model.selectedSummary {
                 Text(summary).font(.title3.weight(.semibold))
             }
-            LazyVGrid(columns: grid, alignment: .leading, spacing: 8) {
-                if !model.selectedIsRest {
+            // Pitch, length, then the note itself: one row each, every button its own width.
+            if !model.selectedIsRest {
+                row {
                     fixButton("Higher") { model.apply(.step(1)) }.keyboardShortcut(.upArrow, modifiers: [])
                     fixButton("Lower") { model.apply(.step(-1)) }.keyboardShortcut(.downArrow, modifiers: [])
                     fixButton("Sharp") { model.apply(.accidental(.sharp)) }
                     fixButton("Flat") { model.apply(.accidental(.flat)) }
                     fixButton("Natural") { model.apply(.accidental(.natural)) }
                 }
+            }
+            row {
                 Menu {
                     ForEach(MusicXMLEdit.Length.allCases, id: \.self) { length in
                         Button(FixModel.name(length) + (length == model.selectedLength ? " ✓" : "")) {
@@ -78,14 +80,16 @@ struct FixPanel: View {
                         }
                     }
                 } label: {
-                    Text("Length").font(.body)
+                    Text("Length")
                 }
-                .controlSize(.large)
+                .fixedSize()
                 .accessibilityValue(Text(model.selectedLength.map(FixModel.name) ?? ""))
                 fixButton(model.selectedHasDot ? "Remove Dot" : "Dot") { model.apply(.toggleDot) }
                 if !model.selectedIsRest {
                     fixButton(model.selectedIsTied ? "Remove Tie" : "Tie to Next") { model.apply(.toggleTie) }
                 }
+            }
+            row {
                 fixButton(model.selectedIsRest ? "Make Note" : "Make Rest") { model.apply(.toggleRest) }
                 fixButton("Add Note After") { model.addNote() }
                 fixButton("Delete Note") { model.deleteNote() }.keyboardShortcut(.delete, modifiers: [])
@@ -98,7 +102,7 @@ struct FixPanel: View {
             if let bar = model.selectedBar, let number = model.barNumbers[bar] {
                 Text("Bar \(number)").font(.title3.weight(.semibold))
             }
-            LazyVGrid(columns: grid, alignment: .leading, spacing: 8) {
+            row {
                 fixButton("Rehearsal Mark") { words = ""; asking = .rehearsal }
                 fixButton("Tempo") { words = ""; asking = .tempo }
                 fixButton("Fermata") { model.add(.fermata) }
@@ -107,24 +111,28 @@ struct FixPanel: View {
                         Button(mark) { model.addDynamic(mark) }
                     }
                 } label: {
-                    Text("Dynamic").font(.body)
+                    Text("Dynamic")
                 }
-                .controlSize(.large)
+                .fixedSize()
                 Menu {
                     ForEach(0..<Self.times.count, id: \.self) { index in
                         let time = Self.times[index]
                         Button("\(time.0)/\(time.1)") { model.setTime(beats: time.0, beatType: time.1) }
                     }
                 } label: {
-                    Text("Time Signature").font(.body)
+                    Text("Time Signature")
                 }
-                .controlSize(.large)
-                if model.selectedNote == nil {
-                    fixButton("Add Note") { model.addNote() }
-                }
-                if model.selectedBarIsRest {
-                    fixButton("Bars of Rest") { words = "\(model.selectedRestBars)"; asking = .restBars }
-                        .accessibilityValue(Text("\(model.selectedRestBars)"))
+                .fixedSize()
+            }
+            if model.selectedNote == nil || model.selectedBarIsRest {
+                row {
+                    if model.selectedNote == nil {
+                        fixButton("Add Note") { model.addNote() }
+                    }
+                    if model.selectedBarIsRest {
+                        fixButton("Bars of Rest") { words = "\(model.selectedRestBars)"; asking = .restBars }
+                            .accessibilityValue(Text("\(model.selectedRestBars)"))
+                    }
                 }
             }
             ForEach(model.selectedWords) { item in
@@ -140,10 +148,14 @@ struct FixPanel: View {
     }
 
     private func fixButton(_ title: LocalizedStringKey, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            Text(title).font(.body).frame(maxWidth: .infinity)
-        }
-        .controlSize(.large)
+        Button(title, action: action)
+    }
+
+    /// Buttons side by side at their own widths.
+    private func row<Content: View>(@ViewBuilder _ content: () -> Content) -> some View {
+        HStack(spacing: 8) { content() }
+            .controlSize(.large)
+            .fixedSize()
     }
 
     private func title(_ question: Question) -> LocalizedStringKey {

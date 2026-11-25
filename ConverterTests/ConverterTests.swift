@@ -108,6 +108,8 @@ nonisolated final class ConverterTests: XCTestCase, @unchecked Sendable {
         model.selectedNote = id
         model.selectedBar = scene.measure(at: CGPoint(x: box.midX, y: box.midY), reach: 2)
         draw(scene, selectedNote: id, selectedBar: model.selectedBar, name: "page-selected")
+        // The fix buttons for that note and its bar, as the panel shows them.
+        picture(FixPanel(model: model).frame(width: 640, height: 300), size: CGSize(width: 640, height: 300), name: "fix-panel")
     }
 
     /// The window as it looks, drawn off screen: the list and a piece being fixed.

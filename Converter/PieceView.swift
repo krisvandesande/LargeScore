@@ -15,6 +15,13 @@ struct PieceView: View {
         _model = StateObject(wrappedValue: FixModel(xml: xml))
     }
 
+    private func send() {
+        queue.saveFixes(model.xml, for: job)
+        model.markSaved()
+        message = queue.send(job, xml: model.xml, checked: checked)
+            ?? String(localized: "\(job.title) is in the library. The iPad shows it within a minute.")
+    }
+
     var body: some View {
         HSplitView {
             // The music takes the height; the buttons keep a fixed band under it.
@@ -23,13 +30,28 @@ struct PieceView: View {
                 Divider()
                 FixPanel(model: model)
                     .frame(height: 220)
+                Divider()
+                // The last step for a piece, under everything else.
+                HStack(spacing: 16) {
+                    Toggle("Checked Against the PDF", isOn: $checked)
+                        .toggleStyle(.checkbox)
+                        .help("Ticked, the iPad no longer marks the piece Check Against the PDF")
+                    Spacer()
+                    Button("Send to Library", action: send)
+                        .keyboardShortcut(.return, modifiers: .command)
+                        .controlSize(.large)
+                        .buttonStyle(.borderedProminent)
+                        .help("Put the music and the PDF in iCloud Drive for the iPad (⌘Return)")
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
             }
-            .frame(minWidth: 420)
+            .frame(minWidth: 480)
             PDFPane(url: queue.pdf(of: job))
                 .frame(minWidth: 320)
         }
         .toolbar {
-            ToolbarItemGroup(placement: .primaryAction) {
+            ToolbarItem(placement: .primaryAction) {
                 Button {
                     model.undo()
                 } label: {
@@ -38,19 +60,6 @@ struct PieceView: View {
                 .disabled(!model.canUndo)
                 .keyboardShortcut("z")
                 .help("Undo the last fix (⌘Z)")
-                Toggle("Checked Against the PDF", isOn: $checked)
-                    .toggleStyle(.checkbox)
-                    .help("Ticked, the iPad no longer marks the piece Check Against the PDF")
-                Button {
-                    queue.saveFixes(model.xml, for: job)
-                    model.markSaved()
-                    message = queue.send(job, xml: model.xml, checked: checked)
-                        ?? String(localized: "\(job.title) is in the library. The iPad shows it within a minute.")
-                } label: {
-                    Text("Send to Library")
-                }
-                .keyboardShortcut(.return, modifiers: .command)
-                .help("Put the music and the PDF in iCloud Drive for the iPad (⌘Return)")
             }
         }
         .navigationTitle(job.title)
