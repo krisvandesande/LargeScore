@@ -34,6 +34,7 @@
 		4671B617995AEB38015B2608 /* NotesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D4E0A9194472104B818A2C /* NotesTests.swift */; };
 		49B0D03FE11C4AFCF5689BBF /* MusicFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11E71A1975CE6270736A016C /* MusicFile.swift */; };
 		4B55282274225FC6D37EF85D /* EngravingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 619AF0CC40BEA89874498859 /* EngravingTests.swift */; };
+		4DCB456F9EBC786FC9975A53 /* QuickSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16D58D50574FDFF95911C6EB /* QuickSettings.swift */; };
 		56162D7F02D5255C0286C0B4 /* evening-air-quartet.mxl in Resources */ = {isa = PBXBuildFile; fileRef = 8A52E6CE0252C886FD197F00 /* evening-air-quartet.mxl */; };
 		57635CA06508C611ADC0212C /* ReaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D849716F934CBA7A3FD4D00 /* ReaderView.swift */; };
 		5B22D0267645D2CAE06D9E00 /* OneLine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049D9F39E098D68EA2B24425 /* OneLine.swift */; };
@@ -99,6 +100,7 @@
 		0D3C8381AA93F40B9C09CF5B /* converted-by-audiveris.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "converted-by-audiveris.pdf"; sourceTree = "<group>"; };
 		11987A0C4C4B64976C2055A3 /* FixNotesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixNotesTests.swift; sourceTree = "<group>"; };
 		11E71A1975CE6270736A016C /* MusicFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicFile.swift; sourceTree = "<group>"; };
+		16D58D50574FDFF95911C6EB /* QuickSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickSettings.swift; sourceTree = "<group>"; };
 		17268AD31FC953CCF78E7F0A /* LibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryView.swift; sourceTree = "<group>"; };
 		1F8F166C31D3BB62BA66B3B9 /* ZipReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZipReader.swift; sourceTree = "<group>"; };
 		2135B1AA56EFBB86D0F3C587 /* ImportSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportSheet.swift; sourceTree = "<group>"; };
@@ -240,6 +242,7 @@
 				E19AAC2327854B917708BCEE /* CompareView.swift */,
 				86C0F5F1A0FE25C6907142DD /* FixSession.swift */,
 				F44D8CA440E27E7D7D2037D8 /* PageTurner.swift */,
+				16D58D50574FDFF95911C6EB /* QuickSettings.swift */,
 				2D849716F934CBA7A3FD4D00 /* ReaderView.swift */,
 				AF478BA8ECBAAE9FED7D8264 /* ScoreCanvas.swift */,
 			);
@@ -542,6 +545,7 @@
 				7D1319FD90D71337F5CBCAD0 /* PartSplitter.swift in Sources */,
 				3FDD5D05C6B5B9CACE5AEBCB /* Programme.swift in Sources */,
 				D903682E9AF2C340AAA29888 /* ProgrammesView.swift in Sources */,
+				4DCB456F9EBC786FC9975A53 /* QuickSettings.swift in Sources */,
 				C01B1F925B264F392B764D52 /* ReaderSettings.swift in Sources */,
 				57635CA06508C611ADC0212C /* ReaderView.swift in Sources */,
 				E78147419B69271BDDC75854 /* SVGScene.swift in Sources */,

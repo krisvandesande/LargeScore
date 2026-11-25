@@ -102,7 +102,8 @@ struct ReaderView: View {
                 ReaderStrip(title: piece.title, backTitle: backTitle, pageText: pageText,
                             nextTitle: nextPiece?.title,
                             back: { dismiss() }, next: { goToNextPiece() },
-                            notes: notes?.canAnnotate == true ? { startAnnotating() } : nil)
+                            notes: notes?.canAnnotate == true ? { startAnnotating() } : nil,
+                            pieceID: piece.id)
             }
         }
         .environment(\.colorScheme, scheme)
@@ -447,13 +448,16 @@ struct ReaderStrip: View {
     let back: () -> Void
     var next: () -> Void = {}
     var notes: (() -> Void)? = nil
+    /// The piece read, for the quick settings' size; none, no settings button.
+    var pieceID: String? = nil
+    @State private var showingSettings = false
 
     var body: some View {
         ViewThatFits(in: .horizontal) {
             row(showTitle: true)
             row(showTitle: false)
             VStack(alignment: .leading, spacing: 12) {
-                HStack(spacing: 16) { backButton; Spacer(minLength: 0); notesButton }
+                HStack(spacing: 16) { backButton; Spacer(minLength: 0); notesButton; settingsButton }
                 HStack(spacing: 16) { pageLabel; Spacer(minLength: 0); nextButton }
             }
         }
@@ -482,6 +486,22 @@ struct ReaderStrip: View {
             pageLabel
             nextButton
             notesButton
+            settingsButton
+        }
+    }
+
+    @ViewBuilder
+    private var settingsButton: some View {
+        if let pieceID {
+            Button { showingSettings = true } label: {
+                Label("Settings", systemImage: "gearshape")
+                    .fixedSize()
+            }
+            .buttonStyle(.large)
+            .accessibilityShowsLargeContentViewer()
+            .popover(isPresented: $showingSettings) {
+                QuickSettings(pieceID: pieceID)
+            }
         }
     }
 
