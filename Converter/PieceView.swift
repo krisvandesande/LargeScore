@@ -22,7 +22,7 @@ struct PieceView: View {
                 MusicPane(model: model)
                 Divider()
                 FixPanel(model: model)
-                    .frame(height: 280)
+                    .frame(height: 220)
             }
             .frame(minWidth: 420)
             PDFPane(url: queue.pdf(of: job))

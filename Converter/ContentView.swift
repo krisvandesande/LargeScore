@@ -13,7 +13,7 @@ struct ContentView: View {
             List(selection: $selection) {
                 if let problem = queue.problem {
                     Text(problem)
-                        .font(.readingBold)
+                        .font(.headline)
                         .foregroundColor(.orange)
                         .padding(.vertical, 4)
                 }
@@ -70,14 +70,14 @@ struct ContentView: View {
         } else if queue.jobs.isEmpty {
             VStack(spacing: 20) {
                 Text("Drag PDFs here")
-                    .font(.readingTitle)
+                    .font(.largeTitle.weight(.semibold))
                 Text("Each one is converted to music you can check against the PDF, fix, and send to the library on the iPad.")
-                    .font(.reading)
+                    .font(.body)
                     .foregroundColor(.secondary)
                     .multilineTextAlignment(.center)
                     .frame(maxWidth: 520)
                 Button { queue.choosePDFs() } label: {
-                    Text("Add PDFs…").font(.reading).padding(.horizontal, 8)
+                    Text("Add PDFs…").font(.body).padding(.horizontal, 8)
                 }
                 .controlSize(.large)
             }
@@ -115,12 +115,11 @@ private struct JobRow: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(job.title)
-                .font(.readingBold)
+                .font(.headline)
                 .lineLimit(2)
             HStack(spacing: 6) {
                 if job.state == .converting { ProgressView().controlSize(.small) }
                 Text(status)
-                    .font(.system(size: 17))
                     .foregroundColor(.secondary)
             }
         }
@@ -144,7 +143,7 @@ private struct Placeholder: View {
 
     var body: some View {
         Text(text)
-            .font(.reading)
+            .font(.body)
             .foregroundColor(.secondary)
             .multilineTextAlignment(.center)
             .padding(40)

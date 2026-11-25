@@ -14,25 +14,25 @@ struct FixPanel: View {
     }
 
     static let times: [(Int, Int)] = [(2, 4), (3, 4), (4, 4), (5, 4), (2, 2), (3, 8), (6, 8), (9, 8), (12, 8)]
-    private let grid = [GridItem(.adaptive(minimum: 190), spacing: 8, alignment: .leading)]
+    private let grid = [GridItem(.adaptive(minimum: 140), spacing: 8, alignment: .leading)]
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 if let problem = model.problem {
                     Text(problem)
-                        .font(.readingBold)
+                        .font(.headline)
                         .foregroundColor(.orange)
                 }
                 if !model.wrongBars.isEmpty {
                     Text(wrongBarsText)
-                        .font(.reading)
+                        .font(.body)
                 }
                 if model.selectedNote != nil { noteButtons }
                 if model.selectedBar != nil { barButtons }
                 if model.selectedNote == nil && model.selectedBar == nil {
                     Text("Click a note or a bar to fix it.")
-                        .font(.reading)
+                        .font(.body)
                         .foregroundColor(.secondary)
                 }
             }
@@ -61,7 +61,7 @@ struct FixPanel: View {
     private var noteButtons: some View {
         VStack(alignment: .leading, spacing: 8) {
             if let summary = model.selectedSummary {
-                Text(summary).font(.readingHeading)
+                Text(summary).font(.title3.weight(.semibold))
             }
             LazyVGrid(columns: grid, alignment: .leading, spacing: 8) {
                 if !model.selectedIsRest {
@@ -78,7 +78,7 @@ struct FixPanel: View {
                         }
                     }
                 } label: {
-                    Text("Length").font(.reading)
+                    Text("Length").font(.body)
                 }
                 .controlSize(.large)
                 .accessibilityValue(Text(model.selectedLength.map(FixModel.name) ?? ""))
@@ -96,7 +96,7 @@ struct FixPanel: View {
     private var barButtons: some View {
         VStack(alignment: .leading, spacing: 8) {
             if let bar = model.selectedBar, let number = model.barNumbers[bar] {
-                Text("Bar \(number)").font(.readingHeading)
+                Text("Bar \(number)").font(.title3.weight(.semibold))
             }
             LazyVGrid(columns: grid, alignment: .leading, spacing: 8) {
                 fixButton("Rehearsal Mark") { words = ""; asking = .rehearsal }
@@ -107,7 +107,7 @@ struct FixPanel: View {
                         Button(mark) { model.addDynamic(mark) }
                     }
                 } label: {
-                    Text("Dynamic").font(.reading)
+                    Text("Dynamic").font(.body)
                 }
                 .controlSize(.large)
                 Menu {
@@ -116,7 +116,7 @@ struct FixPanel: View {
                         Button("\(time.0)/\(time.1)") { model.setTime(beats: time.0, beatType: time.1) }
                     }
                 } label: {
-                    Text("Time Signature").font(.reading)
+                    Text("Time Signature").font(.body)
                 }
                 .controlSize(.large)
                 if model.selectedNote == nil {
@@ -129,7 +129,7 @@ struct FixPanel: View {
             }
             ForEach(model.selectedWords) { item in
                 HStack(spacing: 8) {
-                    Text(item.text).font(.readingBold)
+                    Text(item.text).font(.headline)
                     fixButton("Change") { words = item.text; asking = .change(item.index) }
                         .accessibilityLabel(Text("Change \(item.text)"))
                     fixButton("Delete") { model.setWords(at: item.index, to: "") }
@@ -141,7 +141,7 @@ struct FixPanel: View {
 
     private func fixButton(_ title: LocalizedStringKey, action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            Text(title).font(.reading).frame(maxWidth: .infinity)
+            Text(title).font(.body).frame(maxWidth: .infinity)
         }
         .controlSize(.large)
     }
@@ -193,9 +193,9 @@ private struct WordsSheet: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text(title).font(.readingHeading)
+            Text(title).font(.title3.weight(.semibold))
             TextField(prompt, text: $text)
-                .font(.reading)
+                .font(.body)
                 .textFieldStyle(.roundedBorder)
                 .onSubmit(done)
             HStack {

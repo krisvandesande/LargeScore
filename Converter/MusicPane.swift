@@ -18,7 +18,7 @@ struct MusicPane: View {
                 VStack(spacing: 16) {
                     if failed {
                         Text("This music couldn't be shown.")
-                            .font(.reading)
+                            .font(.body)
                             .padding(40)
                     }
                     ForEach(pages.indices, id: \.self) { index in

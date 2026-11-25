@@ -30,21 +30,69 @@ xcodebuild -project LargeScore.xcodeproj -scheme LargeScoreConverter -configurat
   CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO \
   build | grep -E "error:|warning: .*sign|BUILD" || true
 
-app="build/ddconv/Build/Products/Release/Large Score Converter.app"
+app="$PWD/build/ddconv/Build/Products/Release/Large Score Converter.app"
 [ -d "$app" ] || { echo "error: the build failed" >&2; exit 1; }
 lipo -info "$app/Contents/MacOS/Large Score Converter"
+
+# Audiveris inside the app (Contents/Helpers), signed from the inside out with the
+# same Developer ID: notarisation checks every program and library, the native
+# libraries inside its jars included.
+[ -d vendor/audiveris/Audiveris.app ] || scripts/fetch-audiveris.sh
+helper="$app/Contents/Helpers/Audiveris.app"
+rm -rf "$app/Contents/Helpers" && mkdir -p "$app/Contents/Helpers"
+ditto vendor/audiveris/Audiveris.app "$helper"
+entitlements=scripts/audiveris.entitlements
+sign() { codesign --force --timestamp --options runtime --sign "$identity" "$@"; }
+while IFS= read -r -d '' jar; do
+  # Jars that carry native code for the Mac: every Mach-O file inside, whatever its
+  # name (Tesseract's own program has no extension).
+  # Listed first, then tested: a pipe into grep -q fails under pipefail when grep
+  # stops reading early, which skipped jars at random.
+  listing=$(unzip -Z1 "$jar" 2>/dev/null || true)
+  grep -qE '\.(dylib|jnilib)$|macosx|darwin' <<< "$listing" || continue
+  tmp=$(mktemp -d)
+  (cd "$tmp" && unzip -o -q "$jar" < /dev/null)
+  natives=()
+  while IFS= read -r -d '' f; do
+    [[ $(file -b "$f") == *Mach-O* ]] || continue
+    sign "$f" >/dev/null
+    natives+=("${f#$tmp/}")
+  done < <(find "$tmp" -type f -print0)
+  [ ${#natives[@]} -gt 0 ] && (cd "$tmp" && zip -q "$jar" "${natives[@]}")
+  rm -rf "$tmp"
+done < <(find "$helper" -name '*.jar' -print0)
+while IFS= read -r -d '' file; do
+  [[ $(file -b "$file") == *Mach-O* ]] || continue
+  case "$file" in
+    */Contents/MacOS/*|*/bin/*|*jspawnhelper) sign --entitlements "$entitlements" "$file" >/dev/null ;;
+    *) sign "$file" >/dev/null ;;
+  esac
+done < <(find "$helper" -type f -print0)
+# Nothing unsigned may be left inside a jar: notarisation looks inside them.
+while IFS= read -r -d '' jar; do
+  tmp=$(mktemp -d)
+  (cd "$tmp" && unzip -o -q "$jar" < /dev/null) || true
+  while IFS= read -r -d '' f; do
+    [[ $(file -b "$f") == *Mach-O* ]] || continue
+    codesign --verify "$f" 2>/dev/null || { echo "error: unsigned native code in $(basename "$jar"): ${f#$tmp/}" >&2; exit 1; }
+  done < <(find "$tmp" -type f -print0)
+  rm -rf "$tmp"
+done < <(find "$helper" -name '*.jar' -print0)
+sign --entitlements "$entitlements" "$helper" >/dev/null
+# The Converter itself again, over its new contents.
+sign --preserve-metadata=entitlements "$app" >/dev/null
 codesign --verify --strict --deep "$app"
 
 zip="$out/Large Score Converter.zip"
 rm -f "$zip"
 ditto -c -k --keepParent "$app" "$zip"
 # The debugging entitlement Xcode adds would make Apple refuse it.
-if codesign -d --entitlements - "$app" 2>/dev/null | grep -q get-task-allow; then
+if [[ $(codesign -d --entitlements - "$app" 2>/dev/null || true) == *get-task-allow* ]]; then
   echo "error: the app still asks for get-task-allow" >&2; exit 1
 fi
 result=$(xcrun notarytool submit "$zip" --key "$ASC_KEY_PATH" --key-id "$ASC_KEY_ID" --issuer "$ASC_ISSUER_ID" --wait 2>&1)
 echo "$result"
-if ! echo "$result" | grep -q "status: Accepted"; then
+if [[ $result != *"status: Accepted"* ]]; then
   id=$(echo "$result" | sed -n 's/^ *id: //p' | head -n 1)
   echo "error: Apple didn't accept it. Why: xcrun notarytool log $id --key … --key-id … --issuer …" >&2
   exit 1

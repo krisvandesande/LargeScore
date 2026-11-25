@@ -480,12 +480,12 @@
         }
       }
     },
-    "Audiveris isn't in Applications, so PDFs can't be converted. Install it and open this app again.": {
+    "Audiveris is missing, so PDFs can't be converted. Download Large Score Converter again.": {
       "localizations": {
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Audiveris staat niet in Apps, dus PDF's kunnen niet worden omgezet. Installeer het en open deze app opnieuw."
+            "value": "Audiveris ontbreekt, dus PDF's kunnen niet worden omgezet. Download Large Score Converter opnieuw."
           }
         }
       }

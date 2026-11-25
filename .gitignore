@@ -18,3 +18,4 @@ scripts/asc.env
 
 ## The ensemble's own parts, for testing only (not ours to publish)
 Demo Scores/
+vendor/

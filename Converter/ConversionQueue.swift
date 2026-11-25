@@ -29,10 +29,14 @@ final class ConversionQueue: ObservableObject {
     @Published private(set) var problem: String?
     private var running = false
 
-    /// Audiveris in Applications; `AUDIVERIS` names another (as the Mac Pro's script
-    /// allows), which the tests use for a stand-in.
+    /// The Audiveris inside this app (release builds carry one in Contents/Helpers),
+    /// else one in Applications. `AUDIVERIS` names another, which the tests use for a
+    /// stand-in.
     nonisolated static var audiveris: URL {
-        URL(fileURLWithPath: ProcessInfo.processInfo.environment["AUDIVERIS"] ?? "/Applications/Audiveris.app/Contents/MacOS/Audiveris")
+        if let other = ProcessInfo.processInfo.environment["AUDIVERIS"] { return URL(fileURLWithPath: other) }
+        let bundled = Bundle.main.bundleURL.appendingPathComponent("Contents/Helpers/Audiveris.app/Contents/MacOS/Audiveris")
+        if FileManager.default.isExecutableFile(atPath: bundled.path) { return bundled }
+        return URL(fileURLWithPath: "/Applications/Audiveris.app/Contents/MacOS/Audiveris")
     }
 
     /// Application Support's "Large Score Converter"; `LARGESCORE_CONVERTER_HOME`
@@ -111,7 +115,7 @@ final class ConversionQueue: ObservableObject {
     private func runNext() {
         guard !running, let job = jobs.first(where: { $0.state == .waiting }) else { return }
         guard FileManager.default.isExecutableFile(atPath: Self.audiveris.path) else {
-            problem = String(localized: "Audiveris isn't in Applications, so PDFs can't be converted. Install it and open this app again.")
+            problem = String(localized: "Audiveris is missing, so PDFs can't be converted. Download Large Score Converter again.")
             return
         }
         problem = nil

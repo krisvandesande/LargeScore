@@ -2,8 +2,9 @@
 
 **Large Score Converter** (the Mac app in `Converter/`) replaces the steps below once
 it's signed: drag PDFs onto its window, check and fix each piece beside its PDF,
-and Send to Library. It needs Audiveris in Applications (step 2 below) and iCloud
-Drive on (step 1); the watched folder and `install.sh` are then not needed.
+and Send to Library. Audiveris 5.11 (Intel) is inside the app, so step 2 isn't
+needed; only iCloud Drive (step 1). The watched folder and `install.sh` are then
+not needed either.
 
 To install it: run `scripts/release-converter.sh` on the development Mac (it signs,
 notarises and staples), copy `build/converter/Large Score Converter.zip` to the Mac
