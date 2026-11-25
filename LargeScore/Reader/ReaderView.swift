@@ -484,9 +484,10 @@ struct ReaderStrip: View {
             }
             Spacer(minLength: 0)
             pageLabel
-            nextButton
             notesButton
             settingsButton
+            // At the right edge, the way the pages turn.
+            nextButton
         }
     }
 
@@ -495,10 +496,14 @@ struct ReaderStrip: View {
         if let pieceID {
             Button { showingSettings = true } label: {
                 Label("Settings", systemImage: "gearshape")
-                    .fixedSize()
+                    .labelStyle(.iconOnly)
+                    .font(.title2.weight(.semibold))
             }
-            .buttonStyle(.large)
-            .accessibilityShowsLargeContentViewer()
+            .buttonStyle(.largeRound)
+            .accessibilityLabel("Settings")
+            .accessibilityShowsLargeContentViewer {
+                Label("Settings", systemImage: "gearshape")
+            }
             .popover(isPresented: $showingSettings) {
                 QuickSettings(pieceID: pieceID)
             }
@@ -519,7 +524,7 @@ struct ReaderStrip: View {
     private var nextButton: some View {
         if let nextTitle {
             Button(action: next) {
-                Label { Text("Next: \(nextTitle)").lineLimit(1).fixedSize() } icon: { Image(systemName: "chevron.forward") }
+                Label { Text("Next Piece").lineLimit(1).fixedSize() } icon: { Image(systemName: "chevron.forward") }
                     .labelStyle(TrailingIcon())
             }
             .buttonStyle(.large)

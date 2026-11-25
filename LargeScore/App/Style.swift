@@ -40,6 +40,8 @@ extension View {
 /// A large capsule button with words: at least 64 pt tall, growing with the text.
 struct LargeButtonStyle: ButtonStyle {
     var prominent = false
+    /// An icon alone: a circle as tall as the words' buttons.
+    var round = false
     @ScaledMetric(relativeTo: .title3) private var height: CGFloat = 64
     @Environment(\.isEnabled) private var isEnabled
 
@@ -48,9 +50,9 @@ struct LargeButtonStyle: ButtonStyle {
             .font(.title3.weight(.semibold))
             .multilineTextAlignment(.center)
             .foregroundStyle(prominent ? Palette.onAccent : Palette.accent)
-            .padding(.horizontal, 28)
-            .air(.vertical, 8)
-            .frame(minHeight: height)
+            .padding(.horizontal, round ? 0 : 28)
+            .air(.vertical, round ? 0 : 8)
+            .frame(minWidth: round ? height : nil, minHeight: height)
             .background(prominent ? Palette.accent : Palette.buttonFill, in: PillShape(radius: 32))
             .opacity(isEnabled ? (configuration.isPressed ? 0.7 : 1) : 0.4)
             .contentShape(PillShape(radius: 32))
@@ -60,6 +62,7 @@ struct LargeButtonStyle: ButtonStyle {
 extension ButtonStyle where Self == LargeButtonStyle {
     static var large: LargeButtonStyle { LargeButtonStyle() }
     static var largeProminent: LargeButtonStyle { LargeButtonStyle(prominent: true) }
+    static var largeRound: LargeButtonStyle { LargeButtonStyle(round: true) }
 }
 
 /// A large title as the screens use it, wrapping rather than cutting.

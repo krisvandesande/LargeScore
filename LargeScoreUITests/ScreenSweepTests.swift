@@ -136,8 +136,6 @@ final class ScreenSweepTests: XCTestCase {
                 }
                 if !dark { audit(app, "library-\(sizeName)") }
 
-                app.buttons["Today"].firstMatch.tap()
-                shot(app, "11-today", variant: variant)
                 app.buttons["Programmes"].firstMatch.tap()
                 shot(app, "12-programmes", variant: variant)
                 app.buttons["Settings"].firstMatch.tap()
@@ -271,10 +269,6 @@ final class ScreenSweepTests: XCTestCase {
             sleep(1)
             shot(app, "51-programme", variant: variant)
             audit(app, "programme-\(sizeName)")
-            app.buttons["Today"].firstMatch.tap()
-            sleep(1)
-            shot(app, "52-today", variant: variant)
-            audit(app, "today-\(sizeName)")
             // Open the first piece and turn past its end into the second.
             app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "1,")).firstMatch.tap()
             let page = app.otherElements["page"]

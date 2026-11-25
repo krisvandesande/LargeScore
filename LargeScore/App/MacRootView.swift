@@ -46,7 +46,7 @@ struct MacRootView: View {
         }
         .onChange(of: section, initial: true) { _, now in
             switch now {
-            case .library, .today: selection = .library
+            case .library: selection = .library
             case .settings: selection = .settings
             case .programmes: break
             }

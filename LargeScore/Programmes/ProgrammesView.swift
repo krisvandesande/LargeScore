@@ -1,7 +1,7 @@
 import SwiftUI
 import SwiftData
 
-/// Every programme; one can be Today's.
+/// Every programme; one can be Today's, and the app opens on it.
 struct ProgrammesView: View {
     @Query(sort: \Programme.createdAt, order: .reverse) private var programmes: [Programme]
     @Environment(\.modelContext) private var context
@@ -10,6 +10,7 @@ struct ProgrammesView: View {
     @State private var newName = ""
     @State private var deleting: Programme?
     @State private var path: [Programme] = []
+    @MainActor private static var openedToday = false
 
     var body: some View {
         NavigationStack(path: $path) {
@@ -60,6 +61,16 @@ struct ProgrammesView: View {
             }
             .navigationDestination(for: Programme.self) { programme in
                 ProgrammeDetail(programme: programme)
+            }
+            .task {
+                // At launch, straight into Today's programme; only once, so coming
+                // back to this tab later shows the list.
+                guard !Self.openedToday, path.isEmpty else { return }
+                Self.openedToday = true
+                // Pinned on two devices at once, two can be Today: the oldest wins everywhere.
+                if let today = programmes.filter(\.isToday).min(by: { ($0.createdAt, $0.name) < ($1.createdAt, $1.name) }) {
+                    path = [today]
+                }
             }
             .onChange(of: commands.namingProgramme, initial: true) { _, asked in
                 if asked { naming = true; commands.namingProgramme = false }
@@ -157,7 +168,7 @@ struct ProgrammeDetail: View {
     }
 }
 
-/// The numbered list both a programme's page and the Today tab show. A piece moves
+/// A programme's pieces, numbered in playing order. A piece moves
 /// by touching and dragging it; VoiceOver has Move Up and Move Down.
 struct ProgrammePieces: View {
     let programme: Programme
@@ -349,37 +360,5 @@ private struct AddPiecesSheet: View {
             }
         }
         .presentationSizing(.page)
-    }
-}
-
-/// The Today tab: the pinned programme, ready to play.
-struct TodayView: View {
-    /// Pinned on two devices at once, two can be Today: the oldest wins everywhere.
-    @Query(filter: #Predicate<Programme> { $0.isToday }, sort: [SortDescriptor(\Programme.createdAt), SortDescriptor(\Programme.name)]) private var today: [Programme]
-    let showProgrammes: () -> Void
-
-    var body: some View {
-        NavigationStack {
-            if let programme = today.first {
-                ProgrammePieces(programme: programme, backTitle: "Today")
-                    .navigationTitle(programme.name)
-            } else {
-                VStack(spacing: 20) {
-                    Text("No programme for today")
-                        .font(.title.weight(.semibold))
-                    Text("Choose one in Programmes.")
-                        .font(.title3)
-                        .foregroundStyle(.secondary)
-                    Button("Go to Programmes", action: showProgrammes)
-                        .buttonStyle(.large)
-                }
-                .multilineTextAlignment(.center)
-                .fixedSize(horizontal: false, vertical: true)
-                .air(.all, 48)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(Palette.ground)
-                .navigationTitle("Today")
-            }
-        }
     }
 }

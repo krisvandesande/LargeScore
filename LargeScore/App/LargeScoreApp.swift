@@ -39,7 +39,7 @@ struct LargeScoreApp: App {
 }
 
 struct RootView: View {
-    enum Section: Hashable { case today, programmes, library, settings }
+    enum Section: Hashable { case programmes, library, settings }
 
     @Environment(ReaderSettings.self) private var settings
     @Environment(ImportCoordinator.self) private var importer
@@ -67,9 +67,9 @@ struct RootView: View {
                 folder.startWatching { _ = look() }
             }
             .task {
-                // Open on Today's programme when there is one.
+                // Open on Today's programme when there is one (Programmes shows it).
                 let pinned = (try? context.fetchCount(FetchDescriptor<Programme>(predicate: #Predicate { $0.isToday }))) ?? 0
-                if pinned > 0 { section = .today }
+                if pinned > 0 { section = .programmes }
             }
             .task {
                 guard LaunchOptions.importSamples else { return }
@@ -95,9 +95,6 @@ struct RootView: View {
 
     private var tabs: some View {
             TabView(selection: $section) {
-                Tab("Today", systemImage: "music.note.list", value: .today) {
-                    TodayView(showProgrammes: { section = .programmes })
-                }
                 Tab("Programmes", systemImage: "list.number", value: .programmes) {
                     ProgrammesView()
                 }

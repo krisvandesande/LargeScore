@@ -4,7 +4,7 @@ Single-maintainer repo (public: github.com/krisvandesande/LargeScore); work on `
 
 ## What it is
 
-An iPad app (and the same app on the Mac through Mac Catalyst) that reads MusicXML and engraves it again at a large size: only your own part, as few bars a line as you ask for, pages turned by tap, swipe or a Bluetooth pedal. Made for Kris's grandfather (early nineties, low vision, still performing, writes his own scores in notation software); App Store release later. Layout B (tabs Today, Programmes, Library, Settings; reader with a strip at the foot), chosen 2026-11-21: `docs/design-decisions.md`.
+An iPad app (and the same app on the Mac through Mac Catalyst) that reads MusicXML and engraves it again at a large size: only your own part, as few bars a line as you ask for, pages turned by tap, swipe or a Bluetooth pedal. Made for Kris's grandfather (early nineties, low vision, still performing, writes his own scores in notation software); App Store release later. Layout B (tabs Programmes, Library, Settings; reader with a strip at the foot), chosen 2026-11-21: `docs/design-decisions.md`. The Today tab was removed on 2026-11-25 (Kris): the app opens on Today's programme inside Programmes. On the Mac (Catalyst) the window is a sidebar instead of tabs (`MacRootView`).
 
 Licences: the app is MIT; Verovio (LGPL-3.0) is used unmodified from its release tag. Keep it unmodified and keep it swappable (`VEROVIO_TAG`), as the README promises.
 

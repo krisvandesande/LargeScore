@@ -5,7 +5,7 @@ What simulators can't tell us: an evening with the real player, at their size, i
 ## Before
 
 - The iPad on the stand at playing distance, in the room's usual light.
-- The pedal paired (Settings › Bluetooth) and Large Score open on Today.
+- The pedal paired (Settings › Bluetooth) and Large Score open on Today's programme (in Programmes).
 - A programme of three pieces, one of them twice (an encore), and one piece with repeats.
 
 ## Reading

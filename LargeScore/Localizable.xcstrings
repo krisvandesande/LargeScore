@@ -654,16 +654,6 @@
         }
       }
     },
-    "Choose one in Programmes.": {
-      "localizations": {
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kies er een in Programma’s."
-          }
-        }
-      }
-    },
     "Choose the line thickness": {
       "localizations": {
         "nl": {
@@ -1080,16 +1070,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "GNU Lesser General Public License 3.0. Large Score gebruikt Verovio ongewijzigd; met de broncode daarvan en die van Large Score kun je de app met een andere versie bouwen."
-          }
-        }
-      }
-    },
-    "Go to Programmes": {
-      "localizations": {
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ga naar Programma’s"
           }
         }
       }
@@ -1514,16 +1494,6 @@
         }
       }
     },
-    "Next: %@": {
-      "localizations": {
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Volgende: %@"
-          }
-        }
-      }
-    },
     "No music yet": {
       "localizations": {
         "nl": {
@@ -1540,16 +1510,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Nog geen stukken"
-          }
-        }
-      }
-    },
-    "No programme for today": {
-      "localizations": {
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Geen programma voor vandaag"
           }
         }
       }
