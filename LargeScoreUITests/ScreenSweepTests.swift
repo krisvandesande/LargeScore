@@ -174,6 +174,10 @@ final class ScreenSweepTests: XCTestCase {
                 }
                 XCTAssertTrue(sizeRow.waitForExistence(timeout: 5))
                 sizeRow.tap()
+                // A tap while the list still settles from the swipe is lost: tap again.
+                let back = app.navigationBars.buttons.firstMatch
+                if !back.waitForExistence(timeout: 3) { sizeRow.tap() }
+                XCTAssertTrue(back.waitForExistence(timeout: 5))
                 sleep(2)
                 shot(app, "22-size-settings", variant: variant)
                 if !dark { audit(app, "size-settings-\(sizeName)") }
