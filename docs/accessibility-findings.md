@@ -105,3 +105,10 @@ A musician with 1/20 vision needed more than the largest size (88 pt staves).
 - Above 120 pt (140, 165, 195, 230, 270 pt) the part is read as one line (`OneLine`): engraved without line breaks, then cut into screens the reader turns through like pages. A screen ends at the last bar line that fits and shows paper after it; a bar wider than the screen is split, and the next screen picks it up a little before the cut. Words and dynamics from the previous screen don't show as scraps at the left edge; staff lines, slurs and hairpins do carry over.
 - The Music Size preview no longer keeps the old layout when the iPad turns (lines ran off the edge upright, the top went under the bars in landscape).
 - Not yet checked: writing notes in the one-line mode, and the clef and key aren't repeated on later screens.
+
+## Hostile review sweep, 2026-11-25 (iPad Pro 13-inch and iPad 11-inch; standard and AX5, light and dark)
+
+- Every UI test passed on both iPads. The iPad mini is no longer part of the sweep (Kris: "As usual, skip the mini").
+- Contrast: the same two flags as before, both kept (disabled Undo; Add Music on the toolbar glass, measured 8.4:1 and 8.1:1).
+- "Text clipped" on "Match iPad" at AX5 in Settings: whole on the screenshot. The audit can't measure text inside a menu's label (as on Rosie, 2026-11-13).
+- Crash reports: `intelligencetasksd` once per iPad (the iOS 27.2 runtime's own); the mini's `assetsd`, `donotdisturbd` and `UsageTrackingAgent` came from stopping it while it booted.

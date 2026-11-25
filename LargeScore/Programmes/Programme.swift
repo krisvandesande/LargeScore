@@ -18,7 +18,11 @@ final class Programme {
 
     /// The pieces in playing order; entries whose piece was deleted are left out.
     var orderedEntries: [ProgrammeEntry] {
-        (entries ?? []).filter { $0.score != nil }.sorted { $0.order < $1.order }
+        // Two devices adding at once can give two entries the same number; the id
+        // settles them the same way everywhere, so the list and the reader agree.
+        (entries ?? []).filter { $0.score != nil }.sorted {
+            $0.order != $1.order ? $0.order < $1.order : $0.id.uuidString < $1.id.uuidString
+        }
     }
 
     var scores: [Score] { orderedEntries.compactMap(\.score) }

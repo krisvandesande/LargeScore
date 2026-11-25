@@ -34,7 +34,7 @@ struct SampleCard: View {
                height: max((fills ? size.height : maxHeight) - margins.top - margins.bottom, 1))
     }
 
-    private var request: LayoutRequest { settings.layoutRequest(for: area, centred: fills) }
+    private var request: LayoutRequest { settings.layoutRequest(for: area, centred: fills, piece: piece.id) }
 
     /// The card's height: the music's lowest point plus the inset, never more than the page.
     private var cardHeight: CGFloat {
@@ -53,7 +53,7 @@ struct SampleCard: View {
         (dark ? Color.black : Color.white)
             .overlay(alignment: .topLeading) {
                 if let page = scene {
-                    ScoreCanvas(scene: page, ink: settings.pageInk(system: systemScheme), glyphWeight: settings.glyphWeight)
+                    ScoreCanvas(scene: page, ink: settings.pageInk(system: systemScheme), glyphWeight: settings.glyphWeight(for: piece.id))
                         .frame(width: area.width, height: area.height)
                         .padding(margins)
                 }
@@ -64,9 +64,10 @@ struct SampleCard: View {
         .clipShape(RoundedRectangle(cornerRadius: asPage ? 0 : 26))
         .overlay(RoundedRectangle(cornerRadius: asPage ? 0 : 26).strokeBorder(asPage ? Color.clear : Color(.separator)))
         .onGeometryChange(for: CGSize.self) { $0.size } action: { size = $0 }
-        .task(id: request) {
+        // The piece too: choosing another part in the import sheet shows that part.
+        .task(id: CardKey(request: request, piece: piece)) {
             guard area.width > 100, area.height > 60 else { return }
-            if let laidOut = try? await loader.layOut(piece, request: request) {
+            if let laidOut = try? await loader.layOut(piece, request: request), !Task.isCancelled {
                 scene = laidOut.pages[safe: min(page, laidOut.pages.count - 1)] ?? laidOut.pages.first
             }
         }
@@ -269,4 +270,9 @@ struct MusicSizePanel: View {
         }
         .air(.vertical, 14)
     }
+}
+
+private struct CardKey: Hashable {
+    var request: LayoutRequest
+    var piece: Piece
 }

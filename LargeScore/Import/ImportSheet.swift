@@ -97,8 +97,8 @@ struct ImportDetail: View {
                     if candidate.replace {
                         VStack(alignment: .leading, spacing: 8) {
                             if !(existing.annotations ?? []).isEmpty, existing.barCount > 0,
-                               existing.barCount != candidate.file.barCount {
-                                Text("This version has \(candidate.file.barCount) bars instead of \(existing.barCount). Check your notes: after the change they may sit on other bars.")
+                               existing.barCount != candidate.barCount {
+                                Text("This version has \(candidate.barCount) bars instead of \(existing.barCount). Check your notes: after the change they may sit on other bars.")
                                     .foregroundStyle(Palette.notes)
                             }
                             Text("Your notes and programmes stay. The previous version can be restored from the library.")
@@ -124,7 +124,7 @@ struct ImportDetail: View {
             if !candidate.parts.isEmpty {
                 Section {
                     SampleCard(piece: Piece(id: "import-\(candidate.id)", title: candidate.title, composer: nil,
-                                            partIDs: candidate.parts.map(\.id), source: .stored(Data(candidate.file.xml.utf8))),
+                                            partIDs: candidate.parts.map(\.id), source: .stored(candidate.data)),
                                description: "Preview of the first page", maxHeight: 360)
                         .listRowInsets(EdgeInsets())
                 } header: {

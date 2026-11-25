@@ -89,9 +89,14 @@ final class MusicFolder {
         var updated: [String] = [], added: [String] = []
         var unplaced: [MusicFile] = []
         for file in files {
-            if let existing = library.first(where: { $0.isSamePiece(as: file) }) {
+            // Replaced without asking only when exactly one piece has that title and
+            // composer: two "Ave Maria"s or two untitled scores go to the sheet instead.
+            let matches = library.filter { $0.isSamePiece(as: file) }
+            if matches.count == 1, let existing = matches.first {
                 existing.replaceMusic(with: file, parts: [])
                 updated.append(file.title)
+            } else if matches.count > 1 {
+                unplaced.append(file)
             } else if let part = file.suggestedPart(for: instruments) {
                 context.insert(Score(file: file, parts: [part]))
                 added.append(file.title)
@@ -101,7 +106,9 @@ final class MusicFolder {
         }
         try? context.save()
         if !unplaced.isEmpty || !failures.isEmpty {
-            importer.session = ImportSession(files: unplaced, failures: failures, instruments: instruments, library: library)
+            let arriving = ImportSession(files: unplaced, failures: failures, instruments: instruments, library: library)
+            // A sheet already open keeps what was typed and chosen.
+            if let open = importer.session { open.add(arriving) } else { importer.session = arriving }
         }
         let result = Self.describe(added: added, updated: updated)
         if let result {
@@ -126,7 +133,20 @@ final class MusicFolder {
         let options: URL.BookmarkResolutionOptions = []
         #endif
         guard let url = try? URL(resolvingBookmarkData: bookmark, options: options, relativeTo: nil, bookmarkDataIsStale: &stale) else { return nil }
-        if stale, let fresh = try? url.bookmarkData() { store.set(fresh, forKey: Key.bookmark) }
+        if stale {
+            // Made again the way it was first made: on the Mac a plain bookmark would
+            // lose the folder's access from the next launch.
+            let scoped = url.startAccessingSecurityScopedResource()
+            defer { if scoped { url.stopAccessingSecurityScopedResource() } }
+            #if targetEnvironment(macCatalyst)
+            let creation: URL.BookmarkCreationOptions = [.withSecurityScope]
+            #else
+            let creation: URL.BookmarkCreationOptions = []
+            #endif
+            if let fresh = try? url.bookmarkData(options: creation, includingResourceValuesForKeys: nil, relativeTo: nil) {
+                store.set(fresh, forKey: Key.bookmark)
+            }
+        }
         return url
     }
 

@@ -23,6 +23,9 @@ nonisolated struct LayoutRequest: Hashable, Sendable {
     /// The whole part as one line, cut into screens (`OneLine`), for sizes where a busy
     /// bar is wider than a page.
     var oneLine = false
+    /// Repeats, endings, D.C., D.S. and Coda written out in the order they're played,
+    /// so pages only ever turn forward.
+    var playingOrder = false
 }
 
 /// One engraved page.

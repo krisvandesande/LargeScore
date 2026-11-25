@@ -63,13 +63,16 @@ private struct LibraryGrid: View {
     @Query(sort: \Programme.createdAt, order: .reverse) private var programmes: [Programme]
     @Environment(\.modelContext) private var context
     @ScaledMetric(relativeTo: .title2) private var cardWidth: CGFloat = 320
-    @State private var open: Score?
+    /// A value, not the stored piece: deleted on another device, a stored piece can't
+    /// be read any more, and the reader would stop the app.
+    @State private var open: Piece?
     @State private var changingPart: Score?
     @State private var deleting: Score?
     @State private var restoring: Score?
     @State private var comparing: Score?
     @State private var fixing: Score?
     @State private var transposing: Score?
+    @State private var sizing: Piece?
 
     init(sort: LibraryView.Sort, search: String, addMusic: @escaping () -> Void) {
         self.addMusic = addMusic
@@ -88,48 +91,55 @@ private struct LibraryGrid: View {
     }
 
     var body: some View {
-        if scores.isEmpty {
-            emptyState
-        } else {
-            ScrollView {
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: min(cardWidth, 600)), spacing: 24)], spacing: 24) {
-                    ForEach(scores) { score in
-                        card(score)
+        // The covers and sheets hang on the group, so deleting the last piece (here or
+        // on another device) doesn't take an open reader with it.
+        Group {
+            if scores.isEmpty {
+                emptyState
+            } else {
+                ScrollView {
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: min(cardWidth, 600)), spacing: 24)], spacing: 24) {
+                        ForEach(scores) { score in
+                            card(score)
+                        }
                     }
+                    .air(.horizontal, 48)
+                    .air(.vertical, 24)
                 }
-                .air(.horizontal, 48)
-                .air(.vertical, 24)
             }
-            .fullScreenCover(item: $open) { score in
-                ReaderView(piece: score.piece, backTitle: "Library")
+        }
+        .fullScreenCover(item: $open) { piece in
+            ReaderView(piece: piece, backTitle: "Library")
+        }
+        .fullScreenCover(item: $comparing) { score in
+            CompareView(score: score)
+        }
+        .fullScreenCover(item: $fixing) { score in
+            CompareView(score: score, startFixing: true)
+        }
+        .sheet(item: $changingPart) { score in
+            PartChooser(score: score)
+        }
+        .sheet(item: $transposing) { score in
+            TransposeSheet(score: score)
+        }
+        .sheet(item: $sizing) { piece in
+            PieceSizeSheet(piece: piece)
+        }
+        .confirmationDialog(Text("Delete \(deleting?.title ?? "")?"), isPresented: isPresent($deleting), titleVisibility: .visible) {
+            Button("Delete", role: .destructive) {
+                if let deleting { context.delete(deleting); try? context.save() }
             }
-            .fullScreenCover(item: $comparing) { score in
-                CompareView(score: score)
+        } message: {
+            Text("The piece and your notes on it are removed from this iPad.")
+        }
+        .confirmationDialog(Text("Restore the previous version of \(restoring?.title ?? "")?"), isPresented: isPresent($restoring), titleVisibility: .visible) {
+            Button("Restore Previous Version") {
+                restoring?.restorePrevious()
+                try? context.save()
             }
-            .fullScreenCover(item: $fixing) { score in
-                CompareView(score: score, startFixing: true)
-            }
-            .sheet(item: $changingPart) { score in
-                PartChooser(score: score)
-            }
-            .sheet(item: $transposing) { score in
-                TransposeSheet(score: score)
-            }
-            .confirmationDialog(Text("Delete \(deleting?.title ?? "")?"), isPresented: isPresent($deleting), titleVisibility: .visible) {
-                Button("Delete", role: .destructive) {
-                    if let deleting { context.delete(deleting); try? context.save() }
-                }
-            } message: {
-                Text("The piece and your notes on it are removed from this iPad.")
-            }
-            .confirmationDialog(Text("Restore the previous version of \(restoring?.title ?? "")?"), isPresented: isPresent($restoring), titleVisibility: .visible) {
-                Button("Restore Previous Version") {
-                    restoring?.restorePrevious()
-                    try? context.save()
-                }
-            } message: {
-                Text("The music you added last is replaced by the version before it.")
-            }
+        } message: {
+            Text("The music you added last is replaced by the version before it.")
         }
     }
 
@@ -137,7 +147,7 @@ private struct LibraryGrid: View {
         Button {
             score.lastOpenedAt = .now
             try? context.save()
-            open = score
+            open = score.piece
         } label: {
             PieceCard(title: score.title, composer: score.composer, note: score.note, needsCheck: score.needsCheck)
         }
@@ -158,6 +168,7 @@ private struct LibraryGrid: View {
             }
             Button("Fix Notes", systemImage: "pencil") { fixing = score }
             Button("Transpose", systemImage: "arrow.up.arrow.down") { transposing = score }
+            Button("Size for This Piece", systemImage: "textformat.size") { sizing = score.piece }
             if score.needsCheck {
                 Button("Mark as Checked", systemImage: "checkmark") {
                     score.needsCheck = false
@@ -176,6 +187,7 @@ private struct LibraryGrid: View {
         .accessibilityAction(named: Text("Delete")) { deleting = score }
         .accessibilityAction(named: Text("Fix Notes")) { fixing = score }
         .accessibilityAction(named: Text("Transpose")) { transposing = score }
+        .accessibilityAction(named: Text("Size for This Piece")) { sizing = score.piece }
         .accessibilityAction(named: Text("Compare with PDF")) { if score.pdf != nil { comparing = score } }
     }
 
@@ -210,6 +222,50 @@ private struct LibraryGrid: View {
 /// Other parts of a piece already in the library; more than one reads together.
 /// Reading a part written for another instrument: what it's written for, what
 /// plays it, and an octave either way.
+/// One piece read at a size of its own: the piece itself at that size, as the reader
+/// will show it, and the size slider.
+private struct PieceSizeSheet: View {
+    let piece: Piece
+    @Environment(ReaderSettings.self) private var settings
+    @Environment(\.dismiss) private var dismiss
+
+    private var count: Int { ReaderSettings.staffHeights.count }
+
+    var body: some View {
+        let step = settings.sizeStep(for: piece.id)
+        NavigationStack {
+            SampleCard(piece: piece, description: "\(piece.title) at size \(step + 1)", fills: true, asPage: true)
+                .overlay(alignment: .bottom) {
+                    StepSlider(value: step, count: count, smaller: "textformat.size.smaller", larger: "textformat.size.larger") {
+                        settings.setSize($0 == settings.sizeStep ? nil : $0, for: piece.id)
+                    }
+                    .accessibilityLabel("Size for this piece")
+                    .accessibilityValue(Text("Size \(step + 1) of \(count)"))
+                    .padding(.horizontal, 24)
+                    .padding(.vertical, 6)
+                    .frame(maxWidth: 620)
+                    .background(.regularMaterial, in: Capsule())
+                    .padding(.horizontal, 80)
+                    .padding(.bottom, 16)
+                }
+                .ignoresSafeArea(edges: .bottom)
+                .navigationTitle(piece.title)
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    if step != settings.sizeStep {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Use Standard Size") { settings.setSize(nil, for: piece.id) }
+                        }
+                    }
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button("Done") { dismiss() }
+                    }
+                }
+        }
+        .presentationSizing(.page)
+    }
+}
+
 private struct TransposeSheet: View {
     let score: Score
     @Environment(\.modelContext) private var context

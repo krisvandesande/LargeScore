@@ -109,21 +109,29 @@ struct RootView: View {
 enum LaunchOptions {
     static var importSamples: Bool { ProcessInfo.processInfo.arguments.contains("-importSamples") }
 
-    static var container: ModelContainer {
+    /// Made once per launch: two containers on one synced store fight over it.
+    static let container: ModelContainer = {
         let inMemory = ProcessInfo.processInfo.arguments.contains("-resetSettings")
-        // Synced through the iCloud container in the entitlements once there is one
-        // (scripts/enable-icloud.sh); until then, and in tests, on this device only.
+        // Synced through the iCloud container in the entitlements; in tests, on this
+        // device only.
         let configuration = ModelConfiguration(isStoredInMemoryOnly: inMemory,
                                                cloudKitDatabase: inMemory ? .none : .automatic)
         #if DEBUG
         CloudSchema.initializeIfNeeded()
         #endif
+        let models: [any PersistentModel.Type] = [Score.self, Programme.self, ProgrammeEntry.self, Annotation.self]
+        if let container = try? ModelContainer(for: Schema(models), configurations: configuration) { return container }
+        // Should sync refuse to start, the library still opens, on this device only;
+        // failing that, an empty one for this launch rather than an app that won't open.
+        if let local = try? ModelContainer(for: Schema(models), configurations: ModelConfiguration(cloudKitDatabase: .none)) {
+            return local
+        }
         do {
-            return try ModelContainer(for: Score.self, Programme.self, ProgrammeEntry.self, Annotation.self, configurations: configuration)
+            return try ModelContainer(for: Schema(models), configurations: ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none))
         } catch {
             fatalError("The library could not be opened: \(error)")
         }
-    }
+    }()
 
     /// Made once per launch: SwiftUI may build the app's state again (when the iPad
     /// turns), and wiping the test store each time sent a test run back to setup.

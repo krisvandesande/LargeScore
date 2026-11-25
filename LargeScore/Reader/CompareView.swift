@@ -149,8 +149,16 @@ struct CompareView: View {
             piece.source = .stored(Data(session.xml.utf8))
             piece.version = session.version
         }
-        if let result = try? await loader.layOut(piece, request: request) {
+        do {
+            let result = try await loader.layOut(piece, request: request)
+            guard !Task.isCancelled, piece.version == (session?.version ?? piece.version) else { return }
             laidOut = result
+        } catch is CancellationError {
+            return
+        } catch {
+            // An edit the engraver can't read is never saved: take it back.
+            guard !Task.isCancelled, let session, session.version == piece.version else { return }
+            session.rejectLastChange()
         }
     }
 
@@ -175,7 +183,7 @@ struct CompareView: View {
         if let number = session?.barNumbers[id] { return number }
         guard let laidOut else { return nil }
         for (index, page) in laidOut.pages.enumerated() {
-            if let i = page.measureIDs.firstIndex(of: id) { return laidOut.firstBars[index] + i }
+            if let i = page.measureIDs.firstIndex(of: id) { return laidOut.pageBars[index][safe: i] }
         }
         return nil
     }

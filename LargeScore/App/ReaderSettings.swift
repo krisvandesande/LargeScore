@@ -38,6 +38,26 @@ final class ReaderSettings {
     var boldLines: Bool { didSet { store.set(boldLines, forKey: Key.boldLines) } }
     var pageColour: PageColour { didSet { store.set(pageColour.rawValue, forKey: Key.pageColour) } }
     var halfPageTurns: Bool { didSet { store.set(halfPageTurns, forKey: Key.halfPageTurns) } }
+    /// Repeats and jumps written out where they're played.
+    var playingOrder: Bool { didSet { store.set(playingOrder, forKey: Key.playingOrder) } }
+    /// A moment's tint on the first bar after a page turn, to find where to read.
+    var markFirstBar: Bool { didSet { store.set(markFirstBar, forKey: Key.markFirstBar) } }
+    /// Pieces read at a size of their own (a busy one smaller, a sparse one larger),
+    /// by piece id. Kept on this device, like the size itself.
+    private(set) var pieceSizes: [String: Int] { didSet { store.set(pieceSizes, forKey: Key.pieceSizes) } }
+
+    /// The size step a piece is read at: its own, else the one for every piece.
+    func sizeStep(for piece: String?) -> Int {
+        guard let piece, let own = pieceSizes[piece], Self.staffHeights.indices.contains(own) else { return sizeStep }
+        return own
+    }
+
+    /// A size for one piece; nil goes back to the size every piece has.
+    func setSize(_ step: Int?, for piece: String) {
+        pieceSizes[piece] = step.map { min(max($0, 0), Self.staffHeights.count - 1) }
+    }
+
+    func staffHeight(for piece: String?) -> CGFloat { Self.staffHeights[sizeStep(for: piece)] }
     /// Everything the player plays, in the order chosen. The first sets the sample's clef.
     var instruments: [Instrument] {
         didSet { store.set(instruments.map(\.rawValue).joined(separator: " "), forKey: Key.instruments) }
@@ -56,6 +76,9 @@ final class ReaderSettings {
         static let boldLines = "boldLines"
         static let pageColour = "pageColour"
         static let halfPageTurns = "halfPageTurns"
+        static let playingOrder = "playingOrder"
+        static let markFirstBar = "markFirstBar"
+        static let pieceSizes = "pieceSizes"
         static let instrument = "instrument"
         static let instruments = "instruments"
         static let onboardingDone = "onboardingDone"
@@ -77,6 +100,9 @@ final class ReaderSettings {
         // The page follows the iPad: white on black in dark mode, unless chosen otherwise.
         pageColour = store.string(forKey: Key.pageColour).flatMap(PageColour.init) ?? .system
         halfPageTurns = store.bool(forKey: Key.halfPageTurns)
+        playingOrder = store.bool(forKey: Key.playingOrder)
+        markFirstBar = store.object(forKey: Key.markFirstBar) as? Bool ?? true
+        pieceSizes = store.dictionary(forKey: Key.pieceSizes) as? [String: Int] ?? [:]
         if let list = store.string(forKey: Key.instruments) {
             instruments = list.split(separator: " ").compactMap { Instrument(rawValue: String($0)) }
         } else {
@@ -86,13 +112,16 @@ final class ReaderSettings {
         onboardingDone = store.bool(forKey: Key.onboardingDone)
     }
 
-    func layoutRequest(for area: CGSize, centred: Bool = false) -> LayoutRequest {
-        LayoutRequest(pageSize: area, staffHeight: staffHeight, bold: boldLines, lineGap: lineGap, centred: centred,
-                      oneLine: readsAsOneLine)
+    func layoutRequest(for area: CGSize, centred: Bool = false, piece: String? = nil) -> LayoutRequest {
+        let height = staffHeight(for: piece)
+        return LayoutRequest(pageSize: area, staffHeight: height, bold: boldLines, lineGap: lineGap, centred: centred,
+                             oneLine: height > Self.largestPageSize, playingOrder: playingOrder)
     }
 
     /// Bold also thickens the glyphs a little: 7% of a staff space all round.
-    var glyphWeight: CGFloat { boldLines ? staffHeight / 4 * 0.07 : 0 }
+    var glyphWeight: CGFloat { glyphWeight(for: nil) }
+
+    func glyphWeight(for piece: String?) -> CGFloat { boldLines ? staffHeight(for: piece) / 4 * 0.07 : 0 }
 
     /// The scheme the page is drawn in, given the iPad's own.
     func pageScheme(system: ColorScheme) -> ColorScheme {

@@ -30,8 +30,15 @@ struct SettingsView: View {
                         }
                     }
                     Toggle("Half-Page Turns", isOn: $settings.halfPageTurns)
+                    Toggle("Mark the First Bar", isOn: $settings.markFirstBar)
                 } footer: {
-                    Text("A half-page turn shows the top of the next page first, so you can read ahead while you finish the bottom.")
+                    Text("A half-page turn shows the top of the next page first, so you can read ahead while you finish the bottom. Marking the first bar tints it for a moment after each turn, to show where to start.")
+                        .formNote()
+                }
+                Section {
+                    Toggle("Repeats in Playing Order", isOn: $settings.playingOrder)
+                } footer: {
+                    Text("Repeated bars are printed again where they're played, with D.C., D.S. and Coda followed, so pages only turn forward.")
                         .formNote()
                 }
                 Section {

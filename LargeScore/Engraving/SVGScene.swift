@@ -26,12 +26,19 @@ nonisolated struct SVGScene: @unchecked Sendable {
     var measureIDs: [String?]
     /// Where each note and rest is drawn, by its MusicXML id, in viewBox units.
     var noteBoxes: [String: CGRect]
+    /// The height of one staff from its top line to its bottom one, in viewBox units:
+    /// a bar's area spans every staff of a piano part, and a one-line staff has none.
+    var staffSpan: CGFloat?
 
-    init?(svg: String) {
+    /// `withoutRepeatDots` leaves out the dots of repeat signs: in playing order the
+    /// repeats are already written out, and the dots would send the eye back.
+    init?(svg: String, withoutRepeatDots: Bool = false) {
         let builder = SceneBuilder()
+        builder.skipsRepeatDots = withoutRepeatDots
         let parser = XMLParser(data: Data(svg.utf8))
         parser.delegate = builder
-        guard parser.parse(), let box = builder.viewBox else { return nil }
+        guard parser.parse(), let box = builder.viewBox, box.width > 0, box.height > 0,
+              box.width.isFinite, box.height.isFinite else { return nil }
         viewBox = box
         items = builder.items
         systems = builder.systems
@@ -39,6 +46,7 @@ nonisolated struct SVGScene: @unchecked Sendable {
         measures = builder.measures
         measureIDs = builder.measureIDs
         noteBoxes = builder.noteBoxes
+        staffSpan = builder.staves.first { $0.height > 0 }?.height
     }
 
     /// Where an item is drawn, in viewBox units (text approximately), to leave out
@@ -59,7 +67,8 @@ nonisolated struct SVGScene: @unchecked Sendable {
     /// `itemBounds` is `items.map(SVGScene.bounds)`, worked out once for all windows.
     /// Nothing that starts at or after `cutoff` is kept: a window that ends at a bar
     /// line shows paper after it, not the start of the next bar.
-    func window(_ rect: CGRect, itemBounds: [CGRect], cutoff: CGFloat = .infinity) -> SVGScene {
+    /// Bars are counted from `start`: the bar before ends on that bar line, inside the margin.
+    func window(_ rect: CGRect, itemBounds: [CGRect], cutoff: CGFloat = .infinity, start: CGFloat = -.infinity) -> SVGScene {
         var copy = self
         copy.viewBox = rect
         // The next bar's staff lines start on the bar line itself: anything starting within a
@@ -73,7 +82,9 @@ nonisolated struct SVGScene: @unchecked Sendable {
             let long = box.width > rect.width * 0.5
             return box.intersects(rect) && box.minX < edge && (long || box.midX >= rect.minX)
         }.map { items[$0] }
-        let inside = measures.indices.filter { !measures[$0].isNull && measures[$0].intersects(rect) && measures[$0].minX < edge }
+        let inside = measures.indices.filter {
+            !measures[$0].isNull && measures[$0].intersects(rect) && measures[$0].minX < edge && measures[$0].maxX > start + 1
+        }
         copy.measures = inside.map { measures[$0] }
         copy.measureIDs = inside.map { measureIDs[$0] }
         copy.measureCount = inside.count
@@ -132,6 +143,9 @@ nonisolated private final class SceneBuilder: NSObject, XMLParserDelegate {
     var measures: [CGRect] = []
     var measureIDs: [String?] = []
     var noteBoxes: [String: CGRect] = [:]
+    /// Each staff's lines, one entry per `g.staff`.
+    var staves: [CGRect] = []
+    var skipsRepeatDots = false
 
     private struct Frame {
         var transform: CGAffineTransform
@@ -142,6 +156,7 @@ nonisolated private final class SceneBuilder: NSObject, XMLParserDelegate {
         var measure: Int?
         /// True directly inside a `g.staff`: its paths are the staff lines.
         var isStaff = false
+        var staff: Int?
         /// The note or rest this element is part of.
         var noteID: String?
     }
@@ -182,7 +197,11 @@ nonisolated private final class SceneBuilder: NSObject, XMLParserDelegate {
                 measures.append(.null)
                 measureIDs.append(a["id"])
             }
-            if element == "g", inDefs == 0, names.contains("staff") { frame.isStaff = true }
+            if element == "g", inDefs == 0, names.contains("staff") {
+                frame.isStaff = true
+                frame.staff = staves.count
+                staves.append(.null)
+            }
             if element == "g", inDefs == 0, names.contains(where: { ["note", "rest", "mRest"].contains($0) }), let id = a["id"] {
                 frame.noteID = id
             }
@@ -240,6 +259,8 @@ nonisolated private final class SceneBuilder: NSObject, XMLParserDelegate {
             add(path: path, attributes: a, frame: frame, closed: element == "polygon")
         case "use":
             let ref = (a["href"] ?? a["xlink:href"] ?? "").trimmingCharacters(in: CharacterSet(charactersIn: "#"))
+            // SMuFL's repeat dot.
+            if skipsRepeatDots, ref.hasPrefix("E044-") { break }
             if let glyph = defs[ref] {
                 let offset = CGAffineTransform(translationX: num(a["x"]), y: num(a["y"]))
                 var t = offset.concatenating(frame.transform)
@@ -349,6 +370,9 @@ nonisolated private final class SceneBuilder: NSObject, XMLParserDelegate {
         if frame.isStaff, let index = frame.measure, measures.indices.contains(index) {
             measures[index] = measures[index].union(placed.boundingBoxOfPath)
         }
+        if frame.isStaff, let index = frame.staff, staves.indices.contains(index) {
+            staves[index] = staves[index].union(placed.boundingBoxOfPath)
+        }
     }
 
     /// Grows the bounds of the line of music the item belongs to.
@@ -382,6 +406,15 @@ nonisolated private final class SceneBuilder: NSObject, XMLParserDelegate {
             case "translate": t = CGAffineTransform(translationX: n.first ?? 0, y: n.count > 1 ? n[1] : 0)
             case "scale": t = CGAffineTransform(scaleX: n.first ?? 1, y: n.count > 1 ? n[1] : (n.first ?? 1))
             case "matrix" where n.count == 6: t = CGAffineTransform(a: n[0], b: n[1], c: n[2], d: n[3], tx: n[4], ty: n[5])
+            case "rotate" where !n.isEmpty:
+                let angle = n[0] * .pi / 180
+                if n.count == 3 {
+                    t = CGAffineTransform(translationX: -n[1], y: -n[2])
+                        .concatenating(CGAffineTransform(rotationAngle: angle))
+                        .concatenating(CGAffineTransform(translationX: n[1], y: n[2]))
+                } else {
+                    t = CGAffineTransform(rotationAngle: angle)
+                }
             default: t = .identity
             }
             result = t.concatenating(result)
@@ -409,7 +442,15 @@ nonisolated enum SVGPathParser {
         var command: Character = "M"
 
         while let next = tokens.next() {
-            if case .command(let c) = next { command = c } else { tokens.pushBack(next) }
+            if case .command(let c) = next {
+                command = c
+            } else if command == "Z" || command == "z" {
+                // A number straight after a close takes no command: malformed, so stop
+                // rather than read the same number for ever.
+                return path
+            } else {
+                tokens.pushBack(next)
+            }
             let relative = command.isLowercase
             func point() -> CGPoint? {
                 guard let x = tokens.number(), let y = tokens.number() else { return nil }

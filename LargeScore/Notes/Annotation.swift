@@ -87,8 +87,13 @@ nonisolated struct BarGeometry {
     var space: CGFloat
 
     init(page: SVGScene, firstBar: Int, request: LayoutRequest) {
-        bars = page.measures.enumerated().compactMap { index, box in
-            box.isNull ? nil : (firstBar + index, box)
+        self.init(page: page, numbers: Array(firstBar..<(firstBar + page.measures.count)), request: request)
+    }
+
+    /// `numbers` gives each of the page's bars its number as the score has it.
+    init(page: SVGScene, numbers: [Int], request: LayoutRequest) {
+        bars = zip(page.measures, numbers).compactMap { box, number in
+            box.isNull ? nil : (number, box)
         }
         let unitsPerPoint = request.pageSize.width > 0 ? page.viewBox.width / request.pageSize.width : 1
         space = request.staffHeight / 4 * unitsPerPoint
@@ -101,6 +106,9 @@ nonisolated struct BarGeometry {
     }
 
     func box(of bar: Int) -> CGRect? { bars.first { $0.number == bar }?.box }
+
+    /// Every place a bar is on the page: in playing order a short repeat shows it twice.
+    func boxes(of bar: Int) -> [CGRect] { bars.filter { $0.number == bar }.map(\.box) }
 
     func anchor(_ point: CGPoint, in box: CGRect) -> CGPoint {
         CGPoint(x: (point.x - box.minX) / space, y: (point.y - box.minY) / space)

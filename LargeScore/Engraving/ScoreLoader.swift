@@ -19,8 +19,18 @@ nonisolated struct Piece: Identifiable, Hashable, Sendable {
     /// Read in another key, for a part written for another instrument.
     var transposition: Transposition?
 
+    /// Bytes of stored music: changes when music synced from iCloud arrives, which
+    /// leaves the version as it was.
+    var size: Int {
+        if case .stored(let data) = source { data.count } else { -1 }
+    }
+
+    /// Stored music that hasn't arrived yet (still on its way from iCloud).
+    var isMissing: Bool { size == 0 }
+
     static func == (a: Piece, b: Piece) -> Bool {
         a.id == b.id && a.partIDs == b.partIDs && a.version == b.version && a.transposition == b.transposition
+            && a.size == b.size
     }
 
     func hash(into hasher: inout Hasher) {
@@ -28,6 +38,7 @@ nonisolated struct Piece: Identifiable, Hashable, Sendable {
         hasher.combine(partIDs)
         hasher.combine(version)
         hasher.combine(transposition)
+        hasher.combine(size)
     }
 
     /// The score as the engraver gets it: one part only.
@@ -57,19 +68,36 @@ nonisolated struct LaidOutPiece: Sendable {
     var request: LayoutRequest
     var pages: [SVGScene]
     /// The first bar number on each page, counted from 1.
+    /// Each page's first bar, as the score numbers it.
     var firstBars: [Int]
+    /// The number, as the score numbers it, of every bar in each page's `measures`. In
+    /// playing order a repeated bar comes again with its own number.
+    var pageBars: [[Int]]
 
-    /// True when a page's music reaches past its bottom edge.
-    var overflows: Bool {
-        pages.contains { page in
-            page.systems.contains { !$0.isNull && $0.maxY > page.viewBox.maxY }
+    init(request: LayoutRequest, pages: [SVGScene], pageBars: [[Int]]) {
+        self.request = request
+        self.pages = pages
+        self.pageBars = pageBars
+        var previous = 0
+        firstBars = pageBars.map { bars in
+            let first = bars.first ?? previous + 1
+            previous = bars.last ?? first
+            return first
         }
     }
 
+    /// How far the music reaches past a page's bottom edge, at most; 0 when it fits.
+    var overflow: CGFloat {
+        pages.map { page in
+            page.systems.filter { !$0.isNull }.map { $0.maxY - page.viewBox.maxY }.max() ?? 0
+        }.max().map { max($0, 0) } ?? 0
+    }
+
+    var overflows: Bool { overflow > 0 }
+
     func bars(onPage index: Int) -> ClosedRange<Int>? {
-        guard pages.indices.contains(index), pages[index].measureCount > 0 else { return nil }
-        let first = firstBars[index]
-        return first...(first + pages[index].measureCount - 1)
+        guard pageBars.indices.contains(index), let low = pageBars[index].min(), let high = pageBars[index].max() else { return nil }
+        return low...high
     }
 }
 
@@ -83,13 +111,19 @@ final class ScoreLoader {
         let xml = try await Self.prepare(piece)
         var request = request
         request.transpose = piece.transposition?.interval
-        var laidOut = await Self.read(try await engraver.engrave(musicXML: xml, request: request))
+        try Task.checkCancellation()
+        var laidOut = try await Self.read(try await engraver.engrave(musicXML: xml, request: request))
         // Pages are filled tightly; if anything under a page's last line runs off the
-        // page, engrave again with more room at the foot, as often as needed.
+        // page, engrave again with more room at the foot, while that helps. A line
+        // taller than the page on its own runs off however much room there is.
         while laidOut.overflows, !request.oneLine, request.bottomRoom < 400 {
+            try Task.checkCancellation()
             request.bottomRoom += 60
-            laidOut = await Self.read(try await engraver.engrave(musicXML: xml, request: request))
+            let roomier = try await Self.read(try await engraver.engrave(musicXML: xml, request: request))
+            guard roomier.overflow < laidOut.overflow else { break }
+            laidOut = roomier
         }
+        try Task.checkCancellation()
         return laidOut
     }
 
@@ -100,22 +134,54 @@ final class ScoreLoader {
     }
 
     @concurrent
-    nonisolated private static func read(_ score: EngravedScore) async -> LaidOutPiece {
-        var pages = score.pages.compactMap { SVGScene(svg: $0.svg) }
-        if score.request.oneLine, let line = pages.first {
-            let screens = OneLine.screens(of: line, area: score.request.pageSize, staffHeight: score.request.staffHeight)
-            return LaidOutPiece(request: score.request, pages: screens.map(\.scene), firstBars: screens.map(\.firstBar))
+    nonisolated private static func read(_ score: EngravedScore) async throws -> LaidOutPiece {
+        // A page that can't be read would shift every later bar number: none, or all.
+        var pages = score.pages.compactMap { SVGScene(svg: $0.svg, withoutRepeatDots: score.request.playingOrder) }
+        guard !pages.isEmpty, pages.count == score.pages.count else { throw EngravingError.empty }
+        if score.request.oneLine {
+            // Without line breaks Verovio makes one page; should a very long part ever
+            // come out on more, the screens carry on through each in turn.
+            let numbers = Self.barNumbers(pages.flatMap(\.measureIDs))
+            var screens: [OneLine.Screen] = []
+            for line in pages {
+                screens += OneLine.screens(of: line, area: score.request.pageSize, staffHeight: score.request.staffHeight)
+            }
+            guard !screens.isEmpty else { throw EngravingError.empty }
+            return LaidOutPiece(request: score.request, pages: screens.map(\.scene),
+                                pageBars: screens.map { Self.numbered($0.scene.measureIDs, numbers) })
         }
         if score.request.centred {
             pages = pages.enumerated().map { index, page in Self.centred(page, last: index == pages.count - 1) }
         }
-        var firstBars: [Int] = []
+        let numbers = Self.barNumbers(pages.flatMap(\.measureIDs))
+        return LaidOutPiece(request: score.request, pages: pages, pageBars: pages.map { Self.numbered($0.measureIDs, numbers) })
+    }
+
+    /// Bar numbers by id, counted from 1 in the order bars first appear. Verovio draws a
+    /// repeated bar again with "-rend2" added to its id: it keeps the number it was
+    /// written with, so notes on it show each time it's played.
+    nonisolated static func barNumbers(_ ids: [String?]) -> [String: Int] {
+        var numbers: [String: Int] = [:]
         var next = 1
-        for page in pages {
-            firstBars.append(next)
-            next += page.measureCount
+        for (index, id) in ids.enumerated() {
+            let key = id.map(writtenID) ?? "#\(index)"
+            if numbers[key] == nil { numbers[key] = next; next += 1 }
         }
-        return LaidOutPiece(request: score.request, pages: pages, firstBars: firstBars)
+        return numbers
+    }
+
+    nonisolated static func writtenID(_ id: String) -> String {
+        guard let range = id.range(of: #"-rend\d+$"#, options: .regularExpression) else { return id }
+        return String(id[..<range.lowerBound])
+    }
+
+    nonisolated private static func numbered(_ ids: [String?], _ numbers: [String: Int]) -> [Int] {
+        var last = 0
+        return ids.map { id in
+            let n = id.flatMap { numbers[writtenID($0)] } ?? last + 1
+            last = n
+            return n
+        }
     }
 
     /// The page's music moved to sit in the middle, top to bottom. Every page but the

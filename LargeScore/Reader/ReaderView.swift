@@ -6,7 +6,12 @@ import UIKit
 /// rest forward), a swipe, or a pedal's keys. Opened from a programme, turning past
 /// the last page goes on to the next piece, and back past the first to the one before.
 struct ReaderView: View {
-    let pieces: [Piece]
+    /// Kept as they were when the reader opened: a programme changed on another device
+    /// mid-concert must not swap the piece on the stand or run the place off the end.
+    @State private var pieces: [Piece]
+    /// The list as the caller has it now. Taken over only while it holds the same
+    /// pieces in the same order: a new version or music that finished downloading.
+    private let incoming: [Piece]
     var backTitle: LocalizedStringResource = "Library"
     /// Called whenever a piece comes up, to note when it was last played.
     var onShow: (Piece) -> Void = { _ in }
@@ -16,7 +21,8 @@ struct ReaderView: View {
     }
 
     init(pieces: [Piece], start: Int, backTitle: LocalizedStringResource, onShow: @escaping (Piece) -> Void = { _ in }) {
-        self.pieces = pieces
+        _pieces = State(initialValue: pieces)
+        incoming = pieces
         self.backTitle = backTitle
         self.onShow = onShow
         _place = State(initialValue: ProgrammePlace(count: pieces.count, index: min(max(start, 0), max(pieces.count - 1, 0))))
@@ -35,13 +41,17 @@ struct ReaderView: View {
     @State private var startAtEnd = false
     @State private var laidOutPieceID: String?
 
-    private var piece: Piece { pieces[place.index] }
+    private var piece: Piece { pieces[min(place.index, pieces.count - 1)] }
     private var nextPiece: Piece? { place.hasNext ? pieces[place.index + 1] : nil }
 
     @Environment(ReaderSettings.self) private var settings
     @Environment(ScoreLoader.self) private var loader
     @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) private var systemScheme
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    /// The first bar is tinted for a moment after a turn forward.
+    @State private var tintFirstBar = false
+    @State private var tintTask: Task<Void, Never>?
     @State private var laidOut: LaidOutPiece?
     @State private var turner = PageTurner(pageCount: 0, halfPageTurns: false)
     @State private var failed = false
@@ -69,7 +79,7 @@ struct ReaderView: View {
                         if value.translation.width < -40 { turn(forward: true) }
                         else if value.translation.width > 40 { turn(forward: false) }
                     })
-                    .task(id: ReaderKey(request: settings.layoutRequest(for: area, centred: true), piece: piece)) {
+                    .task(id: ReaderKey(request: settings.layoutRequest(for: area, centred: true, piece: piece.id), piece: piece, index: place.index)) {
                         await layOut(area: area)
                     }
             }
@@ -96,19 +106,27 @@ struct ReaderView: View {
         }
         .environment(\.colorScheme, scheme)
         // The pedal's keys, except while a sheet over the reader needs the keyboard.
-        .background { PedalKeys(active: !writingNote,
+        // Not while a line is being drawn either: the page under the pen must stay.
+        .background { PedalKeys(active: !writingNote && line.isEmpty,
                                 forward: { turn(forward: true) }, back: { turn(forward: false) }, close: { dismiss() }) }
         .onAppear {
-            UIApplication.shared.isIdleTimerDisabled = true
+            AwakeReaders.opened()
             notes = NotesStore(pieceID: piece.id, context: context)
             onShow(piece)
         }
         .sheet(isPresented: $writingNote) {
             if let notes { WrittenNoteSheet(store: notes) }
         }
-        .onDisappear { UIApplication.shared.isIdleTimerDisabled = false }
+        .onDisappear { AwakeReaders.closed() }
         .onChange(of: settings.halfPageTurns) { _, half in
             turner.update(pageCount: turner.pageCount, halfPageTurns: half && laidOut?.request.oneLine != true)
+        }
+        .onChange(of: turner.page) { old, new in
+            notes?.forgetUndo()
+            if new > old { showFirstBar() }
+        }
+        .onChange(of: incoming) { _, now in
+            if now.map(\.id) == pieces.map(\.id) { pieces = now }
         }
         .persistentSystemOverlays(.hidden)
     }
@@ -124,21 +142,35 @@ struct ReaderView: View {
                let split = HalfPageSplit.split(current: current.systems,
                                                next: laidOut.pages[turner.page + 1].systems,
                                                pageHeight: current.viewBox.height) {
-                ScoreCanvas(scene: current, upper: laidOut.pages[turner.page + 1], split: split, ink: ink, glyphWeight: settings.glyphWeight,
+                ScoreCanvas(scene: current, upper: laidOut.pages[turner.page + 1], split: split, ink: ink, glyphWeight: settings.glyphWeight(for: piece.id),
                             marks: marks, geometry: geometry, upperMarks: marks,
                             upperGeometry: barGeometry(laidOut, page: turner.page + 1))
                     .frame(width: area.width, height: area.height)
             } else {
-                ScoreCanvas(scene: current, ink: ink, glyphWeight: settings.glyphWeight, marks: marks, geometry: geometry)
+                ScoreCanvas(scene: current, ink: ink, glyphWeight: settings.glyphWeight(for: piece.id), marks: marks, geometry: geometry)
                     .frame(width: area.width, height: area.height)
+                    .overlay(alignment: .topLeading) {
+                        if tintFirstBar, !annotating, let box = current.measures.first(where: { !$0.isNull }) {
+                            let scale = ScoreCanvas.scale(of: current, in: area)
+                            let space = (geometry?.space ?? 0) * scale
+                            RoundedRectangle(cornerRadius: space)
+                                .fill(Palette.accent.opacity(0.22))
+                                .frame(width: box.width * scale + space, height: box.height * scale + space * 4)
+                                .offset(x: (box.minX - current.viewBox.minX) * scale - space / 2,
+                                        y: (box.minY - current.viewBox.minY) * scale - space * 2)
+                                .allowsHitTesting(false)
+                                .accessibilityHidden(true)
+                                .transition(.opacity)
+                        }
+                    }
                     .overlay {
                         if annotating, let geometry {
-                            drawingLayer(geometry, scale: ScoreCanvas.scale(of: current, in: area))
+                            drawingLayer(geometry, scale: ScoreCanvas.scale(of: current, in: area), origin: current.viewBox.origin)
                         }
                     }
             }
         } else if failed {
-            Text("This music could not be read.")
+            Text(piece.isMissing ? "This music is still on its way from iCloud." : "This music could not be read.")
                 .font(.title2)
                 .frame(width: area.width, height: area.height)
         } else {
@@ -148,8 +180,20 @@ struct ReaderView: View {
 
     private func barGeometry(_ laidOut: LaidOutPiece, page: Int) -> BarGeometry? {
         guard laidOut.pages.indices.contains(page) else { return nil }
-        return BarGeometry(page: laidOut.pages[page], firstBar: laidOut.firstBars[page],
+        return BarGeometry(page: laidOut.pages[page], numbers: laidOut.pageBars[page],
                            request: laidOut.request)
+    }
+
+    /// Tints the first bar, then lets it fade (or go at once with Reduce Motion).
+    private func showFirstBar() {
+        guard settings.markFirstBar else { return }
+        tintTask?.cancel()
+        tintFirstBar = true
+        tintTask = Task {
+            try? await Task.sleep(for: .seconds(1.2))
+            guard !Task.isCancelled else { return }
+            withAnimation(reduceMotion ? nil : .easeOut(duration: 0.6)) { tintFirstBar = false }
+        }
     }
 
     private func startAnnotating() {
@@ -159,9 +203,10 @@ struct ReaderView: View {
     }
 
     /// Takes the pen, the eraser or a mark while notes are being written. Touches are
-    /// in points; the page is drawn at `scale` points a page unit.
-    private func drawingLayer(_ geometry: BarGeometry, scale: CGFloat) -> some View {
-        let toPage = { (p: CGPoint) in CGPoint(x: p.x / scale, y: p.y / scale) }
+    /// in points; the page is drawn at `scale` points a page unit, from `origin` (a
+    /// screen of one long line starts partway along it).
+    private func drawingLayer(_ geometry: BarGeometry, scale: CGFloat, origin: CGPoint) -> some View {
+        let toPage = { (p: CGPoint) in CGPoint(x: origin.x + p.x / scale, y: origin.y + p.y / scale) }
         return
         ZStack {
             Path { path in
@@ -217,6 +262,9 @@ struct ReaderView: View {
     }
 
     private func turn(forward: Bool) {
+        // Until the piece is laid out its pages aren't known: a second press of the
+        // pedal while the next piece comes up must not skip it.
+        guard laidOut != nil || failed else { return }
         if forward {
             if !turner.forward() { goToNextPiece() }
         } else if !turner.back(), place.previous() {
@@ -235,6 +283,9 @@ struct ReaderView: View {
     private func showPiece() {
         // Never show the old piece's page under the new title.
         laidOut = nil
+        laidOutPieceID = nil
+        failed = false
+        line = []
         notes = NotesStore(pieceID: piece.id, context: context)
         onShow(piece)
         UIAccessibility.post(notification: .announcement, argument: piece.title)
@@ -244,9 +295,16 @@ struct ReaderView: View {
         guard area.width > 100, area.height > 100 else { return }
         do {
             let shown = piece
-            let result = try await loader.layOut(shown, request: settings.layoutRequest(for: area, centred: true))
+            let index = place.index
+            let result = try await loader.layOut(shown, request: settings.layoutRequest(for: area, centred: true, piece: shown.id))
+            // A layout for a size or piece that has since gone is dropped.
+            guard !Task.isCancelled, place.index == index, piece == shown else { return }
             let page: Int
-            if laidOutPieceID == shown.id {
+            if laidOutPieceID == shown.id, let old = laidOut, old.request.playingOrder || result.request.playingOrder {
+                // In playing order a bar can come twice: keep the place by how far through.
+                let through = old.pages.count > 1 ? Double(turner.page) / Double(old.pages.count - 1) : 0
+                page = Int((through * Double(max(result.pages.count - 1, 0))).rounded())
+            } else if laidOutPieceID == shown.id {
                 // Same piece, new size or orientation: keep the place by bar.
                 let firstBar = laidOut?.firstBars[safe: turner.page] ?? 1
                 page = result.firstBars.lastIndex(where: { $0 <= firstBar }) ?? 0
@@ -257,12 +315,15 @@ struct ReaderView: View {
             laidOutPieceID = shown.id
             if let next = nextPiece {
                 // Engrave the next piece ahead, so turning into it is immediate.
-                let request = settings.layoutRequest(for: area, centred: true)
+                let request = settings.layoutRequest(for: area, centred: true, piece: next.id)
                 Task { _ = try? await loader.layOut(next, request: request) }
             }
             turner = PageTurner(pageCount: result.pages.count, halfPageTurns: settings.halfPageTurns && !result.request.oneLine, page: page)
             failed = false
+        } catch is CancellationError {
+            return
         } catch {
+            guard !Task.isCancelled else { return }
             failed = true
         }
     }
@@ -301,9 +362,20 @@ final class KeyCatcherView: UIView {
 
     override var canBecomeFirstResponder: Bool { active }
 
+    private var activation: NSObjectProtocol?
+
     override func didMoveToWindow() {
         super.didMoveToWindow()
         claimKeys()
+        // Coming back to the front can leave no first responder: take the keys again.
+        if window != nil, activation == nil {
+            activation = NotificationCenter.default.addObserver(forName: UIScene.didActivateNotification, object: nil, queue: .main) { [weak self] _ in
+                MainActor.assumeIsolated { self?.claimKeys() }
+            }
+        } else if window == nil, let activation {
+            NotificationCenter.default.removeObserver(activation)
+            self.activation = nil
+        }
     }
 
     func claimKeys() {
@@ -350,6 +422,8 @@ final class KeyCatcherView: UIView {
 private struct ReaderKey: Hashable {
     var request: LayoutRequest
     var piece: Piece
+    /// The same piece twice in a programme (an encore) is laid out again.
+    var index: Int
 }
 
 /// Layout B's strip: back, title, page, the next piece in a programme, size. Where
@@ -459,5 +533,21 @@ private struct TrailingIcon: LabelStyle {
             configuration.title
             configuration.icon
         }
+    }
+}
+
+/// The screen stays awake while any reader is open: on the Mac there can be two.
+@MainActor
+enum AwakeReaders {
+    private static var open = 0
+
+    static func opened() {
+        open += 1
+        UIApplication.shared.isIdleTimerDisabled = true
+    }
+
+    static func closed() {
+        open = max(open - 1, 0)
+        if open == 0 { UIApplication.shared.isIdleTimerDisabled = false }
     }
 }

@@ -22,6 +22,10 @@ nonisolated struct MusicFile: Sendable, Identifiable {
         case damaged
         /// A PDF on its own: it has to be converted to MusicXML first.
         case pdf
+        /// The file couldn't be read at all (not downloaded, or no permission).
+        case unreadable
+        /// MusicXML with no part to show.
+        case noParts
     }
 
     var id = UUID()
@@ -64,7 +68,7 @@ nonisolated struct MusicFile: Sendable, Identifiable {
     }
 
     static func text(of data: Data) throws -> String {
-        try declaringUTF8(decoded(data))
+        try declaringUTF8(decoded(data, depth: 0))
     }
 
     /// The text is kept as UTF-8 from here on; a declaration saying otherwise would
@@ -76,14 +80,19 @@ nonisolated struct MusicFile: Sendable, Identifiable {
         return fixed + text[end.upperBound...]
     }
 
-    private static func decoded(_ data: Data) throws -> String {
+    private static func decoded(_ data: Data, depth: Int) throws -> String {
         if data.starts(with: [0x50, 0x4B]) {
-            return try text(of: unzipped(data))
+            // An archive inside an archive, once: a ZIP that holds itself would never end.
+            guard depth < 2 else { throw Failure.damaged }
+            return try decoded(unzipped(data), depth: depth + 1)
         }
         if data.starts(with: [0xFF, 0xFE]) || data.starts(with: [0xFE, 0xFF]) {
             guard let text = String(data: data, encoding: .utf16) else { throw Failure.notMusicXML }
             return text
         }
+        // UTF-16 without its mark starts "<" and a zero byte, in one order or the other.
+        if data.starts(with: [0x3C, 0x00]), let text = String(data: data, encoding: .utf16LittleEndian) { return text }
+        if data.starts(with: [0x00, 0x3C]), let text = String(data: data, encoding: .utf16BigEndian) { return text }
         guard let text = String(data: data, encoding: .utf8) ?? String(data: data, encoding: .isoLatin1) else {
             throw Failure.notMusicXML
         }
@@ -104,7 +113,7 @@ nonisolated struct MusicFile: Sendable, Identifiable {
         }
         target = target ?? entries.first {
             !$0.name.hasPrefix("META-INF/") && ($0.name.hasSuffix(".musicxml") || $0.name.hasSuffix(".xml"))
-        }
+        } ?? entries.first { $0.name.lowercased().hasSuffix(".mxl") }
         guard let target else { throw Failure.damaged }
         do { return try ZipReader.contents(of: target, in: data) } catch { throw Failure.damaged }
     }

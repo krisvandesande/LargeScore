@@ -16,6 +16,9 @@ final class ImportSession: Identifiable {
         var parts: [ScorePart]
         var existing: Score?
         var replace = true
+        /// Worked out once: the sheet redraws on every key typed in the title.
+        var data: Data
+        var barCount: Int
     }
 
     struct Failure: Identifiable {
@@ -31,24 +34,40 @@ final class ImportSession: Identifiable {
     var isReady: Bool { !candidates.isEmpty && candidates.allSatisfy { !$0.parts.isEmpty } }
 
     init(files: [MusicFile], failures: [Failure], instruments: [Instrument], library: [Score]) {
-        self.failures = failures
-        candidates = files.map { file in
-            let existing = library.first { $0.isSamePiece(as: file) }
+        // A file with no part to show could never be chosen, and would hold back the rest.
+        self.failures = failures + files.filter(\.parts.isEmpty).map { Failure(fileName: $0.fileName, reason: .noParts) }
+        candidates = files.filter { !$0.parts.isEmpty }.map { file in
+            let matches = library.filter { $0.isSamePiece(as: file) }
+            let existing = matches.first
             // A new version keeps the parts already chosen for the piece.
             let kept = existing.map { score in
                 file.parts.filter { score.partIDs.contains($0.id) }
             } ?? []
             let suggested = file.suggestedPart(for: instruments).map { [$0] } ?? []
             return Candidate(file: file, title: file.title, composer: file.composer ?? "",
-                             parts: kept.isEmpty ? suggested : kept, existing: existing)
+                             parts: kept.isEmpty ? suggested : kept, existing: existing,
+                             replace: matches.count == 1,
+                             data: Data(file.xml.utf8), barCount: file.barCount)
         }
+    }
+
+    /// Files that arrived while the sheet was open, unless already in it.
+    func add(_ other: ImportSession) {
+        let names = Set(candidates.map(\.file.fileName))
+        candidates += other.candidates.filter { !names.contains($0.file.fileName) }
+        failures += other.failures
     }
 
     /// Adds or replaces every piece, then saves. Returns how many were added or replaced.
     @discardableResult
     func apply(to context: ModelContext) -> Int {
         var count = 0
-        for candidate in candidates {
+        // The music folder may have added one of these while the sheet was open.
+        let library = (try? context.fetch(FetchDescriptor<Score>())) ?? []
+        for var candidate in candidates {
+            if candidate.existing == nil || candidate.existing?.isDeleted == true {
+                candidate.existing = library.first { !$0.isDeleted && $0.isSamePiece(as: candidate.file) }
+            }
             guard !candidate.parts.isEmpty else { continue }
             var file = candidate.file
             file.title = candidate.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
@@ -81,13 +100,13 @@ final class ImportSession: Identifiable {
             let scoped = url.startAccessingSecurityScopedResource()
             defer { if scoped { url.stopAccessingSecurityScopedResource() } }
             var data: Data?
-            var coordinationError: NSError?
+            var coordinationError: NSError? // no data at all means it couldn't be read
             // Coordinated reading makes file providers download the file first.
             NSFileCoordinator().coordinate(readingItemAt: url, options: .withoutChanges, error: &coordinationError) { readURL in
                 data = try? Data(contentsOf: readURL)
             }
             guard let data else {
-                failures.append(Failure(fileName: name, reason: .notMusicXML))
+                failures.append(Failure(fileName: name, reason: .unreadable))
                 continue
             }
             do {
@@ -144,7 +163,13 @@ final class ImportCoordinator {
         isReading = false
         Self.removeInboxCopies(urls)
         let library = (try? context.fetch(FetchDescriptor<Score>())) ?? []
-        session = ImportSession(files: files, failures: failures, instruments: instruments, library: library)
+        let arriving = ImportSession(files: files, failures: failures, instruments: instruments, library: library)
+        if let session {
+            // A sheet already open keeps what was typed and chosen; the new files join it.
+            session.add(arriving)
+        } else {
+            session = arriving
+        }
     }
 
     /// Files given to the app by AirDrop or Open In are copied into its Inbox; once
@@ -194,6 +219,8 @@ extension MusicFile.Failure {
         case .timewise: "This MusicXML is written bar by bar instead of part by part. Export it again as a standard MusicXML file."
         case .damaged: "This compressed MusicXML file can't be opened. Export it again."
         case .pdf: "This is a PDF. Large Score reads MusicXML: convert the PDF on the Mac first, or add it together with its MusicXML."
+        case .unreadable: "This file couldn't be opened. Check that it has finished downloading, then add it again."
+        case .noParts: "This MusicXML file has no parts to show."
         }
     }
 }

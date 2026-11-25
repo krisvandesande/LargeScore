@@ -11,8 +11,13 @@ final class FixSession {
     private(set) var wrongBars: [String] = []
     /// Each bar's number as parts count them (every bar of a multi-bar rest counts).
     private(set) var barNumbers: [String: Int] = [:]
-    var selectedNote: String?
+    var selectedNote: String? { didSet { readSelection() } }
     var selectedBar: String?
+    /// The selected note's text, read once when the selection or the music changes:
+    /// the fix bar asks for it many times a redraw.
+    private(set) var selectedXML: String?
+    /// Undo keeps this many steps: each holds the whole file.
+    static let undoLimit = 100
     var problem: LocalizedStringResource?
 
     init(xml: String) {
@@ -98,7 +103,10 @@ final class FixSession {
         var copy = edit
         do {
             try body(&copy)
+            // A tap that changes nothing isn't a step to undo.
+            guard copy.xml != edit.xml else { problem = nil; return }
             undoStack.append(edit.xml)
+            if undoStack.count > Self.undoLimit { undoStack.removeFirst() }
             edit = copy
             problem = nil
             changed()
@@ -113,14 +121,24 @@ final class FixSession {
         barNumbers = edit.barNumbers()
         if let note = selectedNote, edit.elementRange("note", id: note) == nil { selectedNote = nil }
         if let bar = selectedBar, edit.elementRange("measure", id: bar) == nil { selectedBar = nil }
+        readSelection()
+    }
+
+    /// The last change gave music the engraver can't read: it is taken back.
+    func rejectLastChange() {
+        guard let last = undoStack.popLast() else { return }
+        edit = MusicXMLEdit(xml: last)
+        changed()
+        problem = "That change couldn't be shown, so it was undone."
+    }
+
+    private func readSelection() {
+        guard let id = selectedNote, let range = edit.elementRange("note", id: id) else { selectedXML = nil; return }
+        selectedXML = String(edit.xml[range])
     }
 
     // MARK: The selected note
 
-    private var selectedXML: String? {
-        guard let id = selectedNote, let range = edit.elementRange("note", id: id) else { return nil }
-        return String(edit.xml[range])
-    }
 
     var selectedIsRest: Bool { selectedXML?.contains("<rest") ?? false }
     var selectedHasDot: Bool { selectedXML?.contains("<dot>") ?? false }

@@ -168,7 +168,7 @@ struct ProgrammePieces: View {
     /// Shown as a large button after the last piece, where it's always in sight.
     var addPieces: (() -> Void)? = nil
     @Environment(\.modelContext) private var context
-    @State private var openAt: Int?
+    @State private var openAt: OpenAt?
 
     var body: some View {
         let entries = programme.orderedEntries
@@ -194,7 +194,7 @@ struct ProgrammePieces: View {
                 }
                 ForEach(Array(entries.enumerated()), id: \.element.id) { index, entry in
                     Button {
-                        openAt = index
+                        openAt = OpenAt(index: index, pieces: programme.scores.map(\.piece))
                     } label: {
                         HStack(alignment: .firstTextBaseline, spacing: 20) {
                             Text("\(index + 1)")
@@ -244,8 +244,11 @@ struct ProgrammePieces: View {
             }
         }
         .environment(\.editMode, .constant(editing ? .active : .inactive))
-        .fullScreenCover(item: Binding(get: { openAt.map(OpenAt.init) }, set: { openAt = $0?.index })) { open in
-            ReaderView(pieces: programme.scores.map(\.piece), start: open.index, backTitle: backTitle) { piece in
+        .fullScreenCover(item: $openAt) { open in
+            // The pieces as they were when it opened: a change synced from another
+            // device mid-concert doesn't move the place or swap the piece.
+            ReaderView(pieces: open.pieces, start: open.index, backTitle: backTitle) { piece in
+                guard !programme.isDeleted, programme.modelContext != nil else { return }
                 programme.scores.first { $0.id.uuidString == piece.id }?.lastOpenedAt = .now
                 try? context.save()
             }
@@ -254,6 +257,7 @@ struct ProgrammePieces: View {
 
     private struct OpenAt: Identifiable {
         var index: Int
+        var pieces: [Piece]
         var id: Int { index }
     }
 }
@@ -325,7 +329,8 @@ private struct AddPiecesSheet: View {
 
 /// The Today tab: the pinned programme, ready to play.
 struct TodayView: View {
-    @Query(filter: #Predicate<Programme> { $0.isToday }) private var today: [Programme]
+    /// Pinned on two devices at once, two can be Today: the oldest wins everywhere.
+    @Query(filter: #Predicate<Programme> { $0.isToday }, sort: [SortDescriptor(\Programme.createdAt), SortDescriptor(\Programme.name)]) private var today: [Programme]
     let showProgrammes: () -> Void
 
     var body: some View {

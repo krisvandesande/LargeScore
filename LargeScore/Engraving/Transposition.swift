@@ -89,16 +89,31 @@ nonisolated struct Transposition: Hashable, Sendable {
         case 12: String(localized: "twelfth")
         case 13: String(localized: "thirteenth")
         case 14: String(localized: "fourteenth")
-        default: String(localized: "two octaves")
+        case 15: String(localized: "two octaves")
+        default: String(localized: "sixteenth")
         }
         return s > 0 ? String(localized: "Up a \(name)") : String(localized: "Down a \(name)")
     }
 
     /// The clefs moved between bass and treble, when the instruments read different ones.
+    /// Whole `<clef>` elements are rewritten: a G clef may leave out its line, and a
+    /// tenor part's treble clef an octave down (`clef-octave-change`) would otherwise
+    /// carry its octave over to the bass clef.
     func clefs(in xml: String) -> String {
         guard changesClef else { return xml }
-        let (fromSign, fromLine, toSign, toLine) = to.bassClef ? ("G", "2", "F", "4") : ("F", "4", "G", "2")
-        let pattern = #"<sign>\#(fromSign)</sign>(\s*)<line>\#(fromLine)</line>"#
-        return xml.replacingOccurrences(of: pattern, with: "<sign>\(toSign)</sign>$1<line>\(toLine)</line>", options: .regularExpression)
+        let (fromSign, toSign, toLine) = to.bassClef ? ("G", "F", "4") : ("F", "G", "2")
+        guard let regex = try? NSRegularExpression(pattern: #"(<clef(?:\s[^>]*)?>)(.*?)(</clef>)"#, options: [.dotMatchesLineSeparators]) else { return xml }
+        let text = xml as NSString
+        var result = ""
+        var last = 0
+        for match in regex.matches(in: xml, range: NSRange(location: 0, length: text.length)) {
+            let body = text.substring(with: match.range(at: 2))
+            guard body.range(of: #"<sign>\s*\#(fromSign)\s*</sign>"#, options: .regularExpression) != nil else { continue }
+            result += text.substring(with: NSRange(location: last, length: match.range.location - last))
+            result += text.substring(with: match.range(at: 1)) + "<sign>\(toSign)</sign><line>\(toLine)</line>" + "</clef>"
+            last = match.range.location + match.range.length
+        }
+        guard last > 0 else { return xml }
+        return result + text.substring(from: last)
     }
 }

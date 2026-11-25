@@ -107,49 +107,50 @@ extension ScoreCanvas {
         cg.setStrokeColor(colour)
         cg.setFillColor(colour)
         for mark in marks {
-            guard let box = geometry.box(of: mark.bar) else { continue }
-            switch mark.kind {
-            case .ink:
-                guard let first = mark.points.first else { continue }
-                let path = CGMutablePath()
-                path.move(to: geometry.place(first, in: box))
-                for point in mark.points.dropFirst() { path.addLine(to: geometry.place(point, in: box)) }
-                if mark.points.count == 1 { path.addLine(to: geometry.place(first, in: box)) }
-                cg.addPath(path)
-                cg.setLineWidth(space * 0.22)
-                cg.setLineCap(.round)
-                cg.setLineJoin(.round)
-                cg.strokePath()
-            case .circle:
-                cg.setLineWidth(space * 0.25)
-                cg.strokeEllipse(in: box.insetBy(dx: -space * 1.2, dy: -space * 2.2))
-            case .highlight:
-                cg.saveGState()
-                // A pale fill keeps the music readable on it; the outline in the notes'
-                // colour gives the mark itself enough contrast (6.5:1 light, 9.2:1 dark).
-                let area = box.insetBy(dx: -space * 0.4, dy: -space * 1.2)
-                cg.setFillColor(UIColor.systemYellow.withAlphaComponent(0.35).cgColor)
-                cg.fill(area)
-                cg.restoreGState()
-                cg.setLineWidth(space * 0.15)
-                cg.stroke(area)
-            case .watch:
-                let at = geometry.place(mark.position, in: box)
-                let side = space * 3
-                if let image = UIImage(systemName: "eyeglasses")?.withTintColor(UIColor(cgColor: colour), renderingMode: .alwaysOriginal) {
-                    UIGraphicsPushContext(cg)
-                    image.draw(in: CGRect(x: at.x - side / 2, y: at.y - side / 2, width: side, height: side))
-                    UIGraphicsPopContext()
-                }
-            default:
-                guard let code = mark.kind.glyph, let glyph = GlyphLibrary.shared.glyph(code, font: "Leipzig") else { continue }
-                let at = geometry.place(mark.position, in: box)
-                // One em of the music font is one staff height; fingerings a little smaller.
-                let em = space * 4 * (code >= 0xED10 ? 0.8 : 1)
-                var t = CGAffineTransform(translationX: at.x - glyph.advance * em / 2000, y: at.y).scaledBy(x: em / 1000, y: em / 1000)
-                if let placed = glyph.path.copy(using: &t) {
-                    cg.addPath(placed)
-                    cg.fillPath()
+            for box in geometry.boxes(of: mark.bar) {
+                switch mark.kind {
+                case .ink:
+                    guard let first = mark.points.first else { continue }
+                    let path = CGMutablePath()
+                    path.move(to: geometry.place(first, in: box))
+                    for point in mark.points.dropFirst() { path.addLine(to: geometry.place(point, in: box)) }
+                    if mark.points.count == 1 { path.addLine(to: geometry.place(first, in: box)) }
+                    cg.addPath(path)
+                    cg.setLineWidth(space * 0.22)
+                    cg.setLineCap(.round)
+                    cg.setLineJoin(.round)
+                    cg.strokePath()
+                case .circle:
+                    cg.setLineWidth(space * 0.25)
+                    cg.strokeEllipse(in: box.insetBy(dx: -space * 1.2, dy: -space * 2.2))
+                case .highlight:
+                    cg.saveGState()
+                    // A pale fill keeps the music readable on it; the outline in the notes'
+                    // colour gives the mark itself enough contrast (6.5:1 light, 9.2:1 dark).
+                    let area = box.insetBy(dx: -space * 0.4, dy: -space * 1.2)
+                    cg.setFillColor(UIColor.systemYellow.withAlphaComponent(0.35).cgColor)
+                    cg.fill(area)
+                    cg.restoreGState()
+                    cg.setLineWidth(space * 0.15)
+                    cg.stroke(area)
+                case .watch:
+                    let at = geometry.place(mark.position, in: box)
+                    let side = space * 3
+                    if let image = UIImage(systemName: "eyeglasses")?.withTintColor(UIColor(cgColor: colour), renderingMode: .alwaysOriginal) {
+                        UIGraphicsPushContext(cg)
+                        image.draw(in: CGRect(x: at.x - side / 2, y: at.y - side / 2, width: side, height: side))
+                        UIGraphicsPopContext()
+                    }
+                default:
+                    guard let code = mark.kind.glyph, let glyph = GlyphLibrary.shared.glyph(code, font: "Leipzig") else { continue }
+                    let at = geometry.place(mark.position, in: box)
+                    // One em of the music font is one staff height; fingerings a little smaller.
+                    let em = space * 4 * (code >= 0xED10 ? 0.8 : 1)
+                    var t = CGAffineTransform(translationX: at.x - glyph.advance * em / 2000, y: at.y).scaledBy(x: em / 1000, y: em / 1000)
+                    if let placed = glyph.path.copy(using: &t) {
+                        cg.addPath(placed)
+                        cg.fillPath()
+                    }
                 }
             }
         }

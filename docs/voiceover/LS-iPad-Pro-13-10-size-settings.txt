@@ -1,7 +1,7 @@
             Button: Settings [BackButton]
             Text: Music Size
             Slider: Space between lines = 2 of 7
-            Slider: Music size = Size 4 of 7 [sizeStepper]
+            Slider: Music size = Size 4 of 15 [sizeStepper]
             Button: Today [music.note.list]
             Button: Today [music.note.list]
             Button: Programmes [list.number]

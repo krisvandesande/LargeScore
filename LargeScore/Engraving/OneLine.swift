@@ -17,10 +17,14 @@ nonisolated enum OneLine {
 
     static func screens(of line: SVGScene, area: CGSize, staffHeight: CGFloat) -> [Screen] {
         let staves = line.measures.filter { !$0.isNull }
-        guard let firstStaff = staves.first, firstStaff.height > 0,
-              let content = line.systems.first(where: { !$0.isNull }) else { return [] }
-        // Points per page unit, so a staff comes out `staffHeight` points tall.
-        let scale = staffHeight / firstStaff.height
+        guard !staves.isEmpty, let content = line.systems.first(where: { !$0.isNull }),
+              area.width > 0, area.height > 0 else { return [] }
+        // Points per page unit, so one staff comes out `staffHeight` points tall (a piano
+        // part's bars span two). A part of one-line staves (percussion) has no staff
+        // height to measure: Verovio's own five-line staff is 72 units at scale 100,
+        // drawn here at 10 viewBox units each.
+        let span = line.staffSpan ?? 720
+        let scale = staffHeight / span
         let width = area.width / scale
         let height = area.height / scale
         let usable = width - 2 * margin / scale
@@ -37,8 +41,9 @@ nonisolated enum OneLine {
             let last = end >= content.maxX - 1
             // The last bar line on this screen, if it leaves at least a third of a screen behind it.
             let barLine = last ? nil : barLines.last { $0 <= end && $0 > start + usable / 3 }
-            let scene = line.window(rect, itemBounds: itemBounds, cutoff: barLine ?? .infinity)
-            let firstIndex = line.measures.firstIndex { !$0.isNull && $0.intersects(rect) } ?? 0
+            let scene = line.window(rect, itemBounds: itemBounds, cutoff: barLine ?? .infinity, start: start)
+            // The bar before ends on the screen's first bar line, a hair inside the margin.
+            let firstIndex = line.measures.firstIndex { !$0.isNull && $0.maxX > start + 1 } ?? 0
             screens.append(Screen(scene: scene, firstBar: firstIndex + 1))
             if last { break }
             // Next screen from that bar line; a bar wider than the screen carries on a

@@ -45,13 +45,20 @@ nonisolated struct MusicXMLEdit {
     }
 
     var xml: String
+    /// How much the last edit multiplied the part's divisions by.
+    private var scaled = 1
+
+    init(xml: String) { self.xml = xml }
 
     // MARK: Ids
 
     /// The file with an `id` on every note and bar that has none ("ls-n12",
     /// "ls-m3"). Ids already there are kept.
     static func withIDs(_ xml: String) -> String {
-        let writer = IDWriter()
+        // Numbers go on from the highest already used, so partly marked files keep unique ids.
+        let existing = MusicXMLEdit(xml: xml)
+        let writer = IDWriter(notes: Int(existing.nextID("ls-n").dropFirst(4))! - 1,
+                              bars: Int(existing.nextID("ls-m").dropFirst(4))! - 1)
         let parser = XMLParser(data: Data(xml.utf8))
         parser.delegate = writer
         return parser.parse() ? writer.output : xml
@@ -61,8 +68,13 @@ nonisolated struct MusicXMLEdit {
 
     mutating func edit(note id: String, _ change: NoteChange) throws {
         guard let range = elementRange("note", id: id) else { throw Failure.notFound }
-        let context = Context(xml: xml, upTo: range.lowerBound)
         var note = String(xml[range])
+        let staff = note.firstMatch(#"<staff>(\d+)</staff>"#).flatMap(Int.init) ?? 1
+        let context = Context(xml: xml, upTo: range.lowerBound, staff: staff)
+        let oldDuration = Int(note.firstMatch(#"<duration>(\d+)</duration>"#) ?? "") ?? 0
+        let inChord = note.contains("<chord")
+        let chordMates = chordGroup(of: range).filter { $0 != id }
+        scaled = 1
         switch change {
         case .step(let steps):
             guard let pitch = Pitch(note) else { throw Failure.cannot }
@@ -76,28 +88,38 @@ nonisolated struct MusicXMLEdit {
             note = note.removingAll(#"<accidental[^>]*>[\s\S]*?</accidental>"#)
             note = note.inserting("<accidental>\(accidental.rawValue)</accidental>", after: ["</dot>", "</type>", "</voice>", "</duration>"])
         case .length(let length):
+            guard !note.contains("<grace") else { throw Failure.cannot }
             let dots = note.components(separatedBy: "<dot>").count - 1
             note = note.replacingFirst(#"<type>[^<]*</type>"#, with: "<type>\(length.rawValue)</type>")
             if !note.contains("<type>") {
                 note = note.inserting("<type>\(length.rawValue)</type>", after: ["</voice>", "</duration>"])
             }
-            try setDuration(&note, quarters: length.quarters * Self.dotted(dots), at: range.lowerBound)
+            note = note.removingAll(#"\smeasure="yes""#)
+            try setDuration(&note, quarters: length.quarters * Self.dotted(dots) * Self.tuplet(note), at: range.lowerBound)
         case .toggleDot:
-            let quarters = note.firstMatch(#"<type>([^<]*)</type>"#).flatMap { Length(rawValue: $0)?.quarters } ?? 1
+            // A note with no written length (a whole-bar rest) has nothing to dot.
+            guard !note.contains("<grace"),
+                  let quarters = note.firstMatch(#"<type>([^<]*)</type>"#).flatMap({ Length(rawValue: $0)?.quarters }) else { throw Failure.cannot }
             if note.contains("<dot>") {
                 note = note.removingAll(#"<dot>\s*</dot>"#)
-                try setDuration(&note, quarters: quarters, at: range.lowerBound)
+                try setDuration(&note, quarters: quarters * Self.tuplet(note), at: range.lowerBound)
             } else {
                 note = note.inserting("<dot></dot>", after: ["</type>"])
-                try setDuration(&note, quarters: quarters * 1.5, at: range.lowerBound)
+                try setDuration(&note, quarters: quarters * 1.5 * Self.tuplet(note), at: range.lowerBound)
             }
         case .toggleTie:
+            guard !note.contains("<grace"), !note.contains("<rest") else { throw Failure.cannot }
             try toggleTie(from: range)
             return
         case .toggleRest:
             if note.contains("<rest") {
                 let pitch = Pitch.middleLine(clef: context.clef)
                 note = note.replacingFirst(#"<rest[^>]*>[\s\S]*?</rest>"#, with: pitch.xml)
+                // A whole-bar rest has no written length: the note gets one from its duration.
+                if !note.contains("<type>") {
+                    guard let length = Length.allCases.first(where: { Double(oldDuration) == $0.quarters * Double(context.divisions) }) else { throw Failure.cannot }
+                    note = note.inserting("<type>\(length.rawValue)</type>", after: ["</voice>", "</duration>"])
+                }
             } else {
                 note = note.replacingFirst(#"<pitch>[\s\S]*?</pitch>"#, with: "<rest></rest>")
                 note = note.removingAll(#"<accidental[^>]*>[\s\S]*?</accidental>"#)
@@ -108,6 +130,62 @@ nonisolated struct MusicXMLEdit {
         // Lengths may have rescaled the part's durations: find the note again.
         guard let current = elementRange("note", id: id) else { throw Failure.notFound }
         xml.replaceSubrange(current, with: note)
+        guard change == .toggleDot || { if case .length = change { true } else { false } }() else { return }
+        // Every note of a chord has one length.
+        let type = note.firstMatch(#"<type>([^<]*)</type>"#)
+        let dots = note.components(separatedBy: "<dot>").count - 1
+        let duration = note.firstMatch(#"<duration>(\d+)</duration>"#)
+        for mate in chordMates {
+            guard let r = elementRange("note", id: mate), let type, let duration else { continue }
+            var other = String(xml[r]).removingAll(#"<dot>\s*</dot>"#)
+            other = other.replacingFirst(#"<type>[^<]*</type>"#, with: "<type>\(type)</type>")
+            other = other.replacingFirst(#"<duration>[^<]*</duration>"#, with: "<duration>\(duration)</duration>")
+            if dots > 0 { other = other.inserting(String(repeating: "<dot></dot>", count: dots), after: ["</type>"]) }
+            xml.replaceSubrange(r, with: other)
+        }
+        // Other voices start again from a backup: it moves by as much as this voice did.
+        _ = inChord
+        if let newDuration = Int(duration ?? ""), let r = elementRange("note", id: chordMates.last ?? id) {
+            adjustBackup(after: r.upperBound, by: newDuration - oldDuration * scaled)
+        }
+    }
+
+    /// How much a tuplet shortens the note: 2/3 for a triplet.
+    private static func tuplet(_ note: String) -> Double {
+        guard let actual = note.firstMatch(#"<actual-notes>(\d+)</actual-notes>"#).flatMap(Double.init),
+              let normal = note.firstMatch(#"<normal-notes>(\d+)</normal-notes>"#).flatMap(Double.init), actual > 0 else { return 1 }
+        return normal / actual
+    }
+
+    /// The ids of a note's chord, the note included, in file order.
+    private func chordGroup(of range: Range<String.Index>) -> [String] {
+        var head = range
+        // Back to the chord's first note.
+        while String(xml[head]).contains("<chord"),
+              let previous = xml.range(of: "<note", options: .backwards, range: xml.startIndex..<head.lowerBound),
+              let end = xml.range(of: "</note>", range: previous.upperBound..<head.lowerBound),
+              xml[end.upperBound..<head.lowerBound].allSatisfy(\.isWhitespace) {
+            head = previous.lowerBound..<end.upperBound
+        }
+        var ranges = [head]
+        var end = head.upperBound
+        while let next = followingNote(end), String(xml[next]).contains("<chord") {
+            ranges.append(next)
+            end = next.upperBound
+        }
+        return ranges.compactMap { String(xml[$0]).firstMatch(#"<note\b[^>]*\bid="([^"]+)""#) }
+    }
+
+    /// Adds `delta` to the next `<backup>` in the bar, if any.
+    private mutating func adjustBackup(after position: String.Index, by delta: Int) {
+        guard delta != 0, position <= xml.endIndex,
+              let barEnd = xml.range(of: "</measure>", range: position..<xml.endIndex),
+              let backup = xml.range(of: "<backup>", range: position..<barEnd.lowerBound),
+              let close = xml.range(of: "</backup>", range: backup.upperBound..<barEnd.lowerBound) else { return }
+        let inside = String(xml[backup.upperBound..<close.lowerBound])
+        guard let old = inside.firstMatch(#"<duration>(\d+)</duration>"#).flatMap(Int.init) else { return }
+        let fixed = inside.replacingFirst(#"<duration>\d+</duration>"#, with: "<duration>\(max(old + delta, 0))</duration>")
+        xml.replaceSubrange(backup.upperBound..<close.lowerBound, with: fixed)
     }
 
     /// Sets a note's duration in divisions, doubling the part's divisions first when
@@ -123,6 +201,7 @@ nonisolated struct MusicXMLEdit {
         if factor > 1 {
             scaleDivisions(of: position, by: factor, in: &note)
             divisions *= factor
+            scaled = factor
         }
         let duration = Int(quarters * Double(divisions))
         if note.contains("<duration>") {
@@ -147,7 +226,19 @@ nonisolated struct MusicXMLEdit {
     private mutating func toggleTie(from range: Range<String.Index>) throws {
         var note = String(xml[range])
         let voice = note.firstMatch(#"<voice>([^<]*)</voice>"#) ?? "1"
-        guard let next = nextNote(after: range.upperBound, voice: voice) else { throw Failure.cannot }
+        // Past this note's own chord, then the note of the next chord at the same pitch.
+        var after = range.upperBound
+        while let mate = followingNote(after), String(xml[mate]).contains("<chord") { after = mate.upperBound }
+        guard let first = nextNote(after: after, voice: voice) else { throw Failure.cannot }
+        var next = first
+        if let pitch = Pitch(note) {
+            var candidate = first
+            while true {
+                if let other = Pitch(String(xml[candidate])), other.step == pitch.step, other.octave == pitch.octave { next = candidate; break }
+                guard let mate = followingNote(candidate.upperBound), String(xml[mate]).contains("<chord") else { break }
+                candidate = mate
+            }
+        }
         var following = String(xml[next])
         if note.contains(#"<tie type="start">"#) {
             note = note.removingAll(#"<tie type="start">\s*</tie>"#).removingAll(#"<tied type="start">\s*</tied>"#)
@@ -222,21 +313,29 @@ nonisolated struct MusicXMLEdit {
     /// Bars whose notes don't add up to the time signature, by id: a pickup bar
     /// (`implicit="yes"`) and the last bar of a part may be short.
     func barsThatDontAddUp() -> [String] {
+        // One pass through the file, carrying divisions and time from bar to bar: a
+        // context worked out afresh for each bar made a long piece take minutes.
         var result: [String] = []
         var search = xml.startIndex
+        var divisions = 1, beats = 4, beatType = 4
         while let start = xml.range(of: "<measure", range: search..<xml.endIndex),
               let end = xml.range(of: "</measure>", range: start.upperBound..<xml.endIndex) {
+            if xml.range(of: "<part ", range: search..<start.lowerBound) != nil || xml.range(of: "<part>", range: search..<start.lowerBound) != nil {
+                divisions = 1; beats = 4; beatType = 4
+            }
             let bar = String(xml[start.lowerBound..<end.upperBound])
             search = end.upperBound
-            let context = Context(xml: xml, upTo: end.lowerBound)
-            let expected = Double(context.divisions) * 4 * Double(context.beats) / Double(context.beatType)
+            if let d = bar.lastMatch(#"<divisions>(\d+)</divisions>"#).flatMap(Int.init), d > 0 { divisions = d }
+            if let b = bar.lastMatch(#"<beats>(\d+)</beats>"#).flatMap(Int.init), b > 0 { beats = b }
+            if let t = bar.lastMatch(#"<beat-type>(\d+)</beat-type>"#).flatMap(Int.init), t > 0 { beatType = t }
+            let expected = Double(divisions) * 4 * Double(beats) / Double(beatType)
             var sums: [String: Double] = [:]
             var position = bar.startIndex
             while let noteStart = bar.range(of: "<note", range: position..<bar.endIndex),
                   let noteEnd = bar.range(of: "</note>", range: noteStart.upperBound..<bar.endIndex) {
                 let note = String(bar[noteStart.lowerBound..<noteEnd.upperBound])
                 position = noteEnd.upperBound
-                if note.contains("<chord") || note.contains("<grace") { continue }
+                if note.contains("<chord") || note.contains("<grace") || note.contains("<cue") { continue }
                 let voice = note.firstMatch(#"<voice>([^<]*)</voice>"#) ?? "1"
                 sums[voice, default: 0] += Double(note.firstMatch(#"<duration>([^<]*)</duration>"#) ?? "0") ?? 0
             }
@@ -258,6 +357,13 @@ nonisolated struct MusicXMLEdit {
         if !note.contains("<chord"), let next = followingNote(range.upperBound), String(xml[next]).contains("<chord") {
             let promoted = String(xml[next]).removingAll(#"<chord>\s*</chord>"#)
             xml.replaceSubrange(next, with: promoted)
+        } else if !note.contains("<chord"), !note.contains("<grace"),
+                  let duration = note.firstMatch(#"<duration>(\d+)</duration>"#).flatMap(Int.init) {
+            // The voice is shorter now: a later voice's backup goes back less far.
+            let offset = xml.distance(from: xml.startIndex, to: range.lowerBound)
+            xml.removeSubrange(range)
+            adjustBackup(after: xml.index(xml.startIndex, offsetBy: offset), by: -duration)
+            return
         }
         xml.removeSubrange(range)
     }
@@ -280,6 +386,10 @@ nonisolated struct MusicXMLEdit {
         copy = copy.replacingFirst(#"\bid="[^"]*""#, with: "id=\"\(newID)\"")
         copy = copy.replacingFirst(#"\s(default-x|relative-x)="[^"]*""#, with: "")
         xml.insert(contentsOf: copy, at: end)
+        if !copy.contains("<grace"), let duration = copy.firstMatch(#"<duration>(\d+)</duration>"#).flatMap(Int.init),
+           let added = elementRange("note", id: newID) {
+            adjustBackup(after: added.upperBound, by: duration)
+        }
         return newID
     }
 
@@ -406,10 +516,13 @@ nonisolated struct MusicXMLEdit {
         guard let range = elementRange("measure", id: id) else { throw Failure.notFound }
         var bar = String(xml[range])
         let time = "<time><beats>\(beats)</beats><beat-type>\(beatType)</beat-type></time>"
-        if bar.range(of: #"<time\b[^>]*>[\s\S]*?</time>"#, options: .regularExpression) != nil {
-            bar = bar.replacingFirst(#"<time\b[^>]*>[\s\S]*?</time>"#, with: time)
+        guard beats > 0, beatType > 0 else { throw Failure.cannot }
+        // `<time>` itself, not `<time-modification>` (a triplet's).
+        let pattern = #"<time(?:\s[^>]*)?>[\s\S]*?</time>"#
+        if bar.range(of: pattern, options: .regularExpression) != nil {
+            bar = bar.replacingFirst(pattern, with: time)
         } else {
-            bar = Self.addAttribute(time, before: ["<staves", "<part-symbol", "<instruments", "<clef", "<staff-details", "<transpose", "<measure-style"], to: bar)
+            bar = Self.addAttribute(time, before: ["<staves", "<part-symbol", "<instruments", "<clef", "<staff-details", "<transpose", "<directive", "<measure-style"], to: bar)
         }
         xml.replaceSubrange(range, with: bar)
     }
@@ -432,18 +545,29 @@ nonisolated struct MusicXMLEdit {
         }
         let insertAt = group.last?.upperBound ?? range.upperBound
         let delta = count - 1 - group.count
+        // Bars that carry a key or time change, or words, aren't taken away.
+        if delta < 0, group.suffix(-delta).contains(where: { String(xml[$0]).contains("<attributes") || String(xml[$0]).contains("<direction") }) {
+            throw Failure.cannot
+        }
+        var duration = 0
+        if delta > 0 {
+            let context = Context(xml: xml, upTo: range.upperBound)
+            let whole = context.divisions * 4 * context.beats
+            // A bar's length must come out in whole divisions.
+            guard context.beatType > 0, whole % context.beatType == 0 else { throw Failure.cannot }
+            duration = whole / context.beatType
+        }
 
         // Shift later bar numbers first, while the ranges still hold.
         if delta != 0 { renumber(after: insertAt, by: delta) }
         if delta > 0 {
-            let context = Context(xml: xml, upTo: range.upperBound)
-            let duration = context.divisions * 4 * context.beats / context.beatType
             let lastNumber = Int(String(xml[group.last ?? range]).firstMatch(#"<measure\b[^>]*\bnumber="(\d+)""#) ?? "") ?? 0
             var added = ""
             var ids = self
             for n in 1...delta {
                 let newID = ids.nextID("ls-m")
-                let measure = "<measure id=\"\(newID)\" number=\"\(lastNumber + n)\"><note><rest measure=\"yes\"></rest><duration>\(duration)</duration><voice>1</voice></note></measure>"
+                let noteID = ids.nextID("ls-n")
+                let measure = "<measure id=\"\(newID)\" number=\"\(lastNumber + n)\"><note id=\"\(noteID)\"><rest measure=\"yes\"></rest><duration>\(duration)</duration><voice>1</voice></note></measure>"
                 ids.xml += measure // reserve the id
                 added += measure
             }
@@ -487,7 +611,10 @@ nonisolated struct MusicXMLEdit {
     /// (MusicXML's order), making the attributes if the bar has none.
     private static func addAttribute(_ element: String, before tags: [String], to bar: String) -> String {
         var bar = bar
-        if let open = bar.range(of: "<attributes>"), let close = bar.range(of: "</attributes>", range: open.upperBound..<bar.endIndex) {
+        // The bar's opening attributes only: a later one is a change mid-bar.
+        let firstNote = bar.range(of: #"<note[\s>]"#, options: .regularExpression)?.lowerBound ?? bar.endIndex
+        if let open = bar.range(of: "<attributes>"), open.lowerBound < firstNote,
+           let close = bar.range(of: "</attributes>", range: open.upperBound..<bar.endIndex) {
             let inside = open.upperBound..<close.lowerBound
             for tag in tags {
                 if let at = bar.range(of: tag, range: inside) {
@@ -575,14 +702,34 @@ nonisolated private struct Context {
     var beatType = 4
     var clef = "G"
 
-    init(xml: String, upTo position: String.Index) {
+    /// Searched backwards from the place, without copying the part: an edit near the
+    /// end of a long file stays quick. `staff` picks the clef of a piano part's staff.
+    init(xml: String, upTo position: String.Index, staff: Int = 1) {
         let partStart = xml.range(of: "<part ", options: .backwards, range: xml.startIndex..<position)?.lowerBound ?? xml.startIndex
-        let before = String(xml[partStart..<position])
-        if let d = before.lastMatch(#"<divisions>(\d+)</divisions>"#).flatMap(Int.init) { divisions = d }
-        if let f = before.lastMatch(#"<fifths>(-?\d+)</fifths>"#).flatMap(Int.init) { fifths = f }
-        if let b = before.lastMatch(#"<beats>(\d+)</beats>"#).flatMap(Int.init) { beats = b }
-        if let t = before.lastMatch(#"<beat-type>(\d+)</beat-type>"#).flatMap(Int.init) { beatType = t }
-        if let c = before.lastMatch(#"<sign>([A-Z]+)</sign>"#) { clef = c }
+        let before = partStart..<position
+        func last(_ tag: String) -> String? {
+            guard let open = xml.range(of: "<\(tag)>", options: .backwards, range: before),
+                  let close = xml.range(of: "</\(tag)>", range: open.upperBound..<position) else { return nil }
+            return String(xml[open.upperBound..<close.lowerBound]).trimmingCharacters(in: .whitespaces)
+        }
+        if let d = last("divisions").flatMap(Int.init), d > 0 { divisions = d }
+        if let f = last("fifths").flatMap(Int.init) { fifths = f }
+        if let b = last("beats").flatMap(Int.init), b > 0 { beats = b }
+        if let t = last("beat-type").flatMap(Int.init), t > 0 { beatType = t }
+        // The last clef for this staff: `<clef number="2">` for a piano's lower staff,
+        // a clef with no number for the first.
+        var search = before
+        while let open = xml.range(of: "<clef", options: .backwards, range: search) {
+            search = partStart..<open.lowerBound
+            guard let tagEnd = xml.range(of: ">", range: open.upperBound..<position),
+                  let close = xml.range(of: "</clef>", range: tagEnd.upperBound..<position) else { continue }
+            let tag = String(xml[open.lowerBound..<tagEnd.upperBound])
+            guard tag == "<clef>" || tag.hasPrefix("<clef ") else { continue }
+            let number = tag.firstMatch(#"number="(\d+)""#).flatMap(Int.init) ?? 1
+            guard number == staff else { continue }
+            if let sign = String(xml[tagEnd.upperBound..<close.lowerBound]).firstMatch(#"<sign>([A-Z]+)</sign>"#) { clef = sign }
+            break
+        }
     }
 }
 
@@ -621,7 +768,7 @@ nonisolated private struct Pitch {
         let index = Pitch.steps.firstIndex(of: step)! + by
         let octaveShift = Int((Double(index) / 7).rounded(.down))
         let newStep = Pitch.steps[((index % 7) + 7) % 7]
-        return Pitch(step: newStep, alter: Pitch.keyAlter(newStep, fifths: fifths), octave: octave + octaveShift)
+        return Pitch(step: newStep, alter: Pitch.keyAlter(newStep, fifths: fifths), octave: min(max(octave + octaveShift, 0), 9))
     }
 
     static func keyAlter(_ step: Character, fifths: Int) -> Int {
@@ -639,8 +786,13 @@ nonisolated private struct Pitch {
 /// Echoes the document, giving notes and bars without an id one of their own.
 nonisolated private final class IDWriter: NSObject, XMLParserDelegate {
     var output = #"<?xml version="1.0" encoding="UTF-8"?>"# + "\n"
-    private var notes = 0
-    private var bars = 0
+    private var notes: Int
+    private var bars: Int
+
+    init(notes: Int, bars: Int) {
+        self.notes = notes
+        self.bars = bars
+    }
 
     func parser(_ parser: XMLParser, didStartElement element: String, namespaceURI: String?, qualifiedName: String?, attributes: [String: String] = [:]) {
         var attributes = attributes
@@ -655,6 +807,10 @@ nonisolated private final class IDWriter: NSObject, XMLParserDelegate {
 
     func parser(_ parser: XMLParser, foundCharacters string: String) {
         output += MusicXMLEdit.escape(string)
+    }
+
+    func parser(_ parser: XMLParser, foundCDATA data: Data) {
+        output += MusicXMLEdit.escape(String(decoding: data, as: UTF8.self))
     }
 
     func parser(_ parser: XMLParser, didEndElement element: String, namespaceURI: String?, qualifiedName: String?) {

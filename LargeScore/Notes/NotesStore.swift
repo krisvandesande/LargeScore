@@ -7,7 +7,13 @@ import UIKit
 @Observable
 final class NotesStore {
     private(set) var marks: [Mark] = []
-    private let score: Score?
+    private let stored: Score?
+    /// The piece while it still exists: deleted on another device while open, reading
+    /// it would stop the app.
+    private var score: Score? {
+        guard let stored, !stored.isDeleted, stored.modelContext != nil else { return nil }
+        return stored
+    }
     private let context: ModelContext
 
     private enum Change {
@@ -19,10 +25,10 @@ final class NotesStore {
     init(pieceID: String, context: ModelContext) {
         self.context = context
         let id = UUID(uuidString: pieceID)
-        score = id.flatMap { id in
+        stored = id.flatMap { id in
             try? context.fetch(FetchDescriptor<Score>(predicate: #Predicate { $0.id == id })).first
         }
-        marks = score?.annotations?.map(\.mark) ?? []
+        marks = stored?.annotations?.map(\.mark) ?? []
     }
 
     /// Only pieces in the library take notes; the bundled sample doesn't.
@@ -49,6 +55,9 @@ final class NotesStore {
         changes.append(.removed(removed))
         save()
     }
+
+    /// Undo covers the page in view: after a turn it would take away notes out of sight.
+    func forgetUndo() { changes.removeAll() }
 
     func undo() {
         guard let last = changes.popLast() else { return }

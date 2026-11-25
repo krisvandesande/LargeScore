@@ -4,6 +4,16 @@
     "": {
       "shouldTranslate": false
     },
+    "%@ at size %lld": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ op grootte %lld"
+          }
+        }
+      }
+    },
     "%@ flat": {
       "localizations": {
         "nl": {
@@ -180,6 +190,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bij een halve paginaomslag zie je eerst de bovenkant van de volgende pagina, zodat je vooruit kunt lezen terwijl je onderaan verder speelt."
+          }
+        }
+      }
+    },
+    "A half-page turn shows the top of the next page first, so you can read ahead while you finish the bottom. Marking the first bar tints it for a moment after each turn, to show where to start.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bij een halve paginaomslag zie je eerst de bovenkant van de volgende pagina, zodat je vooruit kunt lezen terwijl je onderaan verder speelt. Met de eerste maat markeren licht die maat na elke omslag even op, zodat je ziet waar je begint."
           }
         }
       }
@@ -1214,6 +1234,16 @@
         }
       }
     },
+    "Mark the First Bar": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eerste maat markeren"
+          }
+        }
+      }
+    },
     "Match iPad": {
       "localizations": {
         "nl": {
@@ -1750,6 +1780,26 @@
         }
       }
     },
+    "Repeated bars are printed again where they're played, with D.C., D.S. and Coda followed, so pages only turn forward.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Herhaalde maten staan opnieuw waar ze gespeeld worden, met D.C., D.S. en Coda gevolgd, zodat je alleen vooruit bladert."
+          }
+        }
+      }
+    },
+    "Repeats in Playing Order": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Herhalingen in speelvolgorde"
+          }
+        }
+      }
+    },
     "Replace the Music": {
       "localizations": {
         "nl": {
@@ -1896,6 +1946,26 @@
         }
       }
     },
+    "Size for This Piece": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grootte voor dit stuk"
+          }
+        }
+      }
+    },
+    "Size for this piece": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grootte voor dit stuk"
+          }
+        }
+      }
+    },
     "Sort": {
       "localizations": {
         "nl": {
@@ -1982,6 +2052,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Tempo"
+          }
+        }
+      }
+    },
+    "That change couldn't be shown, so it was undone.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die wijziging kon niet getoond worden en is ongedaan gemaakt."
           }
         }
       }
@@ -2102,6 +2182,16 @@
         }
       }
     },
+    "This MusicXML file has no parts to show.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dit MusicXML-bestand heeft geen partijen om te tonen."
+          }
+        }
+      }
+    },
     "This MusicXML is written bar by bar instead of part by part. Export it again as a standard MusicXML file.": {
       "localizations": {
         "nl": {
@@ -2142,6 +2232,16 @@
         }
       }
     },
+    "This file couldn't be opened. Check that it has finished downloading, then add it again.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dit bestand kon niet geopend worden. Controleer of het helemaal gedownload is en voeg het opnieuw toe."
+          }
+        }
+      }
+    },
     "This is a PDF. Large Score reads MusicXML: convert the PDF on the Mac first, or add it together with its MusicXML.": {
       "localizations": {
         "nl": {
@@ -2168,6 +2268,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Deze muziek kon niet worden gelezen."
+          }
+        }
+      }
+    },
+    "This music is still on its way from iCloud.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deze muziek komt nog binnen via iCloud."
           }
         }
       }
@@ -2344,6 +2454,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bijgewerkt: %@"
+          }
+        }
+      }
+    },
+    "Use Standard Size": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Standaardgrootte gebruiken"
           }
         }
       }

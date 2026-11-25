@@ -35,7 +35,7 @@ xcodebuild -project LargeScore.xcodeproj -scheme LargeScore \
 
 ## Accessibility sweep
 
-Use one simulator at a time, "LS iPad Pro 13", for everyday test runs (Kris, 2026-11-22: "use less simulators"; "noone plays on a mini": the app is for the larger iPads, to be said on the App Store). `scripts/sweep.sh` runs on it alone; `scripts/sweep.sh --all` adds "LS iPad" and "LS iPad mini" (iOS 27.2), for the sweep before a TestFlight build; the mini only has to work, not to be optimised for. It warms new ones up, runs `LargeScoreUITests` on each at standard size and AX5, light and dark, and checks crash reports after each run. Screenshots go to `build/sweep/<date>/`, audit lines to its logs, reading-order trees to `docs/voiceover/` (tracked: a run changes them). Write the verdicts into `docs/accessibility-findings.md`.
+Use one simulator at a time, "LS iPad Pro 13", for everyday test runs (Kris, 2026-11-22: "use less simulators"; "noone plays on a mini": the app is for the larger iPads, to be said on the App Store). `scripts/sweep.sh` runs on it alone; `scripts/sweep.sh --all` adds "LS iPad" (iOS 27.2), for the sweep before a TestFlight build. The mini is skipped (Kris, 2026-11-25: "As usual, skip the mini"); `--mini` adds it only when asked. It warms new ones up, runs `LargeScoreUITests` on each at standard size and AX5, light and dark, and checks crash reports after each run. Screenshots go to `build/sweep/<date>/`, audit lines to its logs, reading-order trees to `docs/voiceover/` (tracked: a run changes them). Write the verdicts into `docs/accessibility-findings.md`.
 
 ## Gotchas
 
@@ -49,6 +49,16 @@ Use one simulator at a time, "LS iPad Pro 13", for everyday test runs (Kris, 202
 - iCloud sync is on (container `iCloud.com.kvds.LargeScore`, 2026-11-22); the CloudKit schema was deployed to production on 2026-11-22; after the model gains fields, run a Debug build on My Mac (Mac Catalyst) and deploy again (`docs/icloud-setup.md`, step 3). Xcode's agent tools build headless and see "No Accounts": anything that needs Kris's account (registering a container) needs a build in his Xcode window.
 - PDFs go through Audiveris on the grandfather's Mac Pro (2013, Intel, Monterey): `scripts/macpro/` (converter and installer, bash 3.2), guide in `docs/mac-pro-converter.md`. Files a recognition program wrote (`encoding/software`) are marked "Check against the PDF" until checked; a version saved from MuseScore counts as checked. The Large Score Mac app can't run on that Mac (macOS 26, Apple silicon).
 - Fix Notes edits the MusicXML itself (`MusicXMLEdit`): every note and bar gets an id on import (`ls-n…`, `ls-m…`), Verovio keeps those ids on what it draws, and `SVGScene.noteBoxes` maps a tap back to the note. Edits assume the echo writer's form (opening and closing tags, no self-closing).
+
+- **Hostile review, 2026-11-25** (`LargeScoreTests/RobustnessTests.swift` keeps each from coming back):
+  - Every Verovio option, thin line widths included, is set on every engrave; page sizes are clamped to Verovio's limits (100 to 60000 units), or it keeps the last piece's page.
+  - Verovio names each load afresh (`#koqfui1`, `E062-koqfui1`): never compare whole SVGs between loads.
+  - A layout that finishes after its task was cancelled is dropped (`Task.isCancelled`, and the piece and place still the same).
+  - The reader keeps the pieces it opened with; only new versions of the same pieces are taken over.
+  - SwiftData objects may be deleted by sync while on screen: open readers with `Piece` values, check `isDeleted` before writing.
+  - Fix Notes works in one pass over the file, never a context per bar (minutes on a long part); a change to a note's length moves the next `<backup>` in its bar; an edit Verovio can't engrave is taken back.
+  - Bars added for a multi-bar rest are added to the shown part only: a full score then has parts of different lengths.
+  - The music folder replaces a piece without asking only when exactly one piece has that title and composer.
 
 ## TestFlight
 

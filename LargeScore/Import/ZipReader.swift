@@ -12,7 +12,11 @@ nonisolated enum ZipReader {
         var compressedSize: Int
         var size: Int
         var localHeaderOffset: Int
+        var crc: UInt32 = 0
     }
+
+    /// Larger than any real score: an orchestra's .mxl opens to a few megabytes.
+    static let largestEntry = 64 * 1024 * 1024
 
     static func entries(in data: Data) throws -> [Entry] {
         let bytes = [UInt8](data)
@@ -33,6 +37,7 @@ nonisolated enum ZipReader {
         for _ in 0..<count {
             guard offset + 46 <= bytes.count, u32(bytes, offset) == 0x0201_4B50 else { throw Failure.damaged }
             let method = u16(bytes, offset + 10)
+            let crc = u32(bytes, offset + 16)
             let compressed = Int(u32(bytes, offset + 20))
             let size = Int(u32(bytes, offset + 24))
             let nameLength = Int(u16(bytes, offset + 28))
@@ -41,7 +46,7 @@ nonisolated enum ZipReader {
             let local = Int(u32(bytes, offset + 42))
             guard offset + 46 + nameLength <= bytes.count else { throw Failure.damaged }
             let name = String(decoding: bytes[(offset + 46)..<(offset + 46 + nameLength)], as: UTF8.self)
-            result.append(Entry(name: name, method: method, compressedSize: compressed, size: size, localHeaderOffset: local))
+            result.append(Entry(name: name, method: method, compressedSize: compressed, size: size, localHeaderOffset: local, crc: crc))
             offset += 46 + nameLength + extraLength + commentLength
         }
         return result
@@ -54,19 +59,38 @@ nonisolated enum ZipReader {
         let start = o + 30 + Int(u16(bytes, o + 26)) + Int(u16(bytes, o + 28))
         guard start + entry.compressedSize <= bytes.count else { throw Failure.damaged }
         let raw = Array(bytes[start..<(start + entry.compressedSize)])
+        let result: Data
         switch entry.method {
         case 0:
-            return Data(raw)
+            result = Data(raw)
         case 8:
-            return try inflate(raw, size: entry.size)
+            // A size no score has, or more than deflate can pack into this many bytes:
+            // refused before anything is allocated.
+            guard entry.size <= largestEntry, entry.size <= max(entry.compressedSize, 1) * 1032 else { throw Failure.damaged }
+            result = try inflate(raw, size: entry.size)
         default:
             throw Failure.unsupported
         }
+        // A cut-off or damaged entry would otherwise come in as music missing its end.
+        guard crc32(result) == entry.crc else { throw Failure.damaged }
+        return result
+    }
+
+    private static let crcTable: [UInt32] = (0..<256).map { n in
+        var c = UInt32(n)
+        for _ in 0..<8 { c = c & 1 != 0 ? 0xEDB8_8320 ^ (c >> 1) : c >> 1 }
+        return c
+    }
+
+    static func crc32(_ data: Data) -> UInt32 {
+        var c: UInt32 = 0xFFFF_FFFF
+        for byte in data { c = crcTable[Int((c ^ UInt32(byte)) & 0xFF)] ^ (c >> 8) }
+        return c ^ 0xFFFF_FFFF
     }
 
     /// Raw deflate, as ZIP stores it; Apple's ZLIB algorithm reads exactly that.
     private static func inflate(_ input: [UInt8], size: Int) throws -> Data {
-        guard size > 0 else { return Data() }
+        guard size > 0, !input.isEmpty else { return Data() }
         var output = [UInt8](repeating: 0, count: size)
         let written = input.withUnsafeBufferPointer { source in
             output.withUnsafeMutableBufferPointer { destination in
