@@ -41,7 +41,9 @@ nonisolated struct EngravedScore: Sendable {
     var request: LayoutRequest
     var pages: [EngravedPage]
     /// Time spent engraving, for the speed checks.
-    var duration: Duration
+    /// Seconds the engraving took (plain seconds: `Duration` needs macOS 13, and the
+    /// Mac companion runs on 12).
+    var seconds: Double
 }
 
 /// Anything that turns MusicXML into pages. Verovio today; kept behind this so

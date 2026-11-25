@@ -103,15 +103,14 @@ actor VerovioEngraver: Engraver {
             return cached
         }
 
-        let clock = ContinuousClock()
-        let start = clock.now
+        let start = DispatchTime.now().uptimeNanoseconds
         let json = try JSONSerialization.data(withJSONObject: Self.options(for: request))
         guard toolkit.setOptions(String(decoding: json, as: UTF8.self)) else { throw EngravingError.unreadable }
         guard toolkit.loadData(musicXML) else { throw EngravingError.unreadable }
         let count = toolkit.getPageCount()
         guard count > 0 else { throw EngravingError.empty }
         let pages = (1...count).map { EngravedPage(number: $0, svg: toolkit.renderToSVG($0, false)) }
-        let score = EngravedScore(request: request, pages: pages, duration: clock.now - start)
+        let score = EngravedScore(request: request, pages: pages, seconds: Double(DispatchTime.now().uptimeNanoseconds - start) / 1e9)
         cache[key] = score
         recent.append(key)
         while recent.count > Self.cacheLimit { cache[recent.removeFirst()] = nil }

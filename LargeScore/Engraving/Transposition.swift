@@ -20,6 +20,7 @@ nonisolated enum WrittenFor: String, CaseIterable, Identifiable, Sendable, Codab
 
     var bassClef: Bool { self == .cBass }
 
+    @available(macOS 13, *)
     var title: LocalizedStringResource {
         switch self {
         case .c: "C (flute, oboe, violin)"

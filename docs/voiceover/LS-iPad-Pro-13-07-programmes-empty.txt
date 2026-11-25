@@ -3,8 +3,6 @@
             Text: No programmes yet
             Text: A programme lists the pieces for a rehearsal or concert, in the order you play them.
             Button: New Programme
-            Button: Today [music.note.list]
-            Button: Today [music.note.list]
             Button: Programmes [list.number]
             Button: Programmes [list.number]
             Button: Library [books.vertical]

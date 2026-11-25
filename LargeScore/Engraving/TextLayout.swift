@@ -134,3 +134,21 @@ nonisolated final class GlyphLibrary: @unchecked Sendable {
         return String(text[start.upperBound..<end])
     }
 }
+
+/// Fonts for the music's words, made once per size and style rather than on every draw.
+nonisolated enum FontCache {
+    // NSCache is thread-safe; CTFont is immutable.
+    nonisolated(unsafe) private static let cache = NSCache<NSString, CTFont>()
+
+    static func font(size: CGFloat, bold: Bool, italic: Bool) -> CTFont {
+        let key = "\(size)-\(bold)-\(italic)" as NSString
+        if let font = cache.object(forKey: key) { return font }
+        var traits: CTFontSymbolicTraits = []
+        if bold { traits.insert(.traitBold) }
+        if italic { traits.insert(.traitItalic) }
+        let base = CTFontCreateWithName("Times New Roman" as CFString, size, nil)
+        let font = CTFontCreateCopyWithSymbolicTraits(base, size, nil, traits, traits) ?? base
+        cache.setObject(font, forKey: key)
+        return font
+    }
+}

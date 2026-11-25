@@ -17,6 +17,13 @@ Licences: the app is MIT; Verovio (LGPL-3.0) is used unmodified from its release
 - `AppStore/`: `store-text.md` (English and Dutch drafts for Kris to approve; nothing is in App Store Connect yet), `privacy-and-review.md` (privacy, accessibility answers, review notes; privacy policy page not written yet).
 - `scripts/`: `fetch-verovio.sh`, `sweep.sh`, `release.sh`, `asc.py`, `enable-icloud.sh`, `make-test-piece.py`, `make-icon.swift`. `scripts/asc.env` is gitignored.
 
+## Large Score Converter (Mac companion)
+
+`Converter/`, target `LargeScoreConverter`: a native macOS 12+ app, Intel and Apple silicon, for the grandfather's Mac Pro (2013, Monterey). Drag in PDFs; it runs Audiveris (`/Applications/Audiveris.app`, or `AUDIVERIS`), shows Large Score's engraving beside the PDF with the iPad's Fix Notes tools (`FixModel`, an `ObservableObject` copy of `FixSession`: keep them in step), and Send to Library writes `<title>.musicxml` and `<title>.pdf` into iCloud Drive's "Large Score" folder, which the iPad's music folder reads. Ticked "Checked Against the PDF" rewrites `<software>` so the iPad drops its check mark. Shared code it compiles must build for macOS 12: no `Duration`, Observation, SwiftData or `LocalizedStringResource` (mark such members `@available(macOS 13, *)`).
+- Developer ID download outside the App Store (it runs Audiveris), notarised: `scripts/release-converter.sh` → `build/converter/Large Score Converter.zip`. Needs a Developer ID Application certificate, which only the Account Holder can make (Xcode › Settings › Accounts › Manage Certificates); the API key is refused.
+- Tests: `LargeScoreConverterTests`, run without the app or a window (`-scheme LargeScoreConverter -destination platform=macOS test`): a stand-in Audiveris script, folders in the temporary directory (`LARGESCORE_CONVERTER_HOME`, `LARGESCORE_LIBRARY_FOLDER`), and views drawn off screen to `build/converter/*.png`. Never open its window on Kris's screen to check it.
+- Icon: `swift scripts/make-mac-icon.swift <iPad icon-1024.png> Converter/Assets.xcassets/AppIcon.appiconset`.
+
 ## Build and test
 
 `xcode-select` points at the Command Line Tools, so prefix `DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer` for `xcodebuild` and `xcrun simctl`.

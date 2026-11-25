@@ -1,5 +1,10 @@
 # PDFs to Large Score, on the Mac Pro
 
+**Large Score Converter** (the Mac app in `Converter/`) replaces the steps below once
+it's signed: drag PDFs onto its window, check and fix each piece beside its PDF,
+and Send to Library. It needs Audiveris in Applications (step 2 below) and iCloud
+Drive on (step 1); the watched folder and `install.sh` are then not needed.
+
 For pieces that only exist as a PDF. The Mac Pro (2013, Intel, macOS 12 Monterey)
 converts each PDF to MusicXML with Audiveris and puts it, with the PDF beside it,
 in a folder in iCloud Drive. The iPad reads that folder: the piece appears in the

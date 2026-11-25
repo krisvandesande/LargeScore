@@ -78,7 +78,7 @@ struct EngravingSpeedTests {
             let start = clock.now
             let scenes = score.pages.compactMap { SVGScene(svg: $0.svg) }
             let read = clock.now - start
-            print("SPEED area \(Int(area.width))x\(Int(area.height)) staff \(Int(staff)): \(score.pages.count) pages, engrave \(score.duration), read \(read)")
+            print("SPEED area \(Int(area.width))x\(Int(area.height)) staff \(Int(staff)): \(score.pages.count) pages, engrave \(score.seconds) s, read \(read)")
             #expect(scenes.count == score.pages.count)
             #expect(scenes.allSatisfy { $0.items.count > 10 })
         }
@@ -107,15 +107,15 @@ extension EngravingSpeedTests {
         let drawStart = clock.now
         ScoreCanvas.draw(scenes[1], in: context, size: size, ink: CGColor(gray: 0, alpha: 1))
         let draw = clock.now - drawStart
-        print("SPEED long piece: \(score.pages.count) pages, engrave \(score.duration), read all \(read), first draw \(cold), page turn draw \(draw)")
+        print("SPEED long piece: \(score.pages.count) pages, engrave \(score.seconds) s, read all \(read), first draw \(cold), page turn draw \(draw)")
         #expect(scenes.count == score.pages.count)
         // The target is 300 ms on its own (256 to 275 ms measured); this runs beside the
         // other suites in parallel, which adds up to a tenth.
-        #expect(score.duration < .milliseconds(400))
+        #expect(score.seconds < 0.4)
         #expect(draw < .milliseconds(16))
 
         let again = try await engraver.engrave(musicXML: xml, request: request)
-        #expect(again.duration == score.duration) // served from the cache
+        #expect(again.seconds == score.seconds) // served from the cache
     }
 }
 
