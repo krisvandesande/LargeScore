@@ -2,6 +2,8 @@
             Text: Music Size
             Slider: Space between lines = 2 of 7
             Slider: Music size = Size 4 of 15 [sizeStepper]
+            Button: Decrease Text Size [textformat.size.smaller]
+            Button: Increase Text Size [textformat.size.larger]
             Button: Programmes [list.number]
             Button: Programmes [list.number]
             Button: Library [books.vertical]

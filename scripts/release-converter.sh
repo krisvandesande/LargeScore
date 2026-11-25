@@ -9,6 +9,13 @@
 # Notarising uses the App Store Connect key in scripts/asc.env.
 set -euo pipefail
 cd "$(dirname "$0")/.."
+# --publish also signs the update for Sparkle and publishes it, with the feed
+# (appcast.xml), as a GitHub release: every installed Converter then updates itself.
+publish=0
+[ "${1:-}" = "--publish" ] && publish=1
+# Every release a higher build number, which Sparkle compares: the date and time.
+build=$(date +%Y%m%d%H%M)
+sparkle_key="$HOME/Library/Application Support/LargeScoreSigning/sparkle-private.txt"
 [ -f scripts/asc.env ] && source scripts/asc.env
 export DEVELOPER_DIR="${DEVELOPER_DIR:-/Applications/Xcode.app/Contents/Developer}"
 : "${ASC_KEY_ID:?set ASC_KEY_ID in scripts/asc.env}"
@@ -30,7 +37,7 @@ xcodegen generate >/dev/null
 xcodebuild -project LargeScore.xcodeproj -scheme LargeScoreConverter -configuration Release \
   -destination "generic/platform=macOS" -derivedDataPath "$dd" \
   CODE_SIGN_IDENTITY="$identity" CODE_SIGN_STYLE=Manual OTHER_CODE_SIGN_FLAGS="--timestamp" \
-  CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO \
+  CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO CURRENT_PROJECT_VERSION="$build" \
   build | grep -E "error:|warning: .*sign|BUILD" || true
 
 app="$PWD/$dd/Build/Products/Release/Large Score Converter.app"
@@ -82,6 +89,15 @@ while IFS= read -r -d '' jar; do
   rm -rf "$tmp"
 done < <(find "$helper" -name '*.jar' -print0)
 sign --entitlements "$entitlements" "$helper" >/dev/null
+# Sparkle's helpers with the same Developer ID, as Sparkle's documentation asks for
+# apps signed outside the App Store.
+sparkle="$app/Contents/Frameworks/Sparkle.framework"
+if [ -d "$sparkle" ]; then
+  for helper in "$sparkle"/Versions/B/XPCServices/*.xpc "$sparkle/Versions/B/Autoupdate" "$sparkle/Versions/B/Updater.app"; do
+    [ -e "$helper" ] && sign --preserve-metadata=entitlements "$helper" >/dev/null
+  done
+  sign "$sparkle" >/dev/null
+fi
 # The Converter itself again, over its new contents.
 sign --preserve-metadata=entitlements "$app" >/dev/null
 codesign --verify --strict --deep "$app"
@@ -106,3 +122,35 @@ rm -f "$zip"
 ditto -c -k --keepParent "$app" "$zip"
 spctl --assess --type execute --verbose "$app"
 echo "Ready: $zip"
+
+[ "$publish" = 1 ] || exit 0
+
+# The update: a zip without spaces in its name (GitHub renames those), signed for
+# Sparkle, and a feed naming it, both attached to a new GitHub release.
+asset="$out/LargeScoreConverter.zip"
+cp "$zip" "$asset"
+sign_tool=$(find "$dd/SourcePackages/artifacts" -path "*Sparkle/bin/sign_update" -type f | head -n 1)
+signature=$("$sign_tool" --ed-key-file "$sparkle_key" "$asset")
+tag="converter-$build"
+url="https://github.com/krisvandesande/LargeScore/releases/download/$tag/LargeScoreConverter.zip"
+cat > "$out/appcast.xml" <<FEED
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+  <channel>
+    <title>Large Score Converter</title>
+    <item>
+      <title>$build</title>
+      <pubDate>$(LC_ALL=C date -u "+%a, %d %b %Y %H:%M:%S +0000")</pubDate>
+      <sparkle:version>$build</sparkle:version>
+      <sparkle:shortVersionString>1.0</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>12.0</sparkle:minimumSystemVersion>
+      <enclosure url="$url" $signature type="application/octet-stream"/>
+    </item>
+  </channel>
+</rss>
+FEED
+gh release create "$tag" "$asset" "$out/appcast.xml" --latest \
+  --title "Large Score Converter $build" \
+  --notes "Large Score Converter for macOS 12 and later, Intel and Apple silicon. Installed copies update themselves. Inside: Audiveris 5.11.0 (AGPL-3.0, unmodified; source: https://github.com/Audiveris/audiveris/tree/5.11.0) and Sparkle (MIT)."
+echo "Published: $tag"
+

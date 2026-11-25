@@ -730,6 +730,16 @@
         }
       }
     },
+    "Check for Updates…": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zoek naar updates…"
+          }
+        }
+      }
+    },
     "Checked Against the PDF": {
       "localizations": {
         "nl": {

@@ -40,6 +40,10 @@ settings:
 packages:
   VerovioKit:
     path: Packages/VerovioKit
+  # Updates for Large Score Converter, outside the App Store (MIT).
+  Sparkle:
+    url: https://github.com/sparkle-project/Sparkle
+    exactVersion: 2.10.1
 targets:
   LargeScore:
     type: application
@@ -144,6 +148,8 @@ targets:
     dependencies:
       - package: VerovioKit
         product: VerovioToolkit
+      - package: Sparkle
+        product: Sparkle
     info:
       path: Converter/Info.plist
       properties:
@@ -155,6 +161,14 @@ targets:
         LSApplicationCategoryType: public.app-category.music
         LSMinimumSystemVersion: "12.0"
         NSHumanReadableCopyright: ""
+        # Sparkle: the feed is the latest GitHub release's appcast.xml; updates are
+        # checked daily and installed without asking, signed with this key's pair
+        # (kept in ~/Library/Application Support/LargeScoreSigning, never in the repo).
+        SUFeedURL: https://github.com/krisvandesande/LargeScore/releases/latest/download/appcast.xml
+        SUPublicEDKey: Yr25FtwZ70kDECI2CQwhuWv+5GPZWBZ84SROpqZhHJc=
+        SUEnableAutomaticChecks: true
+        SUAutomaticallyUpdate: true
+        SUScheduledCheckInterval: 86400
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.kvds.LargeScoreConverter

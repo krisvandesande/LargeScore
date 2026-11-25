@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		0177389474DFC4FA754E83EC /* VerovioEngraver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22EE9AB0CE94FA8966AD7CBA /* VerovioEngraver.swift */; };
 		081517B0B1205FD92557E662 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 711AC501B114DB73D9FF8497 /* Credits.rtf */; };
+		084296152BA93F13C513DF2D /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 52A444C89B58622126A1DE6B /* Sparkle */; };
 		0D6DBBC85725A0BBEF2E5C73 /* FixPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5115604EF291FE7DD10375F /* FixPanel.swift */; };
 		0E4CB7B5882A868A02DD96E0 /* harmony-and-tempo.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = 55357AD4C01A37DA6BAE963E /* harmony-and-tempo.musicxml */; };
 		0F024D30A30A960FEC7896E3 /* MusicFolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = C288A269A2E3EA86DD034CE5 /* MusicFolder.swift */; };
@@ -255,6 +256,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				738FAD10B2525F8836A552DB /* VerovioToolkit in Frameworks */,
+				084296152BA93F13C513DF2D /* Sparkle in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -557,6 +559,7 @@
 			name = LargeScoreConverter;
 			packageProductDependencies = (
 				3F9F90EFBA6CFA73B63470F0 /* VerovioToolkit */,
+				52A444C89B58622126A1DE6B /* Sparkle */,
 			);
 			productName = LargeScoreConverter;
 			productReference = 9B62B5BFD9190C121D9F47FB /* LargeScoreConverter.app */;
@@ -640,6 +643,7 @@
 			mainGroup = 84A083FD701D41F1769987D4;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
+				F933F8324306BD0F3CAFCAAB /* XCRemoteSwiftPackageReference "Sparkle" */,
 				41CE53A2B10745219AF77A84 /* XCLocalSwiftPackageReference "Packages/VerovioKit" */,
 			);
 			preferredProjectObjectVersion = 77;
@@ -1285,10 +1289,26 @@
 		};
 /* End XCLocalSwiftPackageReference section */
 
+/* Begin XCRemoteSwiftPackageReference section */
+		F933F8324306BD0F3CAFCAAB /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = exactVersion;
+				version = 2.10.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
 		3F9F90EFBA6CFA73B63470F0 /* VerovioToolkit */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = VerovioToolkit;
+		};
+		52A444C89B58622126A1DE6B /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F933F8324306BD0F3CAFCAAB /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
 		};
 		8AE04FC14615DF12E0213898 /* VerovioToolkit */ = {
 			isa = XCSwiftPackageProductDependency;
