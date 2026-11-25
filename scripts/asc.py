@@ -225,22 +225,11 @@ def distribute(bundle_id, build_version, submit, note, platform="IOS"):
 
     set_what_to_test(build_id, note, bearer)
 
-    groups = external_groups(app_id, bearer)
-    if not groups:
-        print("No external tester groups exist yet — nothing to add.")
-    else:
-        request(
-            "POST",
-            f"/builds/{build_id}/relationships/betaGroups",
-            body={"data": [{"type": "betaGroups", "id": gid} for gid, _ in groups]},
-            bearer=bearer,
-        )
-        for _, name in groups:
-            print(f"  added to {name}")
-
     if submit:
-        # Already-submitted builds, or a build while another of the same version is
-        # in review, are refused; say so and carry on, so the Mac half still runs.
+        # Submitted first: on 2026-11-25 App Store Connect answered 404 ("no resource
+        # of type 'builds'") to adding a fresh build to a group until it had been
+        # submitted. Already-submitted builds, or a build while another of the same
+        # version is in review, are refused; say so and carry on, so the Mac half runs.
         try:
             request(
                 "POST",
@@ -256,6 +245,28 @@ def distribute(bundle_id, build_version, submit, note, platform="IOS"):
             print("Submitted for Beta App Review.")
         except SystemExit:
             print("Not submitted for Beta App Review (see the reason above); submit it later.")
+
+    groups = external_groups(app_id, bearer)
+    if not groups:
+        print("No external tester groups exist yet — nothing to add.")
+    else:
+        # A fresh build can still be unknown to the groups for a few minutes: retry.
+        for attempt in range(10):
+            try:
+                request(
+                    "POST",
+                    f"/builds/{build_id}/relationships/betaGroups",
+                    body={"data": [{"type": "betaGroups", "id": gid} for gid, _ in groups]},
+                    bearer=bearer,
+                )
+                break
+            except SystemExit:
+                if attempt == 9:
+                    raise
+                print("  the groups don't know the build yet; trying again in 30 s")
+                time.sleep(30)
+        for _, name in groups:
+            print(f"  added to {name}")
 
 
 if __name__ == "__main__":
