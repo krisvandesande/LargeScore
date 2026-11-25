@@ -29,7 +29,18 @@ Make programmes for rehearsals and concerts. Turning past the last page of a pie
 
 Write on the music with Apple Pencil or a finger, or add breath marks, fermatas, fingerings, circled and highlighted bars. Notes stay with their bar at any size.
 
-Works with VoiceOver, Voice Control and larger text. In English and Dutch.
+[New paragraphs, 2026-11-25, for Kris to approve:]
+
+Read repeats in playing order: repeated bars are printed again where they're played, with D.C., D.S. and Coda followed, so pages only turn forward. After each turn the first bar is tinted for a moment, to show where to start.
+
+Have the key's sharps and flats printed on every note they apply to. Read black on white, white on black, or yellow on black. Give a busy piece a size of its own.
+
+Read a part written for another instrument: Large Score moves it to your key and clef. Music converted from a PDF can be checked against the PDF and its wrong notes fixed in the app.
+
+At the largest sizes the part reads as one line, a screen at a time.
+
+[Changed, 2026-11-25: VoiceOver taken out, as decided on 2026-11-21:]
+Works with Voice Control and larger text. In English and Dutch.
 
 Made for the 11-inch and 13-inch iPad. [New line, 2026-11-22, for Kris to approve]
 
@@ -63,7 +74,18 @@ Maak programma's voor repetities en concerten. Wie voorbij de laatste pagina van
 
 Schrijf op de muziek met Apple Pencil of een vinger, of voeg ademtekens, fermates, vingerzettingen en omcirkelde of gemarkeerde maten toe. Notities blijven bij hun maat, op elke grootte.
 
-Werkt met VoiceOver, Spraakbediening en grotere tekst. In het Engels en het Nederlands.
+[Nieuwe alinea's, 2026-11-25, ter goedkeuring:]
+
+Lees herhalingen in speelvolgorde: herhaalde maten staan opnieuw waar ze gespeeld worden, met D.C., D.S. en Coda gevolgd, zodat je alleen vooruit bladert. Na elke omslag licht de eerste maat even op, zodat je ziet waar je begint.
+
+Laat de kruisen en mollen van de toonsoort bij elke noot zetten waarvoor ze gelden. Lees zwart op wit, wit op zwart of geel op zwart. Geef een druk stuk een eigen grootte.
+
+Lees een partij die voor een ander instrument geschreven is: Large Score zet ze in jouw toonsoort en sleutel. Muziek die van een pdf is omgezet, vergelijk je met de pdf en verbeter je in de app.
+
+Op de grootste formaten lees je de partij als één regel, scherm per scherm.
+
+[Gewijzigd, 2026-11-25: VoiceOver weggelaten, zoals beslist op 2026-11-21:]
+Werkt met Spraakbediening en grotere tekst. In het Engels en het Nederlands.
 
 Gemaakt voor de iPad van 11 en 13 inch. [Nieuwe regel, 2026-11-22, ter goedkeuring]
 

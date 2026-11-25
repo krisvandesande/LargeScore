@@ -7,8 +7,9 @@ programmes and notes stay on the device; once iCloud sync is on
 (docs/icloud-setup.md) they're in the person's own private iCloud database, which
 Apple doesn't count as collection by the developer.
 
-Privacy policy URL: needed by App Store Connect; one short page saying the above.
-Not written yet: where it should live (kvdsmedia site or the GitHub repo) is Kris's call.
+Privacy policy URL: needed by App Store Connect. Draft in `AppStore/privacy-policy.md`
+(2026-11-25, for Kris to approve). Where it lives (kvdsmedia site or the GitHub repo,
+where it would be github.com/krisvandesande/LargeScore/blob/main/PRIVACY.md) is Kris's call.
 
 ## Accessibility (App Store accessibility labels)
 
@@ -18,10 +19,10 @@ adding music, making a programme and writing notes.
 | Feature | Claim | Basis |
 |---|---|---|
 | Larger Text | Yes | Every screen follows Dynamic Type; swept at AX5 on iPad mini, iPad and iPad Pro 13. The reader's strip and the notes palette stop at xxxLarge on purpose; the music has its own size. |
-| Dark Interface | Yes | Every screen in dark, including a white-on-black page. |
+| Dark Interface | Yes | Every screen in dark, including white-on-black and yellow-on-black pages. |
 | Differentiate Without Color Alone | Yes | Chosen options carry a checkmark; notes are marks and lines, not colour alone. |
 | Sufficient Contrast | Yes | Text 4.5:1 or more, the accent 9.5:1 (light) and 10:1 (dark); the contrast audit's two flags measured and explained in docs/accessibility-findings.md. |
-| Reduced Motion | Yes | No animations beyond the system's own; page turns are instant. |
+| Reduced Motion | Yes | No animations beyond the system's own; page turns are instant, and the first-bar tint goes at once instead of fading. |
 | Voice Control | Yes, after the hand check | Every control has a spoken name containing its words (checked by AccessibilityTreeTests). |
 | VoiceOver | No | Large Score is for reading sheet music, which needs sight (Kris, 2026-11-21). Controls still have spoken names, which Voice Control and Switch Control use. |
 | Captions, Audio Descriptions | Not applicable | No audio or video. |
