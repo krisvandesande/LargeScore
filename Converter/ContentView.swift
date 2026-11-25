@@ -13,7 +13,7 @@ struct ContentView: View {
             List(selection: $selection) {
                 if let problem = queue.problem {
                     Text(problem)
-                        .font(.body.weight(.semibold))
+                        .font(.readingBold)
                         .foregroundColor(.orange)
                         .padding(.vertical, 4)
                 }
@@ -32,7 +32,7 @@ struct ContentView: View {
                 }
             }
             .listStyle(.sidebar)
-            .frame(minWidth: 240)
+            .frame(minWidth: 280)
             .toolbar {
                 ToolbarItem {
                     Button { queue.choosePDFs() } label: {
@@ -70,14 +70,16 @@ struct ContentView: View {
         } else if queue.jobs.isEmpty {
             VStack(spacing: 20) {
                 Text("Drag PDFs here")
-                    .font(.largeTitle.weight(.semibold))
+                    .font(.readingTitle)
                 Text("Each one is converted to music you can check against the PDF, fix, and send to the library on the iPad.")
-                    .font(.title3)
+                    .font(.reading)
                     .foregroundColor(.secondary)
                     .multilineTextAlignment(.center)
                     .frame(maxWidth: 520)
-                Button("Add PDFs…") { queue.choosePDFs() }
-                    .controlSize(.large)
+                Button { queue.choosePDFs() } label: {
+                    Text("Add PDFs…").font(.reading).padding(.horizontal, 8)
+                }
+                .controlSize(.large)
             }
             .padding(40)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -113,11 +115,12 @@ private struct JobRow: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(job.title)
-                .font(.title3.weight(.semibold))
+                .font(.readingBold)
                 .lineLimit(2)
             HStack(spacing: 6) {
                 if job.state == .converting { ProgressView().controlSize(.small) }
                 Text(status)
+                    .font(.system(size: 17))
                     .foregroundColor(.secondary)
             }
         }
@@ -141,7 +144,7 @@ private struct Placeholder: View {
 
     var body: some View {
         Text(text)
-            .font(.title3)
+            .font(.reading)
             .foregroundColor(.secondary)
             .multilineTextAlignment(.center)
             .padding(40)

@@ -24,6 +24,7 @@
 		27A52EEC71E4821E9A565F9F /* FixSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86C0F5F1A0FE25C6907142DD /* FixSession.swift */; };
 		2AD6FA9985243F747B68EB9B /* ImportTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA09A15929E52433660615B /* ImportTests.swift */; };
 		2BDABFE1171DE6A0406AC014 /* PageTurner.swift in Sources */ = {isa = PBXBuildFile; fileRef = F44D8CA440E27E7D7D2037D8 /* PageTurner.swift */; };
+		2CAAFC5FA02A19C58527F962 /* Fonts.swift in Sources */ = {isa = PBXBuildFile; fileRef = C03F3E27FDD7FF6C25C8F3CC /* Fonts.swift */; };
 		2D747F5C25A42F5C98A8E02F /* Engraver.swift in Sources */ = {isa = PBXBuildFile; fileRef = B770B7CA621635E8184DEDB0 /* Engraver.swift */; };
 		2DEDE391E35D16EBBA52F02C /* PieceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504F0F652E8563ACD3A647D5 /* PieceView.swift */; };
 		2E3E9640839400CA3864B8A8 /* ZipReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F8F166C31D3BB62BA66B3B9 /* ZipReader.swift */; };
@@ -76,6 +77,7 @@
 		9D3D1F9DDC72FF21118EE562 /* ImportSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2135B1AA56EFBB86D0F3C587 /* ImportSheet.swift */; };
 		9E79071A7C052DE7EE7F08B7 /* NotesStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25DB924C78D55FA8D3C71F4C /* NotesStore.swift */; };
 		9EDD5236E7EEEC41D16CCF95 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51488DB7B378E6CF0C08F4DA /* ContentView.swift */; };
+		9FF4C210612A74ABCBCF6B93 /* Fonts.swift in Sources */ = {isa = PBXBuildFile; fileRef = C03F3E27FDD7FF6C25C8F3CC /* Fonts.swift */; };
 		A384EF4DF67A6D604A77835F /* MusicXMLEdit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 621B9411D5B09EAA448B9A68 /* MusicXMLEdit.swift */; };
 		A404C02BDD0463E59F85D3E8 /* converted-by-audiveris.mxl in Resources */ = {isa = PBXBuildFile; fileRef = CF12BCD10D749A816121D0C8 /* converted-by-audiveris.mxl */; };
 		A85C945FA5919F696B4D025D /* ProgrammeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D2A5F76D09D30FD53EF78D8 /* ProgrammeTests.swift */; };
@@ -200,6 +202,7 @@
 		B770B7CA621635E8184DEDB0 /* Engraver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Engraver.swift; sourceTree = "<group>"; };
 		BC28BC7AB931DB55F6791614 /* Score.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Score.swift; sourceTree = "<group>"; };
 		BEA09A15929E52433660615B /* ImportTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportTests.swift; sourceTree = "<group>"; };
+		C03F3E27FDD7FF6C25C8F3CC /* Fonts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Fonts.swift; sourceTree = "<group>"; };
 		C0D8417E61C09893DAEEE5C3 /* RenderOutput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenderOutput.swift; sourceTree = "<group>"; };
 		C288A269A2E3EA86DD034CE5 /* MusicFolder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicFolder.swift; sourceTree = "<group>"; };
 		C38FABE19590F985BF6CD2A6 /* SVGScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SVGScene.swift; sourceTree = "<group>"; };
@@ -279,6 +282,7 @@
 				35468BF012C18145CB333972 /* ConverterApp.swift */,
 				48763FA27B8F38EBE63623FD /* FixModel.swift */,
 				C5115604EF291FE7DD10375F /* FixPanel.swift */,
+				C03F3E27FDD7FF6C25C8F3CC /* Fonts.swift */,
 				9196E9DD903AF0EA664F22D2 /* Info.plist */,
 				1BF548960A3CA05B90F91F05 /* MusicPane.swift */,
 				504F0F652E8563ACD3A647D5 /* PieceView.swift */,
@@ -750,6 +754,7 @@
 				2D747F5C25A42F5C98A8E02F /* Engraver.swift in Sources */,
 				E4AB25FB6C146F5B7FDCD391 /* FixModel.swift in Sources */,
 				0D6DBBC85725A0BBEF2E5C73 /* FixPanel.swift in Sources */,
+				2CAAFC5FA02A19C58527F962 /* Fonts.swift in Sources */,
 				829BD23D97231BC77CCE5FD1 /* Instrument.swift in Sources */,
 				1DD80247DAF2D1D917307950 /* KeyReminders.swift in Sources */,
 				89244E49AF388360EB828EDB /* MusicFile.swift in Sources */,
@@ -775,6 +780,7 @@
 				CA48BFD33440C961ADDA6012 /* Engraver.swift in Sources */,
 				D86679FBED8217D9B9799A30 /* FixModel.swift in Sources */,
 				830FD219174204D7ABBB11D9 /* FixPanel.swift in Sources */,
+				9FF4C210612A74ABCBCF6B93 /* Fonts.swift in Sources */,
 				780826AED72B4E527AB7DD81 /* Instrument.swift in Sources */,
 				871CE92F4AD62572BAB38320 /* KeyReminders.swift in Sources */,
 				E422F63B834BAB8E2B6F9CA5 /* MusicFile.swift in Sources */,

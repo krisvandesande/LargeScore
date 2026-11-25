@@ -17,11 +17,12 @@ struct PieceView: View {
 
     var body: some View {
         HSplitView {
-            VSplitView {
+            // The music takes the height; the buttons keep a fixed band under it.
+            VStack(spacing: 0) {
                 MusicPane(model: model)
-                    .frame(minHeight: 300)
+                Divider()
                 FixPanel(model: model)
-                    .frame(minHeight: 160, idealHeight: 240)
+                    .frame(height: 280)
             }
             .frame(minWidth: 420)
             PDFPane(url: queue.pdf(of: job))

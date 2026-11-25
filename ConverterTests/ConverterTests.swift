@@ -94,11 +94,16 @@ nonisolated final class ConverterTests: XCTestCase, @unchecked Sendable {
     @MainActor func testEngravedPagesAndSelection() async throws {
         let xml = try String(contentsOf: Self.samples.appendingPathComponent("evening-air.musicxml"), encoding: .utf8)
         let model = FixModel(xml: xml)
-        let score = try await Engravers.shared.engrave(musicXML: model.xml, request: LayoutRequest(pageSize: CGSize(width: 800, height: 1040), staffHeight: 56))
+        // As the music pane engraves one part: without its name, keeping every id.
+        let parts = PartSplitter.parts(in: model.xml)
+        XCTAssertEqual(parts.count, 1)
+        let shown = try XCTUnwrap(PartSplitter.keeping(partIDs: [parts[0].id], in: model.xml))
+        let score = try await Engravers.shared.engrave(musicXML: shown, request: LayoutRequest(pageSize: CGSize(width: 800, height: 1040), staffHeight: 56))
         let scene = try XCTUnwrap(score.pages.first.flatMap { SVGScene(svg: $0.svg) })
         XCTAssertFalse(scene.noteBoxes.isEmpty)
         // A click on a note's middle selects that note.
         let (id, box) = try XCTUnwrap(scene.noteBoxes.first)
+        XCTAssertTrue(model.xml.contains(#"id="\#(id)""#), "the clicked note is one the fixes can find")
         XCTAssertEqual(scene.note(at: CGPoint(x: box.midX, y: box.midY), reach: 2), id)
         model.selectedNote = id
         model.selectedBar = scene.measure(at: CGPoint(x: box.midX, y: box.midY), reach: 2)

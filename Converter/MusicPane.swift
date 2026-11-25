@@ -18,7 +18,7 @@ struct MusicPane: View {
                 VStack(spacing: 16) {
                     if failed {
                         Text("This music couldn't be shown.")
-                            .font(.title3)
+                            .font(.reading)
                             .padding(40)
                     }
                     ForEach(pages.indices, id: \.self) { index in
@@ -71,7 +71,10 @@ struct MusicPane: View {
     }
 
     private func engrave(width: CGFloat) async {
-        let xml = model.xml
+        // One part is shown without its name before every line, as on the iPad.
+        let full = model.xml
+        let parts = PartSplitter.parts(in: full)
+        let xml = parts.count == 1 ? PartSplitter.keeping(partIDs: [parts[0].id], in: full) ?? full : full
         // A Mac screen is read closer than a music stand: a little smaller than the iPad's
         // standard size, with the page as wide as the pane.
         let request = LayoutRequest(pageSize: CGSize(width: width, height: width * 1.3), staffHeight: 56)
