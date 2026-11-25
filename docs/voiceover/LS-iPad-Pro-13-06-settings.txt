@@ -11,7 +11,17 @@
             Switch: Half-Page Turns = 0
             Text: Half-Page Turns
             Switch:  = 0
-            Text: A half-page turn shows the top of the next page first, so you can read ahead while you finish the bottom.
+            Switch: Mark the First Bar = 1
+            Text: Mark the First Bar
+            Switch:  = 1
+            Text: A half-page turn shows the top of the next page first, so you can read ahead while you finish the bottom. Marking the first bar tints it for a moment after each turn, to show where to start.
+            Switch: Repeats in Playing Order = 0
+            Text: Repeats in Playing Order
+            Switch:  = 0
+            Switch: Key Reminders = 0
+            Text: Key Reminders
+            Switch:  = 0
+            Text: Repeated bars are printed again where they're played, with D.C., D.S. and Coda followed, so pages only turn forward. Key reminders print the key's sharp or flat on every note it applies to.
             Button: Instruments, Bassoon
             Text: Instruments
             Text: Instruments, Bassoon
