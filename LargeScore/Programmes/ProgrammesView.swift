@@ -128,24 +128,21 @@ func present<T>(_ item: Binding<T?>) -> Binding<Bool> {
 struct ProgrammeDetail: View {
     @Bindable var programme: Programme
     @Environment(\.modelContext) private var context
-    @State private var editing = false
     @State private var adding = false
     @State private var renaming = false
     @State private var newName = ""
 
     var body: some View {
-        ProgrammePieces(programme: programme, editing: editing, backTitle: LocalizedStringResource(stringLiteral: programme.name),
+        ProgrammePieces(programme: programme, backTitle: LocalizedStringResource(stringLiteral: programme.name),
                         addPieces: { adding = true })
             .navigationTitle(programme.name)
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
-                ToolbarItemGroup(placement: .primaryAction) {
+                ToolbarItem(placement: .primaryAction) {
                     Button("Rename") {
                         newName = programme.name
                         renaming = true
                     }
-                    Button(editing ? "Done" : "Reorder") { withAnimation { editing.toggle() } }
-                        .disabled(programme.orderedEntries.isEmpty && !editing)
                 }
             }
             .sheet(isPresented: $adding) { AddPiecesSheet(programme: programme) }
@@ -160,10 +157,10 @@ struct ProgrammeDetail: View {
     }
 }
 
-/// The numbered list both a programme's page and the Today tab show.
+/// The numbered list both a programme's page and the Today tab show. A piece moves
+/// by touching and dragging it; VoiceOver has Move Up and Move Down.
 struct ProgrammePieces: View {
     let programme: Programme
-    var editing = false
     var backTitle: LocalizedStringResource
     /// Shown as a large button after the last piece, where it's always in sight.
     var addPieces: (() -> Void)? = nil
@@ -233,15 +230,16 @@ struct ProgrammePieces: View {
                                 }
                             }
                             .frame(maxWidth: .infinity, alignment: .leading)
-                            if !editing { ForwardChevron() }
+                            ForwardChevron()
                         }
                         .air(.vertical, 8)
                         .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
-                    .disabled(editing)
                     .accessibilityElement(children: .combine)
                     .accessibilityLabel(Text("\(index + 1), \(entry.score?.title ?? "")"))
+                    .accessibilityAction(named: Text("Move Up")) { move(index, by: -1, count: entries.count) }
+                    .accessibilityAction(named: Text("Move Down")) { move(index, by: 1, count: entries.count) }
                 }
                 .onMove { source, destination in
                     programme.move(from: source, to: destination)
@@ -252,7 +250,7 @@ struct ProgrammePieces: View {
                     try? context.save()
                 }
             }
-            if let addPieces, !editing {
+            if let addPieces {
                 Section {
                     Button(action: addPieces) {
                         Label("Add Pieces", systemImage: "plus")
@@ -263,7 +261,6 @@ struct ProgrammePieces: View {
                 }
             }
         }
-        .environment(\.editMode, .constant(editing ? .active : .inactive))
         .fullScreenCover(item: $openAt) { open in
             // The pieces as they were when it opened: a change synced from another
             // device mid-concert doesn't move the place or swap the piece.
@@ -273,6 +270,14 @@ struct ProgrammePieces: View {
                 try? context.save()
             }
         }
+    }
+
+    private func move(_ index: Int, by offset: Int, count: Int) {
+        let target = index + offset
+        guard (0..<count).contains(target) else { return }
+        programme.move(from: [index], to: offset > 0 ? target + 1 : target)
+        try? context.save()
+        UIAccessibility.post(notification: .announcement, argument: String(localized: "Moved to \(target + 1)"))
     }
 
     private struct OpenAt: Identifiable {

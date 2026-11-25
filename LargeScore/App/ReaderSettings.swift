@@ -60,6 +60,54 @@ final class ReaderSettings {
     }
 
     func staffHeight(for piece: String?) -> CGFloat { Self.staffHeights[sizeStep(for: piece)] }
+
+    /// The reading settings a piece can have its own value for, besides its size.
+    enum Choice: String, CaseIterable {
+        case boldLines, pageColour, halfPageTurns, markFirstBar, playingOrder, keyReminders
+    }
+
+    /// Own values by piece id, then by `Choice`: "true", "false" or a page colour.
+    /// A piece keeps only what differs from every piece's setting.
+    private(set) var pieceChoices: [String: [String: String]] { didSet { store.set(pieceChoices, forKey: Key.pieceChoices) } }
+
+    private func standard(_ choice: Choice) -> String {
+        switch choice {
+        case .boldLines: String(boldLines)
+        case .pageColour: pageColour.rawValue
+        case .halfPageTurns: String(halfPageTurns)
+        case .markFirstBar: String(markFirstBar)
+        case .playingOrder: String(playingOrder)
+        case .keyReminders: String(keyReminders)
+        }
+    }
+
+    private func value(_ choice: Choice, for piece: String?) -> String {
+        piece.flatMap { pieceChoices[$0]?[choice.rawValue] } ?? standard(choice)
+    }
+
+    func bool(_ choice: Choice, for piece: String?) -> Bool { value(choice, for: piece) == "true" }
+
+    func pageColour(for piece: String?) -> PageColour { PageColour(rawValue: value(.pageColour, for: piece)) ?? pageColour }
+
+    /// A value for one piece; the same as every piece's removes the piece's own.
+    func set(_ choice: Choice, to raw: String, for piece: String) {
+        var own = pieceChoices[piece] ?? [:]
+        if raw == standard(choice) { own.removeValue(forKey: choice.rawValue) } else { own.updateValue(raw, forKey: choice.rawValue) }
+        if own.isEmpty { pieceChoices.removeValue(forKey: piece) } else { pieceChoices.updateValue(own, forKey: piece) }
+    }
+
+    func set(_ choice: Choice, to on: Bool, for piece: String) { set(choice, to: String(on), for: piece) }
+
+    func isOwn(_ choice: Choice, for piece: String) -> Bool { pieceChoices[piece]?[choice.rawValue] != nil }
+
+    /// Whether a piece reads differently from every other: its size or any setting.
+    func hasOwnSettings(_ piece: String) -> Bool { pieceSizes[piece] != nil || pieceChoices[piece] != nil }
+
+    /// Back to the settings every piece has.
+    func clearOwnSettings(_ piece: String) {
+        pieceSizes.removeValue(forKey: piece)
+        pieceChoices.removeValue(forKey: piece)
+    }
     /// Everything the player plays, in the order chosen. The first sets the sample's clef.
     var instruments: [Instrument] {
         didSet { store.set(instruments.map(\.rawValue).joined(separator: " "), forKey: Key.instruments) }
@@ -82,6 +130,7 @@ final class ReaderSettings {
         static let markFirstBar = "markFirstBar"
         static let pieceSizes = "pieceSizes"
         static let keyReminders = "keyReminders"
+        static let pieceChoices = "pieceChoices"
         static let instrument = "instrument"
         static let instruments = "instruments"
         static let onboardingDone = "onboardingDone"
@@ -107,6 +156,7 @@ final class ReaderSettings {
         markFirstBar = store.object(forKey: Key.markFirstBar) as? Bool ?? true
         keyReminders = store.bool(forKey: Key.keyReminders)
         pieceSizes = store.dictionary(forKey: Key.pieceSizes) as? [String: Int] ?? [:]
+        pieceChoices = store.dictionary(forKey: Key.pieceChoices) as? [String: [String: String]] ?? [:]
         if let list = store.string(forKey: Key.instruments) {
             instruments = list.split(separator: " ").compactMap { Instrument(rawValue: String($0)) }
         } else {
@@ -118,19 +168,19 @@ final class ReaderSettings {
 
     func layoutRequest(for area: CGSize, centred: Bool = false, piece: String? = nil) -> LayoutRequest {
         let height = staffHeight(for: piece)
-        return LayoutRequest(pageSize: area, staffHeight: height, bold: boldLines, lineGap: lineGap, centred: centred,
-                             oneLine: height > Self.largestPageSize, playingOrder: playingOrder,
-                             keyReminders: keyReminders)
+        return LayoutRequest(pageSize: area, staffHeight: height, bold: bool(.boldLines, for: piece), lineGap: lineGap, centred: centred,
+                             oneLine: height > Self.largestPageSize, playingOrder: bool(.playingOrder, for: piece),
+                             keyReminders: bool(.keyReminders, for: piece))
     }
 
     /// Bold also thickens the glyphs a little: 7% of a staff space all round.
     var glyphWeight: CGFloat { glyphWeight(for: nil) }
 
-    func glyphWeight(for piece: String?) -> CGFloat { boldLines ? staffHeight(for: piece) / 4 * 0.07 : 0 }
+    func glyphWeight(for piece: String?) -> CGFloat { bool(.boldLines, for: piece) ? staffHeight(for: piece) / 4 * 0.07 : 0 }
 
     /// The scheme the page is drawn in, given the iPad's own.
-    func pageScheme(system: ColorScheme) -> ColorScheme {
-        switch pageColour {
+    func pageScheme(system: ColorScheme, piece: String? = nil) -> ColorScheme {
+        switch pageColour(for: piece) {
         case .light: .light
         case .dark, .yellowOnBlack: .dark
         case .system: system
@@ -138,9 +188,9 @@ final class ReaderSettings {
     }
 
     /// The colour the music is drawn in, given the iPad's own scheme.
-    func pageInk(system: ColorScheme) -> Color {
-        if pageColour == .yellowOnBlack { return Self.yellowInk }
-        return pageScheme(system: system) == .dark ? .white : .black
+    func pageInk(system: ColorScheme, piece: String? = nil) -> Color {
+        if pageColour(for: piece) == .yellowOnBlack { return Self.yellowInk }
+        return pageScheme(system: system, piece: piece) == .dark ? .white : .black
     }
 }
 

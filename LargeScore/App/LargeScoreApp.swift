@@ -83,6 +83,17 @@ struct RootView: View {
     @ViewBuilder
     private var content: some View {
         if settings.onboardingDone {
+            #if targetEnvironment(macCatalyst)
+            MacRootView(section: $section)
+            #else
+            tabs
+            #endif
+        } else {
+            OnboardingView()
+        }
+    }
+
+    private var tabs: some View {
             TabView(selection: $section) {
                 Tab("Today", systemImage: "music.note.list", value: .today) {
                     TodayView(showProgrammes: { section = .programmes })
@@ -97,9 +108,6 @@ struct RootView: View {
                     SettingsView()
                 }
             }
-        } else {
-            OnboardingView()
-        }
     }
 }
 

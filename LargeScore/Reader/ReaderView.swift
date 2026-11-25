@@ -62,7 +62,7 @@ struct ReaderView: View {
     private let margins = EdgeInsets(top: 16, leading: 12, bottom: 12, trailing: 12)
 
     var body: some View {
-        let scheme = settings.pageScheme(system: systemScheme)
+        let scheme = settings.pageScheme(system: systemScheme, piece: piece.id)
         VStack(spacing: 0) {
             GeometryReader { proxy in
                 let area = CGSize(width: max(proxy.size.width - margins.leading - margins.trailing, 1),
@@ -123,7 +123,7 @@ struct ReaderView: View {
             AwakeReaders.closed()
             aheadTask?.cancel()
         }
-        .onChange(of: settings.halfPageTurns) { _, half in
+        .onChange(of: settings.bool(.halfPageTurns, for: piece.id)) { _, half in
             turner.update(pageCount: turner.pageCount, halfPageTurns: half && laidOut?.request.oneLine != true)
         }
         .onChange(of: turner.page) { old, new in
@@ -138,7 +138,7 @@ struct ReaderView: View {
 
     @ViewBuilder
     private func page(area: CGSize, scheme: ColorScheme) -> some View {
-        let ink = settings.pageInk(system: systemScheme)
+        let ink = settings.pageInk(system: systemScheme, piece: piece.id)
         if let laidOut, laidOut.pages.indices.contains(turner.page) {
             let current = laidOut.pages[turner.page]
             let marks = notes?.marks ?? []
@@ -191,7 +191,7 @@ struct ReaderView: View {
 
     /// Tints the first bar, then lets it fade (or go at once with Reduce Motion).
     private func showFirstBar() {
-        guard settings.markFirstBar else { return }
+        guard settings.bool(.markFirstBar, for: piece.id) else { return }
         tintTask?.cancel()
         tintFirstBar = true
         tintTask = Task {
@@ -329,7 +329,7 @@ struct ReaderView: View {
                     await loader.layOutAhead(rest) { settings.layoutRequest(for: area, centred: true, piece: $0.id) }
                 }
             }
-            turner = PageTurner(pageCount: result.pages.count, halfPageTurns: settings.halfPageTurns && !result.request.oneLine, page: page)
+            turner = PageTurner(pageCount: result.pages.count, halfPageTurns: settings.bool(.halfPageTurns, for: shown.id) && !result.request.oneLine, page: page)
             failed = false
         } catch is CancellationError {
             return

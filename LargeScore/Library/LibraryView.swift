@@ -62,6 +62,7 @@ private struct LibraryGrid: View {
     @Query private var scores: [Score]
     @Query(sort: \Programme.createdAt, order: .reverse) private var programmes: [Programme]
     @Environment(\.modelContext) private var context
+    @Environment(ReaderSettings.self) private var settings
     @ScaledMetric(relativeTo: .title2) private var cardWidth: CGFloat = 320
     /// A value, not the stored piece: deleted on another device, a stored piece can't
     /// be read any more, and the reader would stop the app.
@@ -98,7 +99,7 @@ private struct LibraryGrid: View {
                 emptyState
             } else {
                 ScrollView {
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: min(cardWidth, 600)), spacing: 24)], spacing: 24) {
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: min(cardWidth, 600)), spacing: 24, alignment: .top)], spacing: 24) {
                         ForEach(scores) { score in
                             card(score)
                         }
@@ -149,7 +150,8 @@ private struct LibraryGrid: View {
             try? context.save()
             open = score.piece
         } label: {
-            PieceCard(title: score.title, composer: score.composer, note: score.note, needsCheck: score.needsCheck)
+            PieceCard(title: score.title, composer: score.composer, note: score.note, needsCheck: score.needsCheck,
+                      facts: facts(score))
         }
         .buttonStyle(.plain)
         .contextMenu {
@@ -183,12 +185,27 @@ private struct LibraryGrid: View {
             }
             Button("Delete", systemImage: "trash", role: .destructive) { deleting = score }
         }
+        #if targetEnvironment(macCatalyst)
+        // Onto a programme in the sidebar.
+        .draggable(score.id.uuidString) {
+            PieceCard(title: score.title, composer: score.composer).frame(width: 320)
+        }
+        #endif
         .accessibilityAction(named: Text("Change Parts")) { changingPart = score }
         .accessibilityAction(named: Text("Delete")) { deleting = score }
         .accessibilityAction(named: Text("Fix Notes")) { fixing = score }
         .accessibilityAction(named: Text("Transpose")) { transposing = score }
         .accessibilityAction(named: Text("Size for This Piece")) { sizing = score.piece }
         .accessibilityAction(named: Text("Compare with PDF")) { if score.pdf != nil { comparing = score } }
+    }
+
+    private func facts(_ score: Score) -> [PieceFacts.Fact] {
+        let programmes = (score.entries ?? []).compactMap { $0.programme?.name }.sorted { $0.localizedStandardCompare($1) == .orderedAscending }
+        return PieceFacts.facts(PieceFacts.Input(
+            arranger: score.arranger, partName: score.partName, barCount: score.barCount,
+            transposition: score.transposition?.description, programmes: programmes,
+            ownSettings: settings.hasOwnSettings(score.id.uuidString),
+            lastOpenedAt: score.lastOpenedAt, addedAt: score.addedAt))
     }
 
     @ViewBuilder
@@ -397,6 +414,8 @@ struct PieceCard: View {
     let composer: String?
     var note: String = ""
     var needsCheck = false
+    /// The rest of what's known, a line each; heard as More Content.
+    var facts: [PieceFacts.Fact] = []
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -424,6 +443,17 @@ struct PieceCard: View {
                     .foregroundStyle(Palette.notes)
                     .padding(.top, 4)
             }
+            if !facts.isEmpty {
+                VStack(alignment: .leading, spacing: 2) {
+                    ForEach(facts, id: \.kind) { fact in
+                        Text(fact.text)
+                    }
+                }
+                .font(.body)
+                .foregroundStyle(.secondary)
+                .padding(.top, 4)
+                .accessibilityHidden(true)
+            }
         }
         .multilineTextAlignment(.leading)
         .fixedSize(horizontal: false, vertical: true)
@@ -434,6 +464,28 @@ struct PieceCard: View {
         .contentShape(RoundedRectangle(cornerRadius: 26))
         .accessibilityElement(children: .combine)
         .accessibilityAddTraits(.isButton)
+        .modifier(FactContent(facts: facts))
+    }
+}
+
+/// Every kind of fact always applied, nil when the piece has none, so the chain keeps
+/// one shape from card to card.
+private struct FactContent: ViewModifier {
+    let facts: [PieceFacts.Fact]
+
+    private func text(_ kind: PieceFacts.Kind) -> Text? {
+        facts.first { $0.kind == kind }.map { Text($0.text) }
+    }
+
+    func body(content: Content) -> some View {
+        content
+            .accessibilityCustomContent(AccessibilityCustomContentKey("Arranger"), text(.arranger))
+            .accessibilityCustomContent(AccessibilityCustomContentKey("Parts"), text(.parts))
+            .accessibilityCustomContent(AccessibilityCustomContentKey("Bars"), text(.bars))
+            .accessibilityCustomContent(AccessibilityCustomContentKey("Transposed"), text(.transposed))
+            .accessibilityCustomContent(AccessibilityCustomContentKey("Programmes"), text(.programmes))
+            .accessibilityCustomContent(AccessibilityCustomContentKey("Settings"), text(.settings))
+            .accessibilityCustomContent(AccessibilityCustomContentKey("Played"), text(.played))
     }
 }
 

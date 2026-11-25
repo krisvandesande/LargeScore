@@ -324,12 +324,32 @@
         }
       }
     },
+    "Added %@": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toegevoegd op %@"
+          }
+        }
+      }
+    },
     "Added: %@": {
       "localizations": {
         "nl": {
           "stringUnit": {
             "state": "translated",
             "value": "Toegevoegd: %@"
+          }
+        }
+      }
+    },
+    "All Music": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alle muziek"
           }
         }
       }
@@ -350,6 +370,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "Een octaaf lager"
+          }
+        }
+      }
+    },
+    "Arranged by %@": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bewerkt door %@"
+          }
+        }
+      }
+    },
+    "Arranger": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bewerker"
           }
         }
       }
@@ -410,6 +450,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bariton"
+          }
+        }
+      }
+    },
+    "Bars": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maten"
           }
         }
       }
@@ -520,6 +570,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Wijzig %@"
+          }
+        }
+      }
+    },
+    "Change For": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wijzigen voor"
           }
         }
       }
@@ -1094,6 +1154,16 @@
         }
       }
     },
+    "In %@": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In %@"
+          }
+        }
+      }
+    },
     "Instruments": {
       "localizations": {
         "nl": {
@@ -1270,6 +1340,36 @@
           "stringUnit": {
             "state": "translated",
             "value": "Zoals iPad"
+          }
+        }
+      }
+    },
+    "Move Down": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Omlaag"
+          }
+        }
+      }
+    },
+    "Move Up": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Omhoog"
+          }
+        }
+      }
+    },
+    "Moved to %lld": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verplaatst naar %lld"
           }
         }
       }
@@ -1650,6 +1750,26 @@
         }
       }
     },
+    "Played": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gespeeld"
+          }
+        }
+      }
+    },
+    "Played %@": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gespeeld op %@"
+          }
+        }
+      }
+    },
     "Played On": {
       "localizations": {
         "nl": {
@@ -1720,6 +1840,16 @@
         }
       }
     },
+    "Read with its own settings": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gelezen met eigen instellingen"
+          }
+        }
+      }
+    },
     "Recently Played": {
       "localizations": {
         "nl": {
@@ -1776,16 +1906,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Wijzig naam van programma"
-          }
-        }
-      }
-    },
-    "Reorder": {
-      "localizations": {
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Herschik"
           }
         }
       }
@@ -1952,6 +2072,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Grootte %lld van %lld"
+          }
+        }
+      }
+    },
+    "Size for All Music": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grootte voor alle muziek"
           }
         }
       }
@@ -2212,6 +2342,16 @@
         }
       }
     },
+    "This Piece": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dit stuk"
+          }
+        }
+      }
+    },
     "This bar can't be changed that way.": {
       "localizations": {
         "nl": {
@@ -2312,6 +2452,16 @@
         }
       }
     },
+    "This piece keeps its own settings.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dit stuk houdt zijn eigen instellingen."
+          }
+        }
+      }
+    },
     "This version has %lld bars instead of %lld. Check your notes: after the change they may sit on other bars.": {
       "localizations": {
         "en": {
@@ -2408,6 +2558,26 @@
         }
       }
     },
+    "Transposed": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Getransponeerd"
+          }
+        }
+      }
+    },
+    "Transposed: %@": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Getransponeerd: %@"
+          }
+        }
+      }
+    },
     "Trombone": {
       "localizations": {
         "nl": {
@@ -2484,6 +2654,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Gebruik vandaag"
+          }
+        }
+      }
+    },
+    "Use the Settings for All Music": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Instellingen voor alle muziek gebruiken"
           }
         }
       }
@@ -2614,6 +2794,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "Je notities en programma’s blijven. De vorige versie kun je terugzetten vanuit de bibliotheek."
+          }
+        }
+      }
+    },
+    "^[%lld bar](inflect: true)": {
+      "localizations": {
+        "nl": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld maat"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld maten"
+                }
+              }
+            }
           }
         }
       }

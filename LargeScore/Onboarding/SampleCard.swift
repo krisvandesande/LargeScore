@@ -46,14 +46,14 @@ struct SampleCard: View {
     }
 
     var body: some View {
-        let dark = settings.pageScheme(system: systemScheme) == .dark
+        let dark = settings.pageScheme(system: systemScheme, piece: piece.id) == .dark
         // The paper alone sets the card's size; the music is drawn over it. Before, the
         // music's fixed frame from the last layout held the card at the old size when
         // the iPad turned, so the next layout used it too and ran off the screen.
         (dark ? Color.black : Color.white)
             .overlay(alignment: .topLeading) {
                 if let page = scene {
-                    ScoreCanvas(scene: page, ink: settings.pageInk(system: systemScheme), glyphWeight: settings.glyphWeight(for: piece.id))
+                    ScoreCanvas(scene: page, ink: settings.pageInk(system: systemScheme, piece: piece.id), glyphWeight: settings.glyphWeight(for: piece.id))
                         .frame(width: area.width, height: area.height)
                         .padding(margins)
                 }
