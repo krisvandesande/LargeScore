@@ -11,7 +11,7 @@ actor VerovioEngraver: Engraver {
     /// Most recently used last. A long piece's pages run to megabytes, and resizing a
     /// Mac window makes a new layout for every size it passes through.
     private var recent: [CacheKey] = []
-    static let cacheLimit = 8
+    static let cacheLimit = 16
 
     private struct CacheKey: Hashable {
         var source: Int

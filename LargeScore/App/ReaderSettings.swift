@@ -42,6 +42,8 @@ final class ReaderSettings {
     var playingOrder: Bool { didSet { store.set(playingOrder, forKey: Key.playingOrder) } }
     /// A moment's tint on the first bar after a page turn, to find where to read.
     var markFirstBar: Bool { didSet { store.set(markFirstBar, forKey: Key.markFirstBar) } }
+    /// The key's sharps and flats printed on every note they apply to.
+    var keyReminders: Bool { didSet { store.set(keyReminders, forKey: Key.keyReminders) } }
     /// Pieces read at a size of their own (a busy one smaller, a sparse one larger),
     /// by piece id. Kept on this device, like the size itself.
     private(set) var pieceSizes: [String: Int] { didSet { store.set(pieceSizes, forKey: Key.pieceSizes) } }
@@ -79,6 +81,7 @@ final class ReaderSettings {
         static let playingOrder = "playingOrder"
         static let markFirstBar = "markFirstBar"
         static let pieceSizes = "pieceSizes"
+        static let keyReminders = "keyReminders"
         static let instrument = "instrument"
         static let instruments = "instruments"
         static let onboardingDone = "onboardingDone"
@@ -102,6 +105,7 @@ final class ReaderSettings {
         halfPageTurns = store.bool(forKey: Key.halfPageTurns)
         playingOrder = store.bool(forKey: Key.playingOrder)
         markFirstBar = store.object(forKey: Key.markFirstBar) as? Bool ?? true
+        keyReminders = store.bool(forKey: Key.keyReminders)
         pieceSizes = store.dictionary(forKey: Key.pieceSizes) as? [String: Int] ?? [:]
         if let list = store.string(forKey: Key.instruments) {
             instruments = list.split(separator: " ").compactMap { Instrument(rawValue: String($0)) }
@@ -115,7 +119,8 @@ final class ReaderSettings {
     func layoutRequest(for area: CGSize, centred: Bool = false, piece: String? = nil) -> LayoutRequest {
         let height = staffHeight(for: piece)
         return LayoutRequest(pageSize: area, staffHeight: height, bold: boldLines, lineGap: lineGap, centred: centred,
-                             oneLine: height > Self.largestPageSize, playingOrder: playingOrder)
+                             oneLine: height > Self.largestPageSize, playingOrder: playingOrder,
+                             keyReminders: keyReminders)
     }
 
     /// Bold also thickens the glyphs a little: 7% of a staff space all round.

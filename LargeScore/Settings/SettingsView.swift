@@ -37,8 +37,9 @@ struct SettingsView: View {
                 }
                 Section {
                     Toggle("Repeats in Playing Order", isOn: $settings.playingOrder)
+                    Toggle("Key Reminders", isOn: $settings.keyReminders)
                 } footer: {
-                    Text("Repeated bars are printed again where they're played, with D.C., D.S. and Coda followed, so pages only turn forward.")
+                    Text("Repeated bars are printed again where they're played, with D.C., D.S. and Coda followed, so pages only turn forward. Key reminders print the key's sharp or flat on every note it applies to.")
                         .formNote()
                 }
                 Section {

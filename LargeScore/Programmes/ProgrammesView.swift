@@ -168,10 +168,30 @@ struct ProgrammePieces: View {
     /// Shown as a large button after the last piece, where it's always in sight.
     var addPieces: (() -> Void)? = nil
     @Environment(\.modelContext) private var context
+    @Environment(ReaderSettings.self) private var settings
+    @Environment(ScoreLoader.self) private var loader
     @State private var openAt: OpenAt?
 
     var body: some View {
         let entries = programme.orderedEntries
+        content(entries)
+            // Today's pieces laid out ahead at the reader's size, so none waits to appear.
+            .task(id: TodayKey(pieces: programme.isToday ? programme.scores.map(\.piece) : [], area: loader.readerArea)) {
+                guard programme.isToday, let area = loader.readerArea else { return }
+                let settings = settings
+                await loader.layOutAhead(programme.scores.map(\.piece)) {
+                    settings.layoutRequest(for: area, centred: true, piece: $0.id)
+                }
+            }
+    }
+
+    private struct TodayKey: Hashable {
+        var pieces: [Piece]
+        var area: CGSize?
+    }
+
+    @ViewBuilder
+    private func content(_ entries: [ProgrammeEntry]) -> some View {
         List {
             Section {
                 Toggle("Today’s Programme", isOn: Binding(

@@ -23,6 +23,7 @@
 		2E3E9640839400CA3864B8A8 /* ZipReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F8F166C31D3BB62BA66B3B9 /* ZipReader.swift */; };
 		3046DB222CB6DD220594DA32 /* CloudSchema.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86F011439BA621309C700329 /* CloudSchema.swift */; };
 		3753B5939D0C165FE98888C9 /* Engraver.swift in Sources */ = {isa = PBXBuildFile; fileRef = B770B7CA621635E8184DEDB0 /* Engraver.swift */; };
+		37CCD573E8ECF1673872B976 /* KeyReminders.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7D24DD2FAB6CD2CB0C1A9A3 /* KeyReminders.swift */; };
 		3A65A92834C34B9459BEC7C8 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 21FCDEC6F400623C55EC368B /* Localizable.xcstrings */; };
 		3BA5A283ABCA62CF09902A13 /* ScreenSweepTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F3D4B823D53D688EADE29A3 /* ScreenSweepTests.swift */; };
 		3C1FD0409376A0D1D08E716B /* evening-air-treble.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = FEDAB8FE7CB3DC5664A5D395 /* evening-air-treble.musicxml */; };
@@ -153,6 +154,7 @@
 		D70C85A52005056D240202DE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		DD0A5935BC4C624F27CA3BDA /* DemoScoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoScoreTests.swift; sourceTree = "<group>"; };
 		E19AAC2327854B917708BCEE /* CompareView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompareView.swift; sourceTree = "<group>"; };
+		E7D24DD2FAB6CD2CB0C1A9A3 /* KeyReminders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyReminders.swift; sourceTree = "<group>"; };
 		F30C6972272BBECB99A21250 /* evening-air.musicxml */ = {isa = PBXFileReference; path = "evening-air.musicxml"; sourceTree = "<group>"; };
 		F44D8CA440E27E7D7D2037D8 /* PageTurner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageTurner.swift; sourceTree = "<group>"; };
 		F4C3345DCD65C0A8E77FDBF9 /* ScoreLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreLoader.swift; sourceTree = "<group>"; };
@@ -248,6 +250,7 @@
 			isa = PBXGroup;
 			children = (
 				B770B7CA621635E8184DEDB0 /* Engraver.swift */,
+				E7D24DD2FAB6CD2CB0C1A9A3 /* KeyReminders.swift */,
 				621B9411D5B09EAA448B9A68 /* MusicXMLEdit.swift */,
 				049D9F39E098D68EA2B24425 /* OneLine.swift */,
 				6571A2CA874D68B485A827E6 /* PartSplitter.swift */,
@@ -525,6 +528,7 @@
 				27A52EEC71E4821E9A565F9F /* FixSession.swift in Sources */,
 				B8E2B41CE24CB3C0616A654E /* ImportSession.swift in Sources */,
 				9D3D1F9DDC72FF21118EE562 /* ImportSheet.swift in Sources */,
+				37CCD573E8ECF1673872B976 /* KeyReminders.swift in Sources */,
 				E6E7DAF75C872D89F7292D88 /* LargeScoreApp.swift in Sources */,
 				1E3E694D612E7296C55AA653 /* LayoutKit.swift in Sources */,
 				224DA9E13A57C61C072D5DC8 /* LibraryView.swift in Sources */,

@@ -1094,6 +1094,16 @@
         }
       }
     },
+    "Key Reminders": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voortekenherinneringen"
+          }
+        }
+      }
+    },
     "Language": {
       "localizations": {
         "nl": {
@@ -1780,12 +1790,12 @@
         }
       }
     },
-    "Repeated bars are printed again where they're played, with D.C., D.S. and Coda followed, so pages only turn forward.": {
+    "Repeated bars are printed again where they're played, with D.C., D.S. and Coda followed, so pages only turn forward. Key reminders print the key's sharp or flat on every note it applies to.": {
       "localizations": {
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Herhaalde maten staan opnieuw waar ze gespeeld worden, met D.C., D.S. en Coda gevolgd, zodat je alleen vooruit bladert."
+            "value": "Herhaalde maten staan opnieuw waar ze gespeeld worden, met D.C., D.S. en Coda gevolgd, zodat je alleen vooruit bladert. Voortekenherinneringen zetten de kruis of mol van de toonsoort bij elke noot waarvoor die geldt."
           }
         }
       }

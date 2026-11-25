@@ -1,5 +1,6 @@
 import Foundation
 import CoreGraphics
+import UIKit
 
 /// A piece the app can open: the bundled sample, or a score from the library with
 /// the part to show.
@@ -107,8 +108,51 @@ nonisolated struct LaidOutPiece: Sendable {
 final class ScoreLoader {
     private let engraver = VerovioEngraver()
 
+    /// Pieces laid out lately, so turning into one already laid out ahead is immediate.
+    private var laidOut: [LoadKey: LaidOutPiece] = [:]
+    private var recent: [LoadKey] = []
+    static let keep = 16
+
+    private struct LoadKey: Hashable {
+        var piece: Piece
+        var request: LayoutRequest
+    }
+
+    /// The reader's page area last used, kept so a programme can be laid out ahead
+    /// before the reader opens.
+    var readerArea: CGSize? {
+        get {
+            let stored = UserDefaults.standard.string(forKey: "readerArea").map(NSCoder.cgSize(for:))
+            return stored.flatMap { $0.width > 100 && $0.height > 100 ? $0 : nil }
+        }
+        set { UserDefaults.standard.set(newValue.map(NSCoder.string(for:)), forKey: "readerArea") }
+    }
+
     func layOut(_ piece: Piece, request: LayoutRequest) async throws -> LaidOutPiece {
-        let xml = try await Self.prepare(piece)
+        let key = LoadKey(piece: piece, request: request)
+        if let done = laidOut[key] {
+            recent.removeAll { $0 == key }
+            recent.append(key)
+            return done
+        }
+        let result = try await engrave(piece, request: request)
+        laidOut[key] = result
+        recent.removeAll { $0 == key }
+        recent.append(key)
+        while recent.count > Self.keep { laidOut[recent.removeFirst()] = nil }
+        return result
+    }
+
+    /// Lays out pieces one after another, quietly, so they open at once later.
+    func layOutAhead(_ pieces: [Piece], request: (Piece) -> LayoutRequest) async {
+        for piece in pieces.prefix(Self.keep - 2) {
+            guard !Task.isCancelled else { return }
+            _ = try? await layOut(piece, request: request(piece))
+        }
+    }
+
+    private func engrave(_ piece: Piece, request: LayoutRequest) async throws -> LaidOutPiece {
+        let xml = try await Self.prepare(piece, keyReminders: request.keyReminders)
         var request = request
         request.transpose = piece.transposition?.interval
         try Task.checkCancellation()
@@ -129,8 +173,9 @@ final class ScoreLoader {
 
     /// Splitting out one part reads the whole file: kept off the main thread.
     @concurrent
-    nonisolated private static func prepare(_ piece: Piece) async throws -> String {
-        try piece.musicXML()
+    nonisolated private static func prepare(_ piece: Piece, keyReminders: Bool) async throws -> String {
+        let xml = try piece.musicXML()
+        return keyReminders ? KeyReminders.apply(xml) : xml
     }
 
     @concurrent

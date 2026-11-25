@@ -82,3 +82,42 @@ struct PlayingOrderTests {
         try image.pngData()!.write(to: renderOutput("playing-order.png"))
     }
 }
+
+/// The key's sharps and flats on every note they apply to.
+struct KeyReminderTests {
+    @Test func notesTheKeyAltersGetTheirAccidental() {
+        // F major: B is flat. B♭ gets a flat, B natural (already marked) and F are left.
+        let xml = """
+        <part id="P1"><measure><attributes><key><fifths>-1</fifths></key></attributes>
+        <note><pitch><step>B</step><alter>-1</alter><octave>4</octave></pitch><duration>1</duration><voice>1</voice><type>quarter</type></note>
+        <note><pitch><step>B</step><octave>4</octave></pitch><duration>1</duration><voice>1</voice><type>quarter</type><accidental>natural</accidental></note>
+        <note><pitch><step>F</step><octave>4</octave></pitch><duration>1</duration><voice>1</voice><type>quarter</type></note>
+        <note><pitch><step>B</step><alter>-1</alter><octave>4</octave></pitch><duration>1</duration><voice>1</voice><type>quarter</type><tie type="stop"></tie></note>
+        </measure></part>
+        """
+        let result = KeyReminders.apply(xml)
+        #expect(result.components(separatedBy: "<accidental>flat</accidental>").count == 2)
+        #expect(result.contains("<type>quarter</type><accidental>flat</accidental></note>"))
+        #expect(result.components(separatedBy: "<accidental>natural</accidental>").count == 2)
+    }
+
+    @Test func eachPartStartsInC() {
+        let xml = #"<part id="P1"><fifths>2</fifths></part><part id="P2"><note><pitch><step>F</step><alter>1</alter><octave>4</octave></pitch><type>quarter</type></note></part>"#
+        #expect(KeyReminders.apply(xml) == xml)
+    }
+
+    @Test func remindersEngrave() async throws {
+        let url = try #require(Bundle.main.url(forResource: "evening-air", withExtension: "musicxml"))
+        let piece = Piece(id: "k", title: "K", source: .stored(try Data(contentsOf: url)))
+        var request = LayoutRequest(pageSize: CGSize(width: 900, height: 1200), staffHeight: 64)
+        request.keyReminders = true
+        let laidOut = try await ScoreLoader().layOut(piece, request: request)
+        let page = try #require(laidOut.pages.first)
+        let size = CGSize(width: 900, height: 1200)
+        let image = UIGraphicsImageRenderer(size: size).image { ctx in
+            UIColor.white.setFill(); ctx.fill(CGRect(origin: .zero, size: size))
+            ScoreCanvas.draw(page, in: ctx.cgContext, size: size, ink: UIColor.black.cgColor)
+        }
+        try image.pngData()!.write(to: renderOutput("key-reminders.png"))
+    }
+}

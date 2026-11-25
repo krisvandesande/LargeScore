@@ -26,6 +26,8 @@ nonisolated struct LayoutRequest: Hashable, Sendable {
     /// Repeats, endings, D.C., D.S. and Coda written out in the order they're played,
     /// so pages only ever turn forward.
     var playingOrder = false
+    /// The key's sharps and flats on every note they apply to (`KeyReminders`).
+    var keyReminders = false
 }
 
 /// One engraved page.

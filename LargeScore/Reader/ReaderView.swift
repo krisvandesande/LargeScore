@@ -52,6 +52,7 @@ struct ReaderView: View {
     /// The first bar is tinted for a moment after a turn forward.
     @State private var tintFirstBar = false
     @State private var tintTask: Task<Void, Never>?
+    @State private var aheadTask: Task<Void, Never>?
     @State private var laidOut: LaidOutPiece?
     @State private var turner = PageTurner(pageCount: 0, halfPageTurns: false)
     @State private var failed = false
@@ -117,7 +118,10 @@ struct ReaderView: View {
         .sheet(isPresented: $writingNote) {
             if let notes { WrittenNoteSheet(store: notes) }
         }
-        .onDisappear { AwakeReaders.closed() }
+        .onDisappear {
+            AwakeReaders.closed()
+            aheadTask?.cancel()
+        }
         .onChange(of: settings.halfPageTurns) { _, half in
             turner.update(pageCount: turner.pageCount, halfPageTurns: half && laidOut?.request.oneLine != true)
         }
@@ -313,10 +317,16 @@ struct ReaderView: View {
             }
             laidOut = result
             laidOutPieceID = shown.id
-            if let next = nextPiece {
-                // Engrave the next piece ahead, so turning into it is immediate.
-                let request = settings.layoutRequest(for: area, centred: true, piece: next.id)
-                Task { _ = try? await loader.layOut(next, request: request) }
+            loader.readerArea = area
+            if place.hasNext {
+                // The rest of the programme laid out ahead, the next piece first, so
+                // turning into any of them is immediate.
+                let rest = Array(pieces[(place.index + 1)...])
+                let settings = settings
+                aheadTask?.cancel()
+                aheadTask = Task(priority: .utility) {
+                    await loader.layOutAhead(rest) { settings.layoutRequest(for: area, centred: true, piece: $0.id) }
+                }
             }
             turner = PageTurner(pageCount: result.pages.count, halfPageTurns: settings.halfPageTurns && !result.request.oneLine, page: page)
             failed = false
