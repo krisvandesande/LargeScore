@@ -108,7 +108,7 @@ struct FixPanel: View {
     }
 
     private var noteSection: some View {
-        section(title: model.selectedIsRest ? Text("Rest") : Text("Note"), detail: model.selectedSummary) {
+        section(title: model.selectedIsRest ? Text("Rest") : Text("Note"), detail: model.selectedIsRest ? model.selectedLength.map(FixModel.name) : model.selectedSummary) {
             if !model.selectedIsRest {
                 field("Pitch") {
                     HStack(spacing: 8) {
