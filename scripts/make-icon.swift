@@ -24,12 +24,16 @@ enum Symbol {
     static let barStart: CGFloat = -207.5, barPeriod: CGFloat = 73.6, barWidth: CGFloat = 36.1 // in x + y
 }
 
+// Drawn in a 1024 canvas; ICON_PIXELS draws it straight at another size, sharp at
+// every one (the Mac icon's 16 to 1024 px), rather than shrinking the 1024 picture.
 let size: CGFloat = 1024
-let ctx = CGContext(data: nil, width: Int(size), height: Int(size), bitsPerComponent: 8, bytesPerRow: 0,
+let pixels = CGFloat(Double(ProcessInfo.processInfo.environment["ICON_PIXELS"] ?? "") ?? 1024)
+let ctx = CGContext(data: nil, width: Int(pixels), height: Int(pixels), bitsPerComponent: 8, bytesPerRow: 0,
                     space: CGColorSpace(name: CGColorSpace.sRGB)!,
                     // The light icon is opaque with no alpha channel, as the App Store requires.
                     bitmapInfo: (variant == "light" ? CGImageAlphaInfo.noneSkipLast : .premultipliedLast).rawValue)!
-ctx.translateBy(x: 0, y: size); ctx.scaleBy(x: 1, y: -1) // top-left origin, y down
+ctx.translateBy(x: 0, y: pixels); ctx.scaleBy(x: 1, y: -1) // top-left origin, y down
+ctx.scaleBy(x: pixels / size, y: pixels / size)
 
 let accent = CGColor(srgbRed: 0, green: 0x40 / 255, blue: 0xA0 / 255, alpha: 1)
 let background: CGColor?, art: CGColor

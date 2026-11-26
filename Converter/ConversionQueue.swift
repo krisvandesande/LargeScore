@@ -162,6 +162,10 @@ final class ConversionQueue: ObservableObject {
             if environment["TESSDATA_PREFIX"] == nil, FileManager.default.fileExists(atPath: tessdata) {
                 environment["TESSDATA_PREFIX"] = tessdata
             }
+            // A background tool: no Dock icon, no window, never taking focus. Without
+            // this every conversion made Java a front app, and Finder came forward.
+            let quiet = "-Djava.awt.headless=true -Dapple.awt.UIElement=true"
+            environment["JAVA_TOOL_OPTIONS"] = [environment["JAVA_TOOL_OPTIONS"], quiet].compactMap { $0 }.joined(separator: " ")
             process.environment = environment
             let log = home.appendingPathComponent("audiveris.log")
             if !FileManager.default.fileExists(atPath: log.path) { FileManager.default.createFile(atPath: log.path, contents: nil) }

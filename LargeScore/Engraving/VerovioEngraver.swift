@@ -4,9 +4,27 @@ import VerovioToolkit
 /// Engraves with Verovio. One toolkit, used from one actor, so calls never overlap.
 actor VerovioEngraver: Engraver {
     /// Made on first use, inside the actor.
-    private lazy var toolkit = VerovioToolkit(
-        VerovioResources.bundle.resourceURL!.appendingPathComponent("data").path
-    )
+    private lazy var toolkit = VerovioToolkit(Self.resourcePath)
+
+    /// Verovio's fonts and data, found by looking where they are in the app: inside the
+    /// package's resource bundle, `Contents/Resources/data` on the Mac and `data` on
+    /// iPad. Its own `Bundle.module` stops the app when it can't open that bundle, which
+    /// it couldn't on macOS 12 (the Converter on the Mac Pro, 2026-11-26), so it is only
+    /// the last resort.
+    nonisolated static var resourcePath: String {
+        let name = "VerovioKit_VerovioToolkit.bundle"
+        let roots = [Bundle.main.resourceURL, Bundle.main.bundleURL, Bundle(for: Marker.self).resourceURL].compactMap { $0 }
+        for root in roots {
+            for inner in ["Contents/Resources/data", "data"] {
+                let data = root.appendingPathComponent(name).appendingPathComponent(inner)
+                var folder: ObjCBool = false
+                if FileManager.default.fileExists(atPath: data.path, isDirectory: &folder), folder.boolValue { return data.path }
+            }
+        }
+        return VerovioResources.bundle.resourceURL!.appendingPathComponent("data").path
+    }
+
+    private final class Marker {}
     private var cache: [CacheKey: EngravedScore] = [:]
     /// Most recently used last. A long piece's pages run to megabytes, and resizing a
     /// Mac window makes a new layout for every size it passes through.
