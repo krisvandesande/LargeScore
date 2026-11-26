@@ -89,4 +89,22 @@ nonisolated final class KeyTests: XCTestCase {
         XCTAssertFalse(model.keyMissing)
         XCTAssertEqual(model.edit.firstKey, -2)
     }
+
+    /// A bass clef read where the PDF has a treble clef: the notes stay on their lines.
+    @MainActor func testClefKeepsNotesOnTheirLines() throws {
+        var edit = MusicXMLEdit(xml: Self.bar)
+        XCTAssertEqual(edit.clef(atBar: "m1"), .bass)
+        try edit.setKey(-2, fromBar: "m1")
+        try edit.setClef(.treble, fromBar: "m1")
+        XCTAssertEqual(edit.clef(atBar: "m2"), .treble)
+        XCTAssertTrue(edit.xml.contains("<clef><sign>G</sign><line>2</line></clef>"))
+        XCTAssertEqual(pitch(edit.xml, "n1"), "G0/5")    // above the staff, as B was in the bass clef
+        XCTAssertEqual(pitch(edit.xml, "n2"), "G-1/5")   // its printed flat stays a flat
+        XCTAssertEqual(pitch(edit.xml, "n3"), "G-1/5")   // and carries through the bar
+        XCTAssertEqual(pitch(edit.xml, "n4"), "C0/5")    // E in the bass clef: C here
+        XCTAssertEqual(pitch(edit.xml, "n6"), "C0/5")
+        XCTAssertEqual(pitch(edit.xml, "n7"), "D1/5")    // F sharp's line: D, sharp as printed
+        try edit.setClef(.bass, fromBar: "m1")
+        XCTAssertEqual(pitch(edit.xml, "n4"), "E-1/3")   // back, with the key's flat again
+    }
 }

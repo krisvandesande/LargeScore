@@ -108,6 +108,19 @@ final class FixModel: ObservableObject {
         perform(problem: String(localized: "The key couldn't be set here.")) { try $0.setKey(fifths, fromBar: id) }
     }
 
+    var currentClef: MusicXMLEdit.Clef {
+        guard let bar = selectedBar ?? firstBar else { return .treble }
+        return edit.clef(atBar: bar)
+    }
+
+    private var firstBar: String? { edit.xml.firstMatch(#"<measure\b[^>]*\bid="([^"]+)""#) }
+
+    /// Sets the clef from the selected bar (or the start), the notes staying on their lines.
+    func setClef(_ clef: MusicXMLEdit.Clef, fromStart: Bool = false) {
+        guard let id = (fromStart ? nil : selectedBar) ?? firstBar else { return }
+        perform(problem: String(localized: "The clef couldn't be set here.")) { try $0.setClef(clef, fromBar: id) }
+    }
+
     /// Moves all the music to another key.
     func transpose(toKey fifths: Int, up: Bool) {
         perform(problem: String(localized: "The music couldn't be transposed.")) { $0.transpose(toKey: fifths, up: up) }

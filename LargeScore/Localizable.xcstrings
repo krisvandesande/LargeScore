@@ -500,6 +500,16 @@
         }
       }
     },
+    "Alto Clef": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Altsleutel"
+          }
+        }
+      }
+    },
     "An Octave Higher": {
       "localizations": {
         "nl": {
@@ -676,6 +686,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Maten rust"
+          }
+        }
+      }
+    },
+    "Bass Clef": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fasleutel"
           }
         }
       }
@@ -956,6 +976,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Klarinet"
+          }
+        }
+      }
+    },
+    "Clef": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sleutel"
           }
         }
       }
@@ -2650,6 +2680,26 @@
         }
       }
     },
+    "Set the clef from this bar on. The notes stay on their lines, as on the PDF.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stel de sleutel in vanaf deze maat. De noten blijven op hun lijnen, zoals op de pdf."
+          }
+        }
+      }
+    },
+    "Set the clef of the piece. The notes stay on their lines, as on the PDF.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stel de sleutel van het stuk in. De noten blijven op hun lijnen, zoals op de pdf."
+          }
+        }
+      }
+    },
     "Set the key from this bar on. Notes without their own sharp or flat follow it.": {
       "localizations": {
         "nl": {
@@ -2956,12 +3006,32 @@
         }
       }
     },
+    "Tenor Clef": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tenorsleutel"
+          }
+        }
+      }
+    },
     "That change couldn't be shown, so it was undone.": {
       "localizations": {
         "nl": {
           "stringUnit": {
             "state": "translated",
             "value": "Die wijziging kon niet getoond worden en is ongedaan gemaakt."
+          }
+        }
+      }
+    },
+    "The clef couldn't be set here.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De sleutel kon hier niet worden ingesteld."
           }
         }
       }
@@ -3454,6 +3524,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Transponeren…"
+          }
+        }
+      }
+    },
+    "Treble Clef": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Solsleutel"
           }
         }
       }

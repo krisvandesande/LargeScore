@@ -14,6 +14,7 @@ struct PieceView: View {
     @State private var message: String?
     @StateObject private var pdfZoom = PDFZoom()
     @State private var transposing = false
+    private var firstBarID: String { model.xml.firstMatch(#"<measure\b[^>]*\bid="([^"]+)""#) ?? "" }
 
     init(job: Job, xml: String) {
         self.job = job
@@ -105,6 +106,19 @@ struct PieceView: View {
                     Text("Key: \(KeyName.signature(model.edit.firstKey))")
                 }
                 .help("Set the key of the piece. Notes without their own sharp or flat follow it.")
+            }
+            ToolbarItem(placement: .primaryAction) {
+                // A clef read wrongly: the notes stay where they are on the staff.
+                Menu {
+                    ForEach(MusicXMLEdit.Clef.allCases) { clef in
+                        Button { model.setClef(clef, fromStart: true) } label: {
+                            if clef == model.edit.clef(atBar: firstBarID) { Label(clef.name, systemImage: "checkmark") } else { Text(clef.name) }
+                        }
+                    }
+                } label: {
+                    Text(model.edit.clef(atBar: firstBarID).name)
+                }
+                .help("Set the clef of the piece. The notes stay on their lines, as on the PDF.")
             }
             ToolbarItem(placement: .primaryAction) {
                 Button("Transpose…") { transposing = true }

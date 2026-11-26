@@ -26,3 +26,15 @@ enum KeyName {
 
     static func name(_ fifths: Int) -> String { "\(signature(fifths)) (\(major(fifths)))" }
 }
+
+extension MusicXMLEdit.Clef {
+    /// As players name it: in Dutch, by the note the clef shows (sol, fa, do).
+    var name: String {
+        switch self {
+        case .treble: String(localized: "Treble Clef")
+        case .bass: String(localized: "Bass Clef")
+        case .alto: String(localized: "Alto Clef")
+        case .tenor: String(localized: "Tenor Clef")
+        }
+    }
+}

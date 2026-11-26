@@ -182,6 +182,21 @@ struct FixPanel: View {
                 .accessibilityLabel(Text("Time Signature"))
                 .accessibilityValue(Text(model.currentTime))
             }
+            field("Clef") {
+                Menu {
+                    ForEach(MusicXMLEdit.Clef.allCases) { clef in
+                        Button { model.setClef(clef) } label: {
+                            if clef == model.currentClef { Label(clef.name, systemImage: "checkmark") } else { Text(clef.name) }
+                        }
+                    }
+                } label: {
+                    Text(model.currentClef.name)
+                }
+                .fixedSize()
+                .help("Set the clef from this bar on. The notes stay on their lines, as on the PDF.")
+                .accessibilityLabel(Text("Clef"))
+                .accessibilityValue(Text(model.currentClef.name))
+            }
             field("Key Signature") {
                 Menu {
                     ForEach(MusicXMLEdit.keys.reversed(), id: \.self) { fifths in

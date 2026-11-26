@@ -1112,3 +1112,98 @@ extension Pitch {
         return Pitch(step: Pitch.steps[newIndex], alter: newAlter, octave: newOctave)
     }
 }
+
+// MARK: - Clefs
+
+extension MusicXMLEdit {
+    /// The clefs a part can be read in.
+    enum Clef: String, CaseIterable, Identifiable {
+        case treble, bass, alto, tenor
+        var id: String { rawValue }
+        var sign: String { switch self { case .treble: "G"; case .bass: "F"; case .alto, .tenor: "C" } }
+        var line: Int { switch self { case .treble: 2; case .bass: 4; case .alto: 3; case .tenor: 4 } }
+
+        init?(sign: String, line: Int?) {
+            switch (sign, line) {
+            case ("G", _): self = .treble
+            case ("F", _): self = .bass
+            case ("C", 4): self = .tenor
+            case ("C", _): self = .alto
+            default: return nil
+            }
+        }
+
+        /// The middle line of the staff as a letter-name count from C0 (C0 = 0, D0 = 1…).
+        var middleLine: Int {
+            let signNote: Int = switch sign { case "G": 4 * 7 + 4; case "F": 3 * 7 + 3; default: 4 * 7 }
+            return signNote + (3 - line) * 2
+        }
+
+        var xml: String { "<clef><sign>\(sign)</sign><line>\(line)</line></clef>" }
+    }
+
+    /// The clef in force at the start of this bar.
+    func clef(atBar id: String) -> Clef {
+        guard let range = elementRange("measure", id: id) else { return .treble }
+        let firstNote = xml.range(of: #"<note[\s>]"#, options: .regularExpression, range: range)?.lowerBound ?? range.upperBound
+        let partStart = xml.range(of: "<part ", options: .backwards, range: xml.startIndex..<range.lowerBound)?.lowerBound ?? xml.startIndex
+        let before = String(xml[partStart..<firstNote])
+        guard let regex = try? NSRegularExpression(pattern: #"<clef(?:\s[^>]*)?>[\s\S]*?</clef>"#),
+              let match = regex.matches(in: before, range: NSRange(before.startIndex..., in: before)).last,
+              let range = Range(match.range, in: before) else { return .treble }
+        let last = String(before[range])
+        guard let sign = last.firstMatch(#"<sign>\s*([A-Z]+)\s*</sign>"#) else { return .treble }
+        return Clef(sign: sign, line: last.firstMatch(#"<line>\s*(\d)\s*</line>"#).flatMap(Int.init)) ?? .treble
+    }
+
+    /// Sets the clef from this bar on, up to the next bar that changes to another
+    /// clef, keeping every note on its line or space: for a clef that was read wrong,
+    /// the notes then sound as they're written on the PDF. Each note takes the key's
+    /// sharp or flat on its new line, or the one printed before it in its bar.
+    mutating func setClef(_ clef: Clef, fromBar id: String) throws {
+        guard let start = elementRange("measure", id: id) else { throw Failure.notFound }
+        let old = self.clef(atBar: id)
+        let shift = clef.middleLine - old.middleLine
+        var fifths = key(atBar: id)
+        let partEnd = xml.range(of: "</part>", range: start.lowerBound..<xml.endIndex)?.lowerBound ?? xml.endIndex
+        let tail = String(xml[start.lowerBound..<partEnd])
+        var out = ""
+        var cursor = tail.startIndex
+        var first = true
+        while let open = tail.range(of: "<measure", range: cursor..<tail.endIndex),
+              let close = tail.range(of: "</measure>", range: open.upperBound..<tail.endIndex) {
+            var bar = String(tail[open.lowerBound..<close.upperBound])
+            let written = bar.firstMatch(#"(<clef(?:\s[^>]*)?>[\s\S]*?</clef>)"#)
+            if !first, let written,
+               let sign = written.firstMatch(#"<sign>\s*([A-Z]+)\s*</sign>"#),
+               Clef(sign: sign, line: written.firstMatch(#"<line>\s*(\d)\s*</line>"#).flatMap(Int.init)) != old {
+                break    // A real change of clef further on: it and what follows stay.
+            }
+            out += tail[cursor..<open.lowerBound]
+            if let f = bar.firstMatch(#"<fifths>\s*(-?\d+)\s*</fifths>"#).flatMap(Int.init) { fifths = f }
+            if written != nil {
+                bar = bar.replacingFirst(#"<clef(?:\s[^>]*)?>[\s\S]*?</clef>"#, with: clef.xml)
+            } else if first {
+                bar = Self.addAttribute(clef.xml, before: ["<staff-details", "<transpose", "<directive", "<measure-style"], to: bar)
+            }
+            if shift != 0 {
+                bar = bar.replacingMatches(of: #"(<note\b[\s\S]*?</note>)"#) { note in
+                    guard let pitch = Pitch(note) else { return note }
+                    var moved = pitch.moved(shift, fifths: fifths)
+                    // A printed accidental stays the one printed.
+                    if let name = note.firstMatch(#"<accidental\b[^>]*>\s*([a-z-]+)\s*</accidental>"#),
+                       let alter = Self.accidentalNames.first(where: { $0.value == name })?.key {
+                        moved.alter = alter
+                    }
+                    return note.replacingFirst(#"<pitch>[\s\S]*?</pitch>"#, with: moved.xml)
+                }
+                bar = Self.spelled(bar, fifths: fifths)
+            }
+            out += bar
+            first = false
+            cursor = close.upperBound
+        }
+        out += tail[cursor..<tail.endIndex]
+        xml.replaceSubrange(start.lowerBound..<partEnd, with: out)
+    }
+}
