@@ -29,6 +29,11 @@ struct SettingsView: View {
                             Text(colour.title).tag(colour)
                         }
                     }
+                    FittingPicker(String(localized: "Page Turns"), value: settings.scrollTurns ? String(localized: "Scroll") : String(localized: "Jump"),
+                                  selection: $settings.scrollTurns) {
+                        Text("Scroll").tag(true)
+                        Text("Jump").tag(false)
+                    }
                     Toggle("Half-Page Turns", isOn: $settings.halfPageTurns)
                     Toggle("Mark the First Bar", isOn: $settings.markFirstBar)
                 } footer: {

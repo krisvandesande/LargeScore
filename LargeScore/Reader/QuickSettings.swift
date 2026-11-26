@@ -82,6 +82,12 @@ struct QuickSettings: View {
                             Text(colour.title).tag(colour)
                         }
                     }
+                    let scroll = bool(.scrollTurns, scope)
+                    FittingPicker(String(localized: "Page Turns"), value: scroll.wrappedValue ? String(localized: "Scroll") : String(localized: "Jump"),
+                                  selection: scroll) {
+                        Text("Scroll").tag(true)
+                        Text("Jump").tag(false)
+                    }
                     Toggle("Half-Page Turns", isOn: bool(.halfPageTurns, scope))
                     Toggle("Mark the First Bar", isOn: bool(.markFirstBar, scope))
                     Toggle("Repeats in Playing Order", isOn: bool(.playingOrder, scope))
@@ -102,7 +108,7 @@ struct QuickSettings: View {
             .navigationBarTitleDisplayMode(.inline)
         }
         // Tall enough for what shows, with no empty room under the last row.
-        .frame(idealWidth: 520, idealHeight: 784 + (settings.hasOwnSettings(pieceID) ? (scope == .all ? 126 : 86) : 0))
+        .frame(idealWidth: 520, idealHeight: 870 + (settings.hasOwnSettings(pieceID) ? (scope == .all ? 126 : 86) : 0))
         // Solid: the music showing through the glass makes the words hard to read.
         .presentationBackground(Color(.systemGroupedBackground))
     }
@@ -138,6 +144,7 @@ struct QuickSettings: View {
                 case .markFirstBar: settings.markFirstBar = on
                 case .playingOrder: settings.playingOrder = on
                 case .keyReminders: settings.keyReminders = on
+                case .scrollTurns: settings.scrollTurns = on
                 case .pageColour, .lineGap: break
                 }
             })

@@ -37,6 +37,8 @@ struct ReaderView: View {
     @State private var writingNote = false
 
     @State private var place: ProgrammePlace
+    /// Which way the last turn went, so a scrolled page comes from below or above.
+    @State private var turnedForward = true
     /// Set when going back into the previous piece: it opens on its last page.
     @State private var startAtEnd = false
     @State private var laidOutPieceID: String?
@@ -67,8 +69,15 @@ struct ReaderView: View {
             GeometryReader { proxy in
                 let area = CGSize(width: max(proxy.size.width - margins.leading - margins.trailing, 1),
                                   height: max(proxy.size.height - margins.top - margins.bottom, 1))
-                page(area: area, scheme: scheme)
+                // Each page its own view, so a turn can slide the next one in.
+                ZStack {
+                    page(area: area, scheme: scheme)
+                        .id(PageKey(piece: laidOutPieceID, page: turner.page, halfway: turner.halfway))
+                        .transition(.asymmetric(insertion: .move(edge: turnedForward ? .bottom : .top),
+                                                removal: .move(edge: turnedForward ? .top : .bottom)))
+                }
                     .padding(margins)
+                    .clipped()
                     .frame(width: proxy.size.width, height: proxy.size.height, alignment: .topLeading)
                     .contentShape(Rectangle())
                     .onTapGesture { location in
@@ -193,8 +202,16 @@ struct ReaderView: View {
     private func showFirstBar() {
         guard settings.bool(.markFirstBar, for: piece.id) else { return }
         tintTask?.cancel()
-        tintFirstBar = true
+        tintFirstBar = false
+        // After a scrolled turn the page arrives first: a tint drawn sooner lands on the
+        // page sliding away.
+        let scrolling = settings.bool(.scrollTurns, for: piece.id) && !reduceMotion
         tintTask = Task {
+            if scrolling {
+                try? await Task.sleep(for: .seconds(0.8))
+                guard !Task.isCancelled else { return }
+            }
+            tintFirstBar = true
             try? await Task.sleep(for: .seconds(1.2))
             guard !Task.isCancelled else { return }
             withAnimation(reduceMotion ? nil : .easeOut(duration: 0.6)) { tintFirstBar = false }
@@ -270,12 +287,25 @@ struct ReaderView: View {
         // Until the piece is laid out its pages aren't known: a second press of the
         // pedal while the next piece comes up must not skip it.
         guard laidOut != nil || failed else { return }
+        turnedForward = forward
+        // A slow scroll, which reads best for the player it was made for; at once with Reduce Motion, or when chosen.
+        let scroll = settings.bool(.scrollTurns, for: piece.id) && !reduceMotion
+        var turned = false
+        withAnimation(scroll ? .easeInOut(duration: 0.8) : nil) {
+            turned = forward ? turner.forward() : turner.back()
+        }
         if forward {
-            if !turner.forward() { goToNextPiece() }
-        } else if !turner.back(), place.previous() {
+            if !turned { goToNextPiece() }
+        } else if !turned, place.previous() {
             startAtEnd = true
             showPiece()
         }
+    }
+
+    private struct PageKey: Hashable {
+        var piece: String?
+        var page: Int
+        var halfway: Bool
     }
 
     private func goToNextPiece() {

@@ -1390,6 +1390,16 @@
         }
       }
     },
+    "Jump": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Springen"
+          }
+        }
+      }
+    },
     "Key Reminders": {
       "localizations": {
         "nl": {
@@ -1936,6 +1946,16 @@
         }
       }
     },
+    "Page Turns": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bladzijden omslaan"
+          }
+        }
+      }
+    },
     "Parts": {
       "localizations": {
         "nl": {
@@ -2252,6 +2272,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Saxofoon"
+          }
+        }
+      }
+    },
+    "Scroll": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schuiven"
           }
         }
       }

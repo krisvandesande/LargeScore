@@ -38,6 +38,8 @@ final class ReaderSettings {
     var boldLines: Bool { didSet { store.set(boldLines, forKey: Key.boldLines) } }
     var pageColour: PageColour { didSet { store.set(pageColour.rawValue, forKey: Key.pageColour) } }
     var halfPageTurns: Bool { didSet { store.set(halfPageTurns, forKey: Key.halfPageTurns) } }
+    /// Pages slide up into view, a slow scroll, rather than appearing at once.
+    var scrollTurns: Bool { didSet { store.set(scrollTurns, forKey: Key.scrollTurns) } }
     /// Repeats and jumps written out where they're played.
     var playingOrder: Bool { didSet { store.set(playingOrder, forKey: Key.playingOrder) } }
     /// A moment's tint on the first bar after a page turn, to find where to read.
@@ -63,7 +65,7 @@ final class ReaderSettings {
 
     /// The reading settings a piece can have its own value for, besides its size.
     enum Choice: String, CaseIterable {
-        case boldLines, pageColour, halfPageTurns, markFirstBar, playingOrder, keyReminders, lineGap
+        case boldLines, pageColour, halfPageTurns, markFirstBar, playingOrder, keyReminders, lineGap, scrollTurns
     }
 
     /// Own values by piece id, then by `Choice`: "true", "false" or a page colour.
@@ -79,6 +81,7 @@ final class ReaderSettings {
         case .playingOrder: String(playingOrder)
         case .keyReminders: String(keyReminders)
         case .lineGap: String(lineGap)
+        case .scrollTurns: String(scrollTurns)
         }
     }
 
@@ -130,6 +133,7 @@ final class ReaderSettings {
         static let boldLines = "boldLines"
         static let pageColour = "pageColour"
         static let halfPageTurns = "halfPageTurns"
+        static let scrollTurns = "scrollTurns"
         static let playingOrder = "playingOrder"
         static let markFirstBar = "markFirstBar"
         static let pieceSizes = "pieceSizes"
@@ -156,6 +160,8 @@ final class ReaderSettings {
         // The page follows the iPad: white on black in dark mode, unless chosen otherwise.
         pageColour = store.string(forKey: Key.pageColour).flatMap(PageColour.init) ?? .system
         halfPageTurns = store.bool(forKey: Key.halfPageTurns)
+        // Scroll unless chosen otherwise: what the first player asked for at the hand check (2026-11-26).
+        scrollTurns = store.object(forKey: Key.scrollTurns) as? Bool ?? true
         playingOrder = store.bool(forKey: Key.playingOrder)
         markFirstBar = store.object(forKey: Key.markFirstBar) as? Bool ?? true
         keyReminders = store.bool(forKey: Key.keyReminders)
