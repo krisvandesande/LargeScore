@@ -162,6 +162,16 @@
         }
       }
     },
+    "%lld to check": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld na te kijken"
+          }
+        }
+      }
+    },
     "%lld, %@": {
       "localizations": {
         "en": {
@@ -246,6 +256,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "1 kruis"
+          }
+        }
+      }
+    },
+    "1 to check": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 na te kijken"
           }
         }
       }
@@ -1040,6 +1060,16 @@
         }
       }
     },
+    "Click a note or a bar to fix it. Drag a note up or down to change its pitch.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Klik op een noot of een maat om ze te verbeteren. Sleep een noot omhoog of omlaag om de toonhoogte te veranderen."
+          }
+        }
+      }
+    },
     "Close": {
       "localizations": {
         "nl": {
@@ -1318,6 +1348,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Sleep PDF's hierheen"
+          }
+        }
+      }
+    },
+    "Drag sideways to make the note shorter or longer": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sleep opzij om de noot korter of langer te maken"
           }
         }
       }
@@ -1802,6 +1842,16 @@
         }
       }
     },
+    "Leave this for now and go to the next one": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Laat dit voorlopig en ga naar het volgende"
+          }
+        }
+      }
+    },
     "Length": {
       "localizations": {
         "nl": {
@@ -1868,6 +1918,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Lijst"
+          }
+        }
+      }
+    },
+    "Looks Right": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Klopt"
           }
         }
       }
@@ -2152,6 +2212,26 @@
         }
       }
     },
+    "Next to Check": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volgende om na te kijken"
+          }
+        }
+      }
+    },
+    "No key signature was read.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Er werd geen toonaard gelezen."
+          }
+        }
+      }
+    },
     "No key signature was read. Check the key against the PDF.": {
       "localizations": {
         "nl": {
@@ -2208,6 +2288,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Geen voortekens"
+          }
+        }
+      }
+    },
+    "No time signature was read.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Er werd geen maatsoort gelezen."
           }
         }
       }
@@ -2278,6 +2368,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Niets gevonden"
+          }
+        }
+      }
+    },
+    "Nothing left to check.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Niets meer na te kijken."
           }
         }
       }
@@ -2830,6 +2930,16 @@
         }
       }
     },
+    "Set Time": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maat instellen"
+          }
+        }
+      }
+    },
     "SIL Open Font License 1.1": {
       "localizations": {
         "nl": {
@@ -3156,12 +3266,32 @@
         }
       }
     },
+    "The line on the PDF": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De regel in de pdf"
+          }
+        }
+      }
+    },
     "The music couldn't be transposed.": {
       "localizations": {
         "nl": {
           "stringUnit": {
             "state": "translated",
             "value": "De muziek kon niet worden getransponeerd."
+          }
+        }
+      }
+    },
+    "The notes don't add up to %lld/%lld.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De noten komen niet uit op %lld/%lld."
           }
         }
       }
@@ -3278,6 +3408,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "De oorspronkelijke pdf"
+          }
+        }
+      }
+    },
+    "The PDF has it like this (Return)": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zo staat het in de pdf (Return)"
+          }
+        }
+      }
+    },
+    "The PDF has no sharps or flats either (Return)": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De pdf heeft ook geen kruisen of mollen (Return)"
           }
         }
       }
