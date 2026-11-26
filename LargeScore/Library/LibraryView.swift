@@ -63,6 +63,8 @@ private struct LibraryGrid: View {
     @Query(sort: \Programme.createdAt, order: .reverse) private var programmes: [Programme]
     @Environment(\.modelContext) private var context
     @Environment(ReaderSettings.self) private var settings
+    @Environment(MusicFolder.self) private var folder
+    @Environment(ImportCoordinator.self) private var importer
     @ScaledMetric(relativeTo: .title2) private var cardWidth: CGFloat = 320
     /// A value, not the stored piece: deleted on another device, a stored piece can't
     /// be read any more, and the reader would stop the app.
@@ -97,7 +99,11 @@ private struct LibraryGrid: View {
         // on another device) doesn't take an open reader with it.
         Group {
             if scores.isEmpty {
-                emptyState
+                // In a scroll view only so it can be pulled down to look for music.
+                ScrollView {
+                    emptyState.containerRelativeFrame(.vertical)
+                }
+                .refreshable { await folder.look(instruments: settings.instruments, context: context, importer: importer) }
             } else {
                 ScrollView {
                     LazyVGrid(columns: [GridItem(.adaptive(minimum: min(cardWidth, 600)), spacing: 24, alignment: .top)], spacing: 24) {
@@ -108,6 +114,8 @@ private struct LibraryGrid: View {
                     .air(.horizontal, 48)
                     .air(.vertical, 24)
                 }
+                // Pull down to look for new music now.
+                .refreshable { await folder.look(instruments: settings.instruments, context: context, importer: importer) }
             }
         }
         .fullScreenCover(item: $open) { piece in

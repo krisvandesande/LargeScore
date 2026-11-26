@@ -21,7 +21,9 @@ final class MusicFolder {
     private enum Key {
         static let bookmark = "musicFolderBookmark"
         static let seen = "musicFolderSeen"
-        static let inboxSeen = "iCloudFolderSeen"
+        // A new name: build 11 marked files as seen before iCloud had downloaded them,
+        // so they were never added. Starting afresh looks at everything there once more.
+        static let inboxSeen = "iCloudFolderSeen-2"
     }
 
     nonisolated static let container = "iCloud.com.kvds.LargeScore"
@@ -69,10 +71,10 @@ final class MusicFolder {
         stopWatching()
     }
 
-    /// On a Mac the app stays open while the notation program saves: look every
-    /// few seconds while it's in front.
+    /// Music arrives while the app is open (sent from the Converter, saved by a
+    /// notation program, still downloading from iCloud): look every few seconds while
+    /// it's in front, on iPad as on the Mac. A look lists one small folder.
     func startWatching(_ look: @escaping @MainActor () -> Void) {
-        #if targetEnvironment(macCatalyst)
         stopWatching()
         watching = Task { @MainActor in
             while !Task.isCancelled {
@@ -80,7 +82,6 @@ final class MusicFolder {
                 if !Task.isCancelled { look() }
             }
         }
-        #endif
     }
 
     func stopWatching() {
@@ -104,14 +105,21 @@ final class MusicFolder {
 
     private func bringIn(from folder: URL, seenKey: String, instruments: [Instrument], context: ModelContext, importer: ImportCoordinator) async {
         let seen = store.dictionary(forKey: seenKey) as? [String: Double] ?? [:]
-        let (changed, stamps) = await Self.changedFiles(in: folder, seen: seen)
+        var (changed, stamps) = await Self.changedFiles(in: folder, seen: seen)
         store.set(stamps, forKey: seenKey)
         guard !changed.isEmpty else { return }
+        defer { store.set(stamps, forKey: seenKey) }
 
         // The files are read through the folder's access, kept open meanwhile.
         let scoped = folder.startAccessingSecurityScopedResource()
-        let (files, failures) = await ImportSession.read(changed)
+        let (files, read) = await ImportSession.read(changed)
         if scoped { folder.stopAccessingSecurityScopedResource() }
+        // A file whose contents couldn't be had (still on its way from iCloud) is tried
+        // again at the next look, not counted as seen; one that isn't music is reported.
+        var failures: [ImportSession.Failure] = []
+        for failure in read {
+            if failure.reason == .unreadable { stamps.removeValue(forKey: failure.fileName) } else { failures.append(failure) }
+        }
         let library = (try? context.fetch(FetchDescriptor<Score>())) ?? []
         var updated: [String] = [], added: [String] = []
         var unplaced: [MusicFile] = []
@@ -196,7 +204,14 @@ final class MusicFolder {
         for url in urls {
             let name = url.lastPathComponent
             if name.hasPrefix("."), name.hasSuffix(".icloud") {
-                // ".Piece.mxl.icloud": not downloaded yet.
+                // ".Piece.mxl.icloud": not downloaded yet (older systems).
+                try? FileManager.default.startDownloadingUbiquitousItem(at: url)
+                continue
+            }
+            // Current systems list a file iCloud hasn't downloaded under its own name:
+            // ask for it, and leave it unseen until its contents are here.
+            let status = try? url.resourceValues(forKeys: [.isUbiquitousItemKey, .ubiquitousItemDownloadingStatusKey])
+            if status?.isUbiquitousItem == true, status?.ubiquitousItemDownloadingStatus != .current {
                 try? FileManager.default.startDownloadingUbiquitousItem(at: url)
                 continue
             }
