@@ -14,6 +14,8 @@ struct PieceView: View {
     @State private var message: String?
     @StateObject private var pdfZoom = PDFZoom()
     @State private var transposing = false
+    @State private var pdf: PDFDocument?
+    @State private var staves: [PDFPlaces.Staff]?
     private var firstBarID: String { model.xml.firstMatch(#"<measure\b[^>]*\bid="([^"]+)""#) ?? "" }
 
     init(job: Job, xml: String) {
@@ -55,8 +57,21 @@ struct PieceView: View {
         HSplitView {
             // The music the full height, the tools beside it as a Mac inspector, then
             // the PDF it came from.
-            MusicPane(model: model)
-                .frame(minWidth: 420)
+            VStack(spacing: 0) {
+                Proofreader(model: model, pdf: pdf, staves: staves)
+                Divider()
+                MusicPane(model: model)
+            }
+            .frame(minWidth: 420)
+            .task {
+                // The PDF's staves, found once, away from the main thread: about a
+                // quarter of a second a page.
+                let url = queue.pdf(of: job)
+                pdf = PDFDocument(url: url)
+                staves = await Task.detached(priority: .userInitiated) {
+                    PDFDocument(url: url).map(PDFPlaces.staves(in:)) ?? []
+                }.value
+            }
             VStack(spacing: 0) {
                 FixPanel(model: model)
                 Divider()

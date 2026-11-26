@@ -184,6 +184,131 @@ nonisolated final class ConverterTests: XCTestCase, @unchecked Sendable {
         save(window, name: "note-tools")
     }
 
+    /// Each bar's place on the PDF, from Audiveris's page layout: pictures of a few bars
+    /// cut from the sample PDF, to compare by eye.
+    @MainActor func testBarPlacesOnThePDF() async throws {
+        let queue = ConversionQueue()
+        queue.add([Self.samples.appendingPathComponent("converted-by-audiveris.pdf")])
+        try await waitFor { queue.jobs.first?.state == .ready }
+        let job = try XCTUnwrap(queue.jobs.first)
+        let xml = MusicXMLEdit.withIDs(try String(contentsOf: queue.music(of: job), encoding: .utf8))
+        let pdf = try XCTUnwrap(PDFDocument(url: queue.pdf(of: job)))
+        let staves = PDFPlaces.staves(in: pdf)
+        XCTAssertEqual(staves.count, 3)
+        let places = PDFPlaces.bars(in: xml, staves: staves)
+        XCTAssertEqual(places.count, 16)
+        let ids = try NSRegularExpression(pattern: #"<measure\b[^>]*\bid="([^"]+)""#)
+            .matches(in: xml, range: NSRange(xml.startIndex..., in: xml))
+            .compactMap { Range($0.range(at: 1), in: xml).map { String(xml[$0]) } }
+        // The whole first page with every bar's place outlined.
+        if let page = pdf.page(at: 0) {
+            let box = page.bounds(for: .mediaBox)
+            print("PDF page", box)
+            let image = NSImage(size: box.size, flipped: false) { _ in
+                guard let cg = NSGraphicsContext.current?.cgContext else { return false }
+                cg.setFillColor(.white); cg.fill(box)
+                page.draw(with: .mediaBox, to: cg)
+                cg.setStrokeColor(CGColor(red: 1, green: 0, blue: 0, alpha: 1))
+                for place in places.values where place.page == 0 {
+                    cg.stroke(CGRect(x: place.bar.minX * box.width, y: (1 - place.bar.maxY) * box.height,
+                                     width: place.bar.width * box.width, height: place.bar.height * box.height))
+                }
+                return true
+            }
+            if let tiff = image.tiffRepresentation, let rep = NSBitmapImageRep(data: tiff) {
+                try rep.representation(using: .png, properties: [:])?.write(to: Self.pictures.appendingPathComponent("pdf-places.png"))
+            }
+        }
+        for (number, id) in ids.enumerated() where [0, 3, 6, 12, 15].contains(number) {
+            let place = try XCTUnwrap(places[id])
+            let image = try XCTUnwrap(PDFPlaces.picture(of: place, in: pdf, mark: true))
+            let rep = try XCTUnwrap(image.representations.first as? NSBitmapImageRep)
+            try rep.representation(using: .png, properties: [:])?.write(to: Self.pictures.appendingPathComponent("pdf-bar-\(number + 1).png"))
+        }
+    }
+
+    /// With LS_PROBE set to a folder of `pdfs/` and Audiveris's `out/Leland/*.mxl`:
+    /// how many of Audiveris's lines found a staff on the PDF, piece by piece, with each
+    /// first page drawn with its bars outlined. Skipped otherwise.
+    @MainActor func testProbeBarPlaces() throws {
+        guard let root = ProcessInfo.processInfo.environment["LS_PROBE"] else { throw XCTSkip("LS_PROBE not set") }
+        let folder = URL(fileURLWithPath: root)
+        let out = Self.pictures.appendingPathComponent("probe")
+        try? FileManager.default.createDirectory(at: out, withIntermediateDirectories: true)
+        var report = ""
+        let names = try FileManager.default.contentsOfDirectory(atPath: folder.appendingPathComponent("out/Leland").path).filter { $0.hasSuffix(".mxl") }.sorted()
+        for name in names {
+            let base = String(name.dropLast(4))
+            let pdfURL = folder.appendingPathComponent("pdfs/\(base).pdf")
+            guard let pdf = PDFDocument(url: pdfURL),
+                  let data = try? Data(contentsOf: folder.appendingPathComponent("out/Leland/\(name)")),
+                  let xml = try? MusicFile.text(of: data) else { report += "\(base)\tunreadable\n"; continue }
+            let tagged = MusicXMLEdit.withIDs(xml)
+            let staves = PDFPlaces.staves(in: pdf)
+            let lines = tagged.components(separatedBy: #"new-system="yes""#).count + tagged.components(separatedBy: #"new-page="yes""#).count - 1
+            let bars = tagged.components(separatedBy: "<measure ").count - 1
+            let places = PDFPlaces.bars(in: tagged, staves: staves)
+            report += "\(base)\tpages \(pdf.pageCount)\tstaves \(staves.count)\tlines ~\(lines)\tbars \(bars)\tplaced \(places.count)\n"
+            if let page = pdf.page(at: 0) {
+                let box = page.bounds(for: .mediaBox)
+                let image = NSImage(size: box.size, flipped: false) { _ in
+                    guard let cg = NSGraphicsContext.current?.cgContext else { return false }
+                    cg.setFillColor(.white); cg.fill(box)
+                    page.draw(with: .mediaBox, to: cg)
+                    cg.setStrokeColor(CGColor(red: 1, green: 0, blue: 0, alpha: 1))
+                    cg.setLineWidth(1.5)
+                    for place in places.values where place.page == 0 {
+                        cg.stroke(CGRect(x: box.minX + place.bar.minX * box.width, y: box.minY + (1 - place.bar.maxY) * box.height,
+                                         width: place.bar.width * box.width, height: place.bar.height * box.height))
+                    }
+                    return true
+                }
+                if let tiff = image.tiffRepresentation, let rep = NSBitmapImageRep(data: tiff) {
+                    try? rep.representation(using: .png, properties: [:])?.write(to: out.appendingPathComponent(base + ".png"))
+                }
+            }
+        }
+        try report.write(to: out.appendingPathComponent("report.tsv"), atomically: true, encoding: .utf8)
+    }
+
+    /// The proofreader goes through the missing key, then each bar that doesn't add
+    /// up; a fixed or passed item drops off.
+    @MainActor func testProofreader() async throws {
+        let queue = ConversionQueue()
+        queue.add([Self.samples.appendingPathComponent("converted-by-audiveris.pdf")])
+        try await waitFor { queue.jobs.first?.state == .ready }
+        let job = try XCTUnwrap(queue.jobs.first)
+        var edit = MusicXMLEdit(xml: MusicXMLEdit.withIDs(try String(contentsOf: queue.music(of: job), encoding: .utf8)))
+        // Bar 7 a note short, and no key read.
+        let bars = try NSRegularExpression(pattern: #"<measure\b[^>]*\bid="([^"]+)""#)
+            .matches(in: edit.xml, range: NSRange(edit.xml.startIndex..., in: edit.xml))
+            .compactMap { Range($0.range(at: 1), in: edit.xml).map { String(edit.xml[$0]) } }
+        let bar7 = bars[6]
+        let barRange = try XCTUnwrap(edit.elementRange("measure", id: bar7))
+        let note = try XCTUnwrap(String(edit.xml[barRange]).firstMatch(#"<note\b[^>]*\bid="([^"]+)""#))
+        try edit.delete(note: note)
+        let xml = edit.xml.replacingOccurrences(of: #"<key>\s*<fifths>-1</fifths>\s*</key>"#, with: "", options: .regularExpression)
+
+        let model = FixModel(xml: xml)
+        XCTAssertEqual(model.checkItems, [.key, .bar(bar7)])
+        model.show(.bar(bar7))
+        XCTAssertEqual(model.selectedBar, bar7)
+        XCTAssertEqual(model.revealBar, bar7)
+        model.pass(.bar(bar7))
+        XCTAssertEqual(model.checkItems, [.key])
+        model.setKey(-1, fromStart: true)
+        XCTAssertEqual(model.checkItems, [])
+
+        let view = PieceView(job: job, xml: xml).environmentObject(queue)
+        let window = host(view, size: CGSize(width: 1300, height: 860))
+        try await Task.sleep(nanoseconds: 4_000_000_000)
+        save(window, name: "proofreader-key")
+        let barOnly = xml.replacingOccurrences(of: "<attributes>", with: "<attributes><key><fifths>-1</fifths></key>", options: [], range: xml.range(of: "<attributes>"))
+        let second = host(PieceView(job: job, xml: barOnly).environmentObject(queue), size: CGSize(width: 1300, height: 860))
+        try await Task.sleep(nanoseconds: 4_000_000_000)
+        save(second, name: "proofreader-bar")
+    }
+
     /// The window as it looks, drawn off screen: the list and a piece being fixed.
     @MainActor func testWindowPictures() async throws {
         let queue = ConversionQueue()

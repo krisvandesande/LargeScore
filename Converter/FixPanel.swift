@@ -18,7 +18,7 @@ struct FixPanel: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
-                if model.problem != nil || !model.wrongBars.isEmpty || model.keyMissing || model.timeMissing {
+                if model.problem != nil {
                     warnings
                     Divider()
                 }
@@ -53,58 +53,17 @@ struct FixPanel: View {
 
     // MARK: Sections
 
-    /// What's wrong: the last change that couldn't be made, and bars that don't add up.
+    /// The last change that couldn't be made. What to check is in the proofreader.
     private var warnings: some View {
         VStack(alignment: .leading, spacing: 8) {
             if let problem = model.problem {
                 Label(problem, systemImage: "exclamationmark.triangle.fill")
                     .foregroundColor(.orange)
             }
-            if model.keyMissing {
-                Label {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("No key signature was read. Check the key against the PDF.")
-                            .foregroundColor(.primary)
-                        Menu {
-                            ForEach(MusicXMLEdit.keys.reversed(), id: \.self) { fifths in
-                                Button(KeyName.name(fifths)) { model.setKey(fifths, fromStart: true) }
-                            }
-                        } label: {
-                            Text("Set Key")
-                        }
-                        .fixedSize()
-                        .controlSize(.large)
-                    }
-                } icon: {
-                    Image(systemName: "exclamationmark.triangle.fill").foregroundColor(.orange)
-                }
-            }
-            if model.timeMissing {
-                Label {
-                    Text("No time signature was read. Click the first bar to set it.").foregroundColor(.primary)
-                } icon: {
-                    Image(systemName: "exclamationmark.triangle.fill").foregroundColor(.orange)
-                }
-            }
-            if !model.wrongBars.isEmpty {
-                Label {
-                    Text(wrongBarsText).foregroundColor(.primary)
-                } icon: {
-                    Image(systemName: "exclamationmark.triangle.fill").foregroundColor(.orange)
-                }
-            }
         }
         .font(.body)
         .fixedSize(horizontal: false, vertical: true)
         .padding(Self.inset)
-    }
-
-    private var wrongBarsText: String {
-        let numbers = model.wrongBars.compactMap { model.barNumbers[$0] }.sorted().map(String.init)
-        let list = numbers.prefix(8).joined(separator: ", ")
-        return numbers.count == 1
-            ? String(localized: "Bar \(list) doesn't add up to its time signature.")
-            : String(localized: "Bars \(list) don't add up to their time signature.")
     }
 
     private var noteSection: some View {

@@ -27,6 +27,47 @@ final class FixModel: ObservableObject {
     var xml: String { edit.xml }
     var canUndo: Bool { !undoStack.isEmpty }
 
+    // MARK: Checking, one thing at a time
+
+    /// Something to check against the PDF: what Audiveris often gets wrong.
+    enum CheckItem: Hashable {
+        case key, time
+        case bar(String)
+    }
+
+    /// Items passed with Looks Right; they stay passed while the piece is open.
+    @Published private(set) var passed: Set<CheckItem> = []
+    /// A bar the music pane should scroll to; it clears it when done.
+    @Published var revealBar: String?
+
+    /// What is left to check, in reading order: the key, the time, then each bar that
+    /// doesn't add up. A fixed item drops off by itself.
+    var checkItems: [CheckItem] {
+        var items: [CheckItem] = []
+        if keyMissing { items.append(.key) }
+        if timeMissing { items.append(.time) }
+        items += wrongBars.map(CheckItem.bar)
+        return items.filter { !passed.contains($0) }
+    }
+
+    /// The bar an item is about: the first bar for the key and time.
+    func bar(of item: CheckItem) -> String? {
+        if case .bar(let id) = item { return id }
+        return firstBar
+    }
+
+    /// Shows an item: its bar selected and scrolled to.
+    func show(_ item: CheckItem) {
+        guard let bar = bar(of: item) else { return }
+        if selectedBar != bar { selectedNote = nil }
+        selectedBar = bar
+        revealBar = bar
+    }
+
+    func pass(_ item: CheckItem) {
+        passed.insert(item)
+    }
+
     func markSaved() { unsaved = false }
 
     func apply(_ change: MusicXMLEdit.NoteChange) {

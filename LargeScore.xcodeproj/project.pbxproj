@@ -51,6 +51,7 @@
 		4B55282274225FC6D37EF85D /* EngravingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 619AF0CC40BEA89874498859 /* EngravingTests.swift */; };
 		4C2E5B73227A601005B964CE /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 21FCDEC6F400623C55EC368B /* Localizable.xcstrings */; };
 		4DCB456F9EBC786FC9975A53 /* QuickSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16D58D50574FDFF95911C6EB /* QuickSettings.swift */; };
+		4F071D8E09D297F93FBC667F /* PDFPlaces.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8206B328B0FA13D62B404FC /* PDFPlaces.swift */; };
 		51906094D63115B5F5345562 /* SVGScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = C38FABE19590F985BF6CD2A6 /* SVGScene.swift */; };
 		52723F1491E2B6E4524E0FC4 /* ConverterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F12F0AF9BFAC83A443C81944 /* ConverterTests.swift */; };
 		53688851C15CE920AEFF6448 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 711AC501B114DB73D9FF8497 /* Credits.rtf */; };
@@ -59,6 +60,7 @@
 		57635CA06508C611ADC0212C /* ReaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D849716F934CBA7A3FD4D00 /* ReaderView.swift */; };
 		5B22D0267645D2CAE06D9E00 /* OneLine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049D9F39E098D68EA2B24425 /* OneLine.swift */; };
 		5D4398DB6237BF0C8894E4B0 /* PrintPDFTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB41C6EB583607D0DD582121 /* PrintPDFTests.swift */; };
+		5E53323FB10AA5516CC66AD3 /* Proofreader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F98715C3753D694662A6945 /* Proofreader.swift */; };
 		639AC1738B8401F1F7E70728 /* MacRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21B1CEF4BA95A0ABF58C2A9B /* MacRootView.swift */; };
 		659443519657608587F93A74 /* Instrument.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA85E7EC7BA49D7783A97C54 /* Instrument.swift */; };
 		6B90F54600CF0C6AA0B845B1 /* PartGrouping.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20D419A6CAEDE6AA0ACDC5A0 /* PartGrouping.swift */; };
@@ -93,6 +95,7 @@
 		B1E1FCD95D45DC60299416B0 /* AccessibilityTreeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A482B89B6020A71EF68FBFD0 /* AccessibilityTreeTests.swift */; };
 		B26F8AEC33352795B03C35F4 /* SVGScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = C38FABE19590F985BF6CD2A6 /* SVGScene.swift */; };
 		B2FEE9BAA3A5BFC20A50E5C0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13D8403E78C28AA426A00094 /* Assets.xcassets */; };
+		B6E5845E128F62C82294004B /* PDFPlaces.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8206B328B0FA13D62B404FC /* PDFPlaces.swift */; };
 		B74EE9CC11FBB58C5E6921EA /* Transposition.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9139CDD207E4577CFBA339C /* Transposition.swift */; };
 		B7FABC4CE2CF4E0CD8C8957D /* long-piece.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = CC2650C197E81A824BD81899 /* long-piece.musicxml */; };
 		B861C91F1E7EB4A9FF927E23 /* MarkRenderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67BE2F6AC6FD73DD22EB2E8B /* MarkRenderTests.swift */; };
@@ -114,6 +117,7 @@
 		D903682E9AF2C340AAA29888 /* ProgrammesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A02DBCCD3AF37BB6FB086E /* ProgrammesView.swift */; };
 		DA6568EEFDA2DDBC640DE381 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 72E33B44B559B76024D3E0EB /* Assets.xcassets */; };
 		DAB61FEF895146F62463F30B /* SampleCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 713D748931CE744279E773B4 /* SampleCard.swift */; };
+		DB37F387C3EA6C30F71B0297 /* Proofreader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F98715C3753D694662A6945 /* Proofreader.swift */; };
 		DBF080FCA77937F21C46BB15 /* VerovioEngraver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22EE9AB0CE94FA8966AD7CBA /* VerovioEngraver.swift */; };
 		DD99D5F04264807AC945A9BC /* VerovioToolkit in Frameworks */ = {isa = PBXBuildFile; productRef = 8AE04FC14615DF12E0213898 /* VerovioToolkit */; };
 		E2725BEB063541C04BC758B1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13D8403E78C28AA426A00094 /* Assets.xcassets */; };
@@ -206,6 +210,7 @@
 		9196E9DD903AF0EA664F22D2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		93DCD83E23A8A9966544EF13 /* ReaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderTests.swift; sourceTree = "<group>"; };
 		9B62B5BFD9190C121D9F47FB /* LargeScoreConverter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LargeScoreConverter.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		9F98715C3753D694662A6945 /* Proofreader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Proofreader.swift; sourceTree = "<group>"; };
 		A482B89B6020A71EF68FBFD0 /* AccessibilityTreeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessibilityTreeTests.swift; sourceTree = "<group>"; };
 		A5F94FBBCC69CEB57BB024BC /* TranspositionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranspositionTests.swift; sourceTree = "<group>"; };
 		A64C9C1F5D246BD26E7EB0ED /* LayoutKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayoutKit.swift; sourceTree = "<group>"; };
@@ -237,6 +242,7 @@
 		F30C6972272BBECB99A21250 /* evening-air.musicxml */ = {isa = PBXFileReference; path = "evening-air.musicxml"; sourceTree = "<group>"; };
 		F44D8CA440E27E7D7D2037D8 /* PageTurner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageTurner.swift; sourceTree = "<group>"; };
 		F4C3345DCD65C0A8E77FDBF9 /* ScoreLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreLoader.swift; sourceTree = "<group>"; };
+		F8206B328B0FA13D62B404FC /* PDFPlaces.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFPlaces.swift; sourceTree = "<group>"; };
 		F84B9B4A9ECB304F011F2454 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		F9139CDD207E4577CFBA339C /* Transposition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transposition.swift; sourceTree = "<group>"; };
 		FA85E7EC7BA49D7783A97C54 /* Instrument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Instrument.swift; sourceTree = "<group>"; };
@@ -301,7 +307,9 @@
 				9196E9DD903AF0EA664F22D2 /* Info.plist */,
 				33B7F978A4D671E131D83A09 /* KeyName.swift */,
 				1BF548960A3CA05B90F91F05 /* MusicPane.swift */,
+				F8206B328B0FA13D62B404FC /* PDFPlaces.swift */,
 				504F0F652E8563ACD3A647D5 /* PieceView.swift */,
+				9F98715C3753D694662A6945 /* Proofreader.swift */,
 			);
 			path = Converter;
 			sourceTree = "<group>";
@@ -785,9 +793,11 @@
 				89244E49AF388360EB828EDB /* MusicFile.swift in Sources */,
 				778EEB4E613A3BE1D60FBF08 /* MusicPane.swift in Sources */,
 				A384EF4DF67A6D604A77835F /* MusicXMLEdit.swift in Sources */,
+				4F071D8E09D297F93FBC667F /* PDFPlaces.swift in Sources */,
 				2CD3BFF544A9D99D7CE0B060 /* PartGrouping.swift in Sources */,
 				C24222E5EAA038B3348676B1 /* PartSplitter.swift in Sources */,
 				2DEDE391E35D16EBBA52F02C /* PieceView.swift in Sources */,
+				5E53323FB10AA5516CC66AD3 /* Proofreader.swift in Sources */,
 				B26F8AEC33352795B03C35F4 /* SVGScene.swift in Sources */,
 				D02C25826416623B9CA14200 /* TextLayout.swift in Sources */,
 				1E8FCB740343338E38D9A8DF /* Transposition.swift in Sources */,
@@ -813,9 +823,11 @@
 				E422F63B834BAB8E2B6F9CA5 /* MusicFile.swift in Sources */,
 				8DCF6815395DC126C4F96D72 /* MusicPane.swift in Sources */,
 				9225DECDC9833092A78693DD /* MusicXMLEdit.swift in Sources */,
+				B6E5845E128F62C82294004B /* PDFPlaces.swift in Sources */,
 				6B90F54600CF0C6AA0B845B1 /* PartGrouping.swift in Sources */,
 				8B57F622BE909A22CD1878D1 /* PartSplitter.swift in Sources */,
 				37AF23477CC445D553752F08 /* PieceView.swift in Sources */,
+				DB37F387C3EA6C30F71B0297 /* Proofreader.swift in Sources */,
 				51906094D63115B5F5345562 /* SVGScene.swift in Sources */,
 				C1DDB7640BBCA80BEE5BBCF6 /* TextLayout.swift in Sources */,
 				90F8D6DD411CA147452D0505 /* Transposition.swift in Sources */,

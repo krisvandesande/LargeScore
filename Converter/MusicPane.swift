@@ -16,18 +16,31 @@ struct MusicPane: View {
     var body: some View {
         GeometryReader { proxy in
             let width = max(proxy.size.width - 32, 200)
-            ScrollView {
-                VStack(spacing: 16) {
-                    if failed {
-                        Text("This music couldn't be shown.")
-                            .font(.body)
-                            .padding(40)
+            ScrollViewReader { scroller in
+                ScrollView {
+                    VStack(spacing: 16) {
+                        if failed {
+                            Text("This music couldn't be shown.")
+                                .font(.body)
+                                .padding(40)
+                        }
+                        ForEach(pages.indices, id: \.self) { index in
+                            page(pages[index], width: width)
+                        }
                     }
-                    ForEach(pages.indices, id: \.self) { index in
-                        page(pages[index], width: width)
+                    .padding(16)
+                }
+                // The proofreader asks for a bar: it is scrolled to the middle.
+                .onChange(of: model.revealBar) { bar in
+                    guard let bar else { return }
+                    DispatchQueue.main.async {
+                        withAnimation(.easeInOut(duration: 0.3)) { scroller.scrollTo(Self.revealID(bar), anchor: .center) }
                     }
                 }
-                .padding(16)
+                .onChange(of: pages.count) { _ in
+                    guard let bar = model.selectedBar else { return }
+                    DispatchQueue.main.async { scroller.scrollTo(Self.revealID(bar), anchor: .center) }
+                }
             }
             .background(Color(nsColor: .underPageBackgroundColor))
             .task(id: EngraveKey(version: model.version, width: Int(width))) {
@@ -63,12 +76,24 @@ struct MusicPane: View {
             .accessibilityLabel(Text("Music"))
             .accessibilityHint(Text("Click a note or a bar to fix it. Drag a note up or down to change its pitch."))
 
+            // A mark to scroll to, on the selected bar.
+            if let bar = model.selectedBar, let index = scene.measureIDs.firstIndex(of: bar), scene.measures.indices.contains(index) {
+                let rect = viewRect(scene.measures[index], in: scene, size: size)
+                Color.clear
+                    .frame(width: 1, height: max(rect.height, 1))
+                    .position(x: rect.midX, y: rect.midY)
+                    .id(Self.revealID(bar))
+                    .allowsHitTesting(false)
+                    .accessibilityHidden(true)
+            }
             if let id = model.selectedNote, let box = scene.noteBoxes[id] {
                 noteTools(around: viewRect(box, in: scene, size: size), step: stepSize(of: scene, size: size), page: size)
             }
         }
         .frame(width: width, height: height)
     }
+
+    static func revealID(_ bar: String) -> String { "bar-" + bar }
 
     // MARK: Dragging
 
