@@ -20,12 +20,26 @@ struct LibraryView: View {
     @Environment(ReaderSettings.self) private var settings
     @Environment(ImportCoordinator.self) private var importer
     @Environment(\.modelContext) private var context
+    enum Layout: String, CaseIterable, Identifiable {
+        case list, cards
+        var id: String { rawValue }
+        var title: LocalizedStringResource {
+            switch self {
+            case .list: "List"
+            case .cards: "Cards"
+            }
+        }
+    }
+
     @AppStorage("librarySort") private var sort = Sort.title
+    /// A list by default: with a whole book of parts, cards run to dozens of screens.
+    @AppStorage("libraryLayout") private var layout = Layout.list
     @State private var search = ""
+    @State private var selecting = false
 
     var body: some View {
         NavigationStack {
-            LibraryGrid(sort: sort, search: search, addMusic: { importer.choosingFiles = true })
+            LibraryGrid(sort: sort, search: search, layout: layout, selecting: $selecting, addMusic: { importer.choosingFiles = true })
                 .background(Palette.ground)
                 .navigationTitle("Library")
                 .searchable(text: $search, prompt: Text("Title or Composer"))
@@ -35,12 +49,20 @@ struct LibraryView: View {
                             Picker(selection: $sort) {
                                 ForEach(Sort.allCases) { Text($0.title).tag($0) }
                             } label: { Text("Sort") }
+                            Picker(selection: $layout) {
+                                ForEach(Layout.allCases) { Text($0.title).tag($0) }
+                            } label: { Text("Show As") }
                         } label: {
                             Text("Sort: \(Text(sort.title))")
                         }
                         .accessibilityLabel("Sort")
                         .accessibilityValue(Text(sort.title))
-                        Button("Add Music") { importer.choosingFiles = true }
+                        if layout == .list {
+                            Button(selecting ? "Done" : "Select") { withAnimation { selecting.toggle() } }
+                        }
+                        if !selecting {
+                            Button("Add Music") { importer.choosingFiles = true }
+                        }
                     }
                 }
         }
@@ -59,6 +81,14 @@ struct LibraryView: View {
 private struct LibraryGrid: View {
     let addMusic: () -> Void
     let isSearching: Bool
+    let sort: LibraryView.Sort
+    let layout: LibraryView.Layout
+    @Binding var selecting: Bool
+    @State private var selection: Set<UUID> = []
+    @State private var deletingMany = false
+    @State private var showOthers = false
+    /// Letters and other parts, worked out when the library changes, not every redraw.
+    @State private var grouping = LibraryGrouping()
     @Query private var scores: [Score]
     @Query(sort: \Programme.createdAt, order: .reverse) private var programmes: [Programme]
     @Environment(\.modelContext) private var context
@@ -78,8 +108,11 @@ private struct LibraryGrid: View {
     @State private var sizing: Piece?
     @State private var editingDetails: Score?
 
-    init(sort: LibraryView.Sort, search: String, addMusic: @escaping () -> Void) {
+    init(sort: LibraryView.Sort, search: String, layout: LibraryView.Layout, selecting: Binding<Bool>, addMusic: @escaping () -> Void) {
         self.addMusic = addMusic
+        self.sort = sort
+        self.layout = layout
+        _selecting = selecting
         let words = search.trimmingCharacters(in: .whitespacesAndNewlines)
         isSearching = !words.isEmpty
         let order: [SortDescriptor<Score>] = switch sort {
@@ -104,6 +137,8 @@ private struct LibraryGrid: View {
                     emptyState.containerRelativeFrame(.vertical)
                 }
                 .refreshable { await folder.look(instruments: settings.instruments, context: context, importer: importer) }
+            } else if layout == .list {
+                list
             } else {
                 ScrollView {
                     LazyVGrid(columns: [GridItem(.adaptive(minimum: min(cardWidth, 600)), spacing: 24, alignment: .top)], spacing: 24) {
@@ -118,6 +153,12 @@ private struct LibraryGrid: View {
                 .refreshable { await folder.look(instruments: settings.instruments, context: context, importer: importer) }
             }
         }
+        .task(id: GroupingKey(items: scores.map { GroupingKey.Item(id: $0.id, title: $0.title, composer: $0.composer) },
+                              myPart: settings.myPart, sort: sort)) {
+            grouping = LibraryGrouping(scores.map { (id: $0.id, title: $0.title, composer: $0.composer) },
+                                       myPart: settings.myPart, sort: sort)
+        }
+        .onChange(of: selecting) { _, now in if !now { selection = [] } }
         .fullScreenCover(item: $open) { piece in
             ReaderView(piece: piece, backTitle: "Library")
         }
@@ -166,38 +207,7 @@ private struct LibraryGrid: View {
                       facts: facts(score))
         }
         .buttonStyle(.plain)
-        .contextMenu {
-            if !programmes.isEmpty {
-                Menu("Add to Programme", systemImage: "text.badge.plus") {
-                    ForEach(programmes) { programme in
-                        Button(programme.name) {
-                            programme.append([score])
-                            try? context.save()
-                        }
-                    }
-                }
-            }
-            if score.pdf != nil {
-                Button("Compare with PDF", systemImage: "doc.on.doc") { comparing = score }
-            }
-            Button("Edit Details", systemImage: "character.cursor.ibeam") { editingDetails = score }
-            Button("Fix Notes", systemImage: "pencil") { fixing = score }
-            Button("Transpose", systemImage: "arrow.up.arrow.down") { transposing = score }
-            Button("Size for This Piece", systemImage: "textformat.size") { sizing = score.piece }
-            if score.needsCheck {
-                Button("Mark as Checked", systemImage: "checkmark") {
-                    score.needsCheck = false
-                    try? context.save()
-                }
-            }
-            if score.partCount > 1 {
-                Button("Change Parts", systemImage: "music.note.list") { changingPart = score }
-            }
-            if score.previousMusicXML != nil {
-                Button("Restore Previous Version", systemImage: "clock.arrow.circlepath") { restoring = score }
-            }
-            Button("Delete", systemImage: "trash", role: .destructive) { deleting = score }
-        }
+        .contextMenu { menu(for: score) }
         #if targetEnvironment(macCatalyst)
         // Onto a programme in the sidebar.
         .draggable(score.id.uuidString) {
@@ -220,6 +230,197 @@ private struct LibraryGrid: View {
             transposition: score.transposition?.description, programmes: programmes,
             ownSettings: settings.hasOwnSettings(score.id.uuidString),
             lastOpenedAt: score.lastOpenedAt, addedAt: score.addedAt))
+    }
+
+    /// One row a piece, grouped by first letter, with a strip of letters to jump by.
+    /// Other parts of pieces whose own part is there wait, closed, at the end.
+    private var list: some View {
+        let byID = Dictionary(scores.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
+        let letters = grouping.sections.map(\.key).filter { !$0.isEmpty }
+        return ScrollViewReader { proxy in
+            List(selection: $selection) {
+                ForEach(grouping.sections, id: \.key) { section in
+                    Section {
+                        ForEach(section.rows) { row in
+                            if let score = byID[row.id] { listRow(row, score: score) }
+                        }
+                    } header: {
+                        if !section.key.isEmpty {
+                            Text(verbatim: section.key)
+                                .font(.title2.weight(.bold))
+                                .foregroundStyle(.primary)
+                                .accessibilityAddTraits(.isHeader)
+                        }
+                    }
+                }
+                if !grouping.others.isEmpty {
+                    Section {
+                        if showOthers {
+                            ForEach(grouping.others) { row in
+                                if let score = byID[row.id] { listRow(row, score: score) }
+                            }
+                        }
+                    } header: {
+                        Button {
+                            withAnimation { showOthers.toggle() }
+                        } label: {
+                            HStack(spacing: 12) {
+                                // Opens in place: a filled triangle, pointing in, down when open.
+                                Image(systemName: showOthers ? "arrowtriangle.down.fill" : "arrowtriangle.right.fill")
+                                    .font(.body)
+                                    .accessibilityHidden(true)
+                                Text("Other Parts")
+                                Text(verbatim: "\(grouping.others.count)").foregroundStyle(.secondary)
+                            }
+                            .font(.title2.weight(.bold))
+                            // A list header dims its contents; this one is a control in the text colour.
+                            .foregroundStyle(Color(uiColor: .label))
+                            .frame(minHeight: 44)
+                            .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel(Text(verbatim: String(AttributedString(localized: "Other Parts, ^[\(grouping.others.count) piece](inflect: true)").characters)))
+                        .accessibilityValue(Text(showOthers ? "Shown" : "Hidden"))
+                        .accessibilityHint(Text("Parts other than your own, of pieces whose own part is in the library."))
+                    }
+                }
+            }
+            .listStyle(.insetGrouped)
+            .environment(\.editMode, .constant(selecting ? .active : .inactive))
+            .contextMenu(forSelectionType: UUID.self) { ids in
+                if ids.count == 1, let id = ids.first, let score = byID[id] { menu(for: score) }
+            } primaryAction: { ids in
+                guard !selecting, let id = ids.first, let score = byID[id] else { return }
+                score.lastOpenedAt = .now
+                try? context.save()
+                open = score.piece
+            }
+            .contentMargins(.trailing, letters.count > 1 ? 56 : 0, for: .scrollContent)
+            .overlay(alignment: .trailing) {
+                if letters.count > 1, !selecting { letterStrip(letters, proxy: proxy) }
+            }
+            .refreshable { await folder.look(instruments: settings.instruments, context: context, importer: importer) }
+            .toolbar {
+                if selecting {
+                    ToolbarItemGroup(placement: .bottomBar) {
+                        let all = Set(grouping.sections.flatMap { $0.rows.map(\.id) } + (showOthers ? grouping.others.map(\.id) : []))
+                        Button(selection.isSuperset(of: all) && !all.isEmpty ? "Deselect All" : "Select All") {
+                            selection = selection.isSuperset(of: all) ? [] : all
+                        }
+                        Spacer()
+                        Button("Delete", role: .destructive) { deletingMany = true }
+                            .disabled(selection.isEmpty)
+                            .accessibilityValue(Text(verbatim: String(AttributedString(localized: "^[\(selection.count) piece](inflect: true)").characters)))
+                            // Anchored to the button, so on iPad it points at what was tapped.
+                            .confirmationDialog(Text(verbatim: String(AttributedString(localized: "Delete ^[\(selection.count) piece](inflect: true)?").characters)),
+                                                isPresented: $deletingMany, titleVisibility: .visible) {
+                                Button("Delete", role: .destructive) {
+                                    for score in scores where selection.contains(score.id) { context.delete(score) }
+                                    try? context.save()
+                                    selection = []
+                                    selecting = false
+                                }
+                            } message: {
+                                Text("The pieces and your notes on them are removed from your library on every device.")
+                            }
+                    }
+                }
+            }
+        }
+    }
+
+    private func listRow(_ row: LibraryGrouping.Row, score: Score) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: 16) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(row.name)
+                    .font(.title2.weight(.semibold))
+                if let composer = score.composer, !composer.isEmpty {
+                    Text(composer).font(.title3).foregroundStyle(.secondary)
+                }
+                if score.needsCheck {
+                    Text("Check against the PDF")
+                        .font(.headline)
+                        .foregroundStyle(Palette.onNotes)
+                        .padding(.horizontal, 12)
+                        .air(.vertical, 4)
+                        .background(Palette.notes, in: PillShape(radius: 14))
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            if let part = row.part {
+                Text("Part \(part)").font(.title3).foregroundStyle(.secondary)
+            }
+            if !selecting { ForwardChevron() }
+        }
+        .air(.vertical, 6)
+        .contentShape(Rectangle())
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(.isButton)
+        .accessibilityAction(named: Text("Edit Details")) { editingDetails = score }
+        .accessibilityAction(named: Text("Fix Notes")) { fixing = score }
+        .accessibilityAction(named: Text("Delete")) { deleting = score }
+    }
+
+    /// The letters down the right edge: a tap jumps to that letter's first piece.
+    private func letterStrip(_ letters: [String], proxy: ScrollViewProxy) -> some View {
+        GeometryReader { geometry in
+            let height = min(44, (geometry.size.height - 16) / CGFloat(max(letters.count, 1)))
+            VStack(spacing: 0) {
+                ForEach(letters, id: \.self) { letter in
+                    Button {
+                        if let first = grouping.sections.first(where: { $0.key == letter })?.rows.first {
+                            withAnimation { proxy.scrollTo(first.id, anchor: .top) }
+                        }
+                    } label: {
+                        Text(verbatim: letter)
+                            .font(.headline)
+                            .frame(width: 44, height: height)
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(Palette.accent)
+                    .accessibilityLabel(Text("Jump to \(letter)"))
+                }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+        .frame(width: 48)
+        .padding(.trailing, 4)
+    }
+
+    /// What can be done with a piece: the card's and the list row's menu.
+    @ViewBuilder
+    private func menu(for score: Score) -> some View {
+        if !programmes.isEmpty {
+            Menu("Add to Programme", systemImage: "text.badge.plus") {
+                ForEach(programmes) { programme in
+                    Button(programme.name) {
+                        programme.append([score])
+                        try? context.save()
+                    }
+                }
+            }
+        }
+        if score.pdf != nil {
+            Button("Compare with PDF", systemImage: "doc.on.doc") { comparing = score }
+        }
+        Button("Edit Details", systemImage: "character.cursor.ibeam") { editingDetails = score }
+        Button("Fix Notes", systemImage: "pencil") { fixing = score }
+        Button("Transpose", systemImage: "arrow.up.arrow.down") { transposing = score }
+        Button("Size for This Piece", systemImage: "textformat.size") { sizing = score.piece }
+        if score.needsCheck {
+            Button("Mark as Checked", systemImage: "checkmark") {
+                score.needsCheck = false
+                try? context.save()
+            }
+        }
+        if score.partCount > 1 {
+            Button("Change Parts", systemImage: "music.note.list") { changingPart = score }
+        }
+        if score.previousMusicXML != nil {
+            Button("Restore Previous Version", systemImage: "clock.arrow.circlepath") { restoring = score }
+        }
+        Button("Delete", systemImage: "trash", role: .destructive) { deleting = score }
     }
 
     @ViewBuilder
@@ -587,3 +788,59 @@ struct EmptyTab: View {
         }
     }
 }
+
+/// What the library's list is built from: changes in a piece's title or composer, the
+/// player's part, or the sort make a new grouping.
+private struct GroupingKey: Hashable {
+    struct Item: Hashable {
+        var id: UUID
+        var title: String
+        var composer: String?
+    }
+    var items: [Item]
+    var myPart: Int
+    var sort: LibraryView.Sort
+}
+
+/// The library's sections: by first letter of the name (by composer when sorted so),
+/// one plain section when sorted by last played; other parts apart.
+struct LibraryGrouping {
+    struct Row: Identifiable, Hashable {
+        var id: UUID
+        var name: String
+        var part: Int?
+    }
+
+    var sections: [(key: String, rows: [Row])] = []
+    var others: [Row] = []
+
+    init() {}
+
+    init(_ items: [(id: UUID, title: String, composer: String?)], myPart: Int, sort: LibraryView.Sort) {
+        let split = PartGrouping.split(items.map { (id: $0.id, title: $0.title) }, myPart: myPart)
+        let aside = Set(split.others)
+        var keys: [String] = []
+        var rows: [String: [Row]] = [:]
+        for item in items {
+            let parsed = PartGrouping.parse(item.title)
+            let row = Row(id: item.id, name: parsed.name, part: parsed.part)
+            if aside.contains(item.id) { others.append(row); continue }
+            let key: String = switch sort {
+            case .title: Self.letter(parsed.name)
+            case .composer: Self.letter(item.composer ?? "")
+            case .recentlyPlayed: ""
+            }
+            if rows[key] == nil { keys.append(key) }
+            rows[key, default: []].append(row)
+        }
+        sections = keys.map { (key: $0, rows: rows[$0] ?? []) }
+    }
+
+    /// "A" to "Z" by the name's first letter, accents ignored; "#" for anything else.
+    static func letter(_ text: String) -> String {
+        guard let first = text.folding(options: [.diacriticInsensitive, .caseInsensitive], locale: nil).first(where: { !$0.isWhitespace }),
+              first.isLetter, first.isASCII else { return "#" }
+        return String(first).uppercased()
+    }
+}
+

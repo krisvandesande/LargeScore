@@ -55,6 +55,9 @@ struct SettingsView: View {
                             Text(settings.instruments.map { String(localized: $0.title) }.joined(separator: ", "))
                         }
                     }
+                    FittingPicker(String(localized: "My Part"), value: String(localized: "Part \(settings.myPart)"), selection: $settings.myPart) {
+                        ForEach(1...4, id: \.self) { Text("Part \($0)").tag($0) }
+                    }
                     Button("Language") {
                         if let url = URL(string: UIApplication.openSettingsURLString) {
                             UIApplication.shared.open(url)

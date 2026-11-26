@@ -12,6 +12,7 @@ struct PieceView: View {
     @State private var composer = ""
     @State private var arranger = ""
     @State private var message: String?
+    @StateObject private var pdfZoom = PDFZoom()
 
     init(job: Job, xml: String) {
         self.job = job
@@ -76,8 +77,12 @@ struct PieceView: View {
                 .padding(.vertical, 12)
             }
             .frame(minWidth: 480)
-            PDFPane(url: queue.pdf(of: job))
-                .frame(minWidth: 320)
+            VStack(spacing: 0) {
+                PDFZoomBar(zoom: pdfZoom)
+                Divider()
+                PDFPane(url: queue.pdf(of: job), zoom: pdfZoom)
+            }
+            .frame(minWidth: 320)
         }
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
@@ -93,9 +98,10 @@ struct PieceView: View {
         }
         .navigationTitle(job.title)
         .onAppear {
-            // What Audiveris read, else the PDF's name; read once.
+            // The PDF's own name: Audiveris reads a title from the page, often a line
+            // of the part's heading ("Bariton/Posaune in B") rather than the piece.
             let file = try? MusicFile.read(Data(model.xml.utf8), fileName: job.title + ".musicxml")
-            title = file?.title ?? job.title
+            title = PartGrouping.tidy(job.title)
             composer = file?.composer ?? ""
             arranger = file?.arranger ?? ""
         }
@@ -109,19 +115,66 @@ struct PieceView: View {
     }
 }
 
-/// The original PDF, fitted to the pane's width.
+/// Zoom for the PDF beside the music: buttons over it, ⌘+ and ⌘− from the View menu,
+/// and the trackpad's pinch. Fit Width goes back to the whole width of the pane.
+final class PDFZoom: ObservableObject {
+    weak var view: PDFView?
+
+    func zoomIn() { view?.zoomIn(nil) }
+    func zoomOut() { view?.zoomOut(nil) }
+    func fitWidth() { view?.autoScales = true }
+}
+
+struct PDFZoomBar: View {
+    @ObservedObject var zoom: PDFZoom
+
+    var body: some View {
+        HStack(spacing: 4) {
+            Spacer()
+            Button(action: zoom.zoomOut) {
+                Label("Zoom Out", systemImage: "minus.magnifyingglass")
+            }
+            .keyboardShortcut("-")
+            .help("Zoom out on the PDF (⌘−)")
+            Button(action: zoom.fitWidth) {
+                Label("Fit Width", systemImage: "arrow.left.and.right")
+            }
+            .keyboardShortcut("0")
+            .help("Fit the PDF to the width of the pane (⌘0)")
+            Button(action: zoom.zoomIn) {
+                Label("Zoom In", systemImage: "plus.magnifyingglass")
+            }
+            .keyboardShortcut("=")
+            .help("Zoom in on the PDF (⌘+)")
+        }
+        .labelStyle(.iconOnly)
+        .buttonStyle(.borderless)
+        .controlSize(.large)
+        .font(.title2)
+        .frame(minHeight: 32)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 6)
+    }
+}
+
+/// The original PDF, fitted to the pane's width until zoomed.
 struct PDFPane: NSViewRepresentable {
     let url: URL
+    var zoom: PDFZoom? = nil
 
     func makeNSView(context: Context) -> PDFView {
         let view = PDFView()
         view.autoScales = true
         view.displayMode = .singlePageContinuous
+        view.minScaleFactor = 0.25
+        view.maxScaleFactor = 8
         view.document = PDFDocument(url: url)
+        zoom?.view = view
         return view
     }
 
     func updateNSView(_ view: PDFView, context: Context) {
         if view.document?.documentURL != url { view.document = PDFDocument(url: url) }
+        zoom?.view = view
     }
 }

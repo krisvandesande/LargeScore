@@ -144,6 +144,7 @@ targets:
       - path: LargeScore/Import/MusicFile.swift
       - path: LargeScore/Import/ZipReader.swift
       - path: LargeScore/App/Instrument.swift
+      - path: LargeScore/Library/PartGrouping.swift
       - path: LargeScore/Localizable.xcstrings
     dependencies:
       - package: VerovioKit
@@ -210,6 +211,7 @@ targets:
       - path: LargeScore/Import/MusicFile.swift
       - path: LargeScore/Import/ZipReader.swift
       - path: LargeScore/App/Instrument.swift
+      - path: LargeScore/Library/PartGrouping.swift
     dependencies:
       - package: VerovioKit
         product: VerovioToolkit

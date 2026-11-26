@@ -121,6 +121,9 @@ final class ReaderSettings {
     }
     var instrument: Instrument? { instruments.first }
     var onboardingDone: Bool { didSet { store.set(onboardingDone, forKey: Key.onboardingDone) } }
+    /// The part the player plays (1 to 4): other parts of the same piece are kept
+    /// aside in the library when this one is there.
+    var myPart: Int { didSet { store.set(myPart, forKey: Key.myPart) } }
 
     var staffHeight: CGFloat { Self.staffHeights[sizeStep] }
 
@@ -142,6 +145,7 @@ final class ReaderSettings {
         static let instrument = "instrument"
         static let instruments = "instruments"
         static let onboardingDone = "onboardingDone"
+        static let myPart = "myPart"
     }
 
     init(store: UserDefaults = .standard) {
@@ -174,6 +178,7 @@ final class ReaderSettings {
             instruments = store.string(forKey: Key.instrument).flatMap(Instrument.init).map { [$0] } ?? []
         }
         onboardingDone = store.bool(forKey: Key.onboardingDone)
+        myPart = min(max(store.object(forKey: Key.myPart) as? Int ?? 1, 1), 4)
     }
 
     func layoutRequest(for area: CGSize, centred: Bool = false, piece: String? = nil) -> LayoutRequest {

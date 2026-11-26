@@ -41,6 +41,9 @@ struct ReaderView: View {
     @State private var turnedForward = true
     /// Set when going back into the previous piece: it opens on its last page.
     @State private var startAtEnd = false
+    /// The page after the last: says the piece has ended and, in a programme, which
+    /// piece comes next, before the next turn opens it.
+    @State private var showingEnd = false
     @State private var laidOutPieceID: String?
 
     private var piece: Piece { pieces[min(place.index, pieces.count - 1)] }
@@ -72,7 +75,7 @@ struct ReaderView: View {
                 // Each page its own view, so a turn can slide the next one in.
                 ZStack {
                     page(area: area, scheme: scheme)
-                        .id(PageKey(piece: laidOutPieceID, page: turner.page, halfway: turner.halfway))
+                        .id(PageKey(piece: showingEnd ? piece.id : laidOutPieceID, page: turner.page, halfway: turner.halfway, end: showingEnd))
                         .transition(.asymmetric(insertion: .move(edge: turnedForward ? .bottom : .top),
                                                 removal: .move(edge: turnedForward ? .top : .bottom)))
                 }
@@ -96,7 +99,7 @@ struct ReaderView: View {
             .background(scheme == .dark ? Color.black : Color.white)
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(Text(piece.title))
-            .accessibilityValue(pageDescription)
+            .accessibilityValue(showingEnd ? endDescription : pageDescription)
             .accessibilityAdjustableAction { direction in
                 turn(forward: direction == .increment)
             }
@@ -111,7 +114,7 @@ struct ReaderView: View {
                 ReaderStrip(title: piece.title, backTitle: backTitle, pageText: pageText,
                             nextTitle: nextPiece?.title,
                             back: { dismiss() }, next: { goToNextPiece() },
-                            notes: notes?.canAnnotate == true ? { startAnnotating() } : nil,
+                            notes: notes?.canAnnotate == true && !showingEnd ? { startAnnotating() } : nil,
                             pieceID: piece.id)
             }
         }
@@ -148,7 +151,10 @@ struct ReaderView: View {
     @ViewBuilder
     private func page(area: CGSize, scheme: ColorScheme) -> some View {
         let ink = settings.pageInk(system: systemScheme, piece: piece.id)
-        if let laidOut, laidOut.pages.indices.contains(turner.page) {
+        if showingEnd {
+            EndOfPiece(title: PartGrouping.parse(piece.title).name, next: nextPiece, inProgramme: pieces.count > 1)
+                .frame(width: area.width, height: area.height)
+        } else if let laidOut, laidOut.pages.indices.contains(turner.page) {
             let current = laidOut.pages[turner.page]
             let marks = notes?.marks ?? []
             let geometry = barGeometry(laidOut, page: turner.page)
@@ -266,8 +272,14 @@ struct ReaderView: View {
     }
 
     private var pageText: Text? {
+        if showingEnd { return Text("End") }
         guard let laidOut, !laidOut.pages.isEmpty else { return nil }
         return Text("Page \(turner.page + 1) of \(laidOut.pages.count)")
+    }
+
+    private var endDescription: Text {
+        if let nextPiece { return Text("End of \(piece.title). Next: \(nextPiece.title)") }
+        return Text("End of \(piece.title)")
     }
 
     private var pageDescription: Text {
@@ -284,38 +296,63 @@ struct ReaderView: View {
     }
 
     private func turn(forward: Bool) {
+        // A slow scroll, which reads best for the player it was made for; at once with Reduce Motion, or when chosen.
+        let scroll = settings.bool(.scrollTurns, for: piece.id) && !reduceMotion
+        let animation: Animation? = scroll ? .easeInOut(duration: 0.8) : nil
+        if showingEnd {
+            turnedForward = forward
+            if forward {
+                // Past the end of the last piece there is nothing more.
+                guard place.hasNext else { return }
+                goToNextPiece()
+            } else {
+                withAnimation(animation) { showingEnd = false }
+            }
+            return
+        }
         // Until the piece is laid out its pages aren't known: a second press of the
         // pedal while the next piece comes up must not skip it.
         guard laidOut != nil || failed else { return }
         turnedForward = forward
-        // A slow scroll, which reads best for the player it was made for; at once with Reduce Motion, or when chosen.
-        let scroll = settings.bool(.scrollTurns, for: piece.id) && !reduceMotion
         var turned = false
-        withAnimation(scroll ? .easeInOut(duration: 0.8) : nil) {
+        withAnimation(animation) {
             turned = forward ? turner.forward() : turner.back()
         }
         if forward {
-            if !turned { goToNextPiece() }
+            if !turned {
+                withAnimation(animation) { showingEnd = true }
+                UIAccessibility.post(notification: .announcement, argument: endAnnouncement)
+            }
         } else if !turned, place.previous() {
+            // Back from a first page: the end of the piece before, then its last page.
             startAtEnd = true
-            showPiece()
+            showPiece(announce: false)
+            withAnimation(animation) { showingEnd = true }
+            UIAccessibility.post(notification: .announcement, argument: endAnnouncement)
         }
+    }
+
+    private var endAnnouncement: String {
+        if let nextPiece { return String(localized: "End of \(piece.title). Next: \(nextPiece.title)") }
+        return String(localized: "End of \(piece.title)")
     }
 
     private struct PageKey: Hashable {
         var piece: String?
         var page: Int
         var halfway: Bool
+        var end: Bool
     }
 
     private func goToNextPiece() {
         guard place.next() else { return }
         startAtEnd = false
+        showingEnd = false
         showPiece()
     }
 
     /// A new piece came up without the person looking at the strip: say which.
-    private func showPiece() {
+    private func showPiece(announce: Bool = true) {
         // Never show the old piece's page under the new title.
         laidOut = nil
         laidOutPieceID = nil
@@ -323,7 +360,7 @@ struct ReaderView: View {
         line = []
         notes = NotesStore(pieceID: piece.id, context: context)
         onShow(piece)
-        UIAccessibility.post(notification: .announcement, argument: piece.title)
+        if announce { UIAccessibility.post(notification: .announcement, argument: piece.title) }
     }
 
     private func layOut(area: CGSize) async {
@@ -367,6 +404,57 @@ struct ReaderView: View {
             guard !Task.isCancelled else { return }
             failed = true
         }
+    }
+}
+
+/// The page after a piece's last: which piece ended and, in a programme, which comes
+/// next, in type big enough to read from the stand. The next turn opens that piece.
+private struct EndOfPiece: View {
+    var title: String
+    var next: Piece?
+    var inProgramme: Bool
+
+    @ScaledMetric(relativeTo: .largeTitle) private var label: CGFloat = 32
+    @ScaledMetric(relativeTo: .largeTitle) private var ended: CGFloat = 48
+    @ScaledMetric(relativeTo: .largeTitle) private var coming: CGFloat = 72
+
+    var body: some View {
+        VStack(spacing: 0) {
+                Text("End of")
+                    .font(.system(size: label))
+                Text(title)
+                    .font(.system(size: ended, weight: .semibold))
+                    .padding(.top, label * 0.25)
+                if next != nil || inProgramme {
+                    Rectangle()
+                        .fill(.primary.opacity(0.35))
+                        .frame(width: 160, height: 2)
+                        .padding(.vertical, label * 1.25)
+                }
+                if let next {
+                    Text("Next")
+                        .font(.system(size: label))
+                    Text(PartGrouping.parse(next.title).name)
+                        .font(.system(size: coming, weight: .bold))
+                        .padding(.top, label * 0.25)
+                    if let composer = next.composer, !composer.isEmpty {
+                        Text(composer)
+                            .font(.system(size: label))
+                            .padding(.top, label * 0.5)
+                    }
+                } else if inProgramme {
+                    Text("End of the programme")
+                        .font(.system(size: ended, weight: .semibold))
+                }
+            }
+            .multilineTextAlignment(.center)
+            .minimumScaleFactor(0.5)
+            .foregroundStyle(.primary)
+            .padding(.horizontal, 32)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        // The page's own taps and swipes turn: the words only show.
+        .allowsHitTesting(false)
+        .accessibilityHidden(true)
     }
 }
 
@@ -506,10 +594,14 @@ struct ReaderStrip: View {
         HStack(spacing: 24) {
             backButton
             if showTitle {
-                Text(title)
+                // Always there while a programme moves from piece to piece: on two
+                // lines, a little smaller, before it would be dropped.
+                Text(PartGrouping.parse(title).name)
                     .font(.title2.weight(.semibold))
-                    .lineLimit(1)
-                    .fixedSize()
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.8)
+                    .frame(minWidth: 160, alignment: .leading)
+                    .accessibilityLabel(Text(title))
                     .accessibilityAddTraits(.isHeader)
             }
             Spacer(minLength: 0)

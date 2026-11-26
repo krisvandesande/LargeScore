@@ -27,6 +27,7 @@
 		27A52EEC71E4821E9A565F9F /* FixSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86C0F5F1A0FE25C6907142DD /* FixSession.swift */; };
 		2AD6FA9985243F747B68EB9B /* ImportTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA09A15929E52433660615B /* ImportTests.swift */; };
 		2BDABFE1171DE6A0406AC014 /* PageTurner.swift in Sources */ = {isa = PBXBuildFile; fileRef = F44D8CA440E27E7D7D2037D8 /* PageTurner.swift */; };
+		2CD3BFF544A9D99D7CE0B060 /* PartGrouping.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20D419A6CAEDE6AA0ACDC5A0 /* PartGrouping.swift */; };
 		2D747F5C25A42F5C98A8E02F /* Engraver.swift in Sources */ = {isa = PBXBuildFile; fileRef = B770B7CA621635E8184DEDB0 /* Engraver.swift */; };
 		2DEDE391E35D16EBBA52F02C /* PieceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504F0F652E8563ACD3A647D5 /* PieceView.swift */; };
 		2E3E9640839400CA3864B8A8 /* ZipReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F8F166C31D3BB62BA66B3B9 /* ZipReader.swift */; };
@@ -41,6 +42,7 @@
 		3E173542E0E5D03848EFA032 /* evening-air-quartet.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = 7D45E730900A18783D457D9A /* evening-air-quartet.musicxml */; };
 		3F8CB360E3A9BB44E3952B76 /* TranspositionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5F94FBBCC69CEB57BB024BC /* TranspositionTests.swift */; };
 		3FDD5D05C6B5B9CACE5AEBCB /* Programme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58BC05456B5B0A8432E0B42C /* Programme.swift */; };
+		4447840498A744250AF7CF67 /* PartGrouping.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20D419A6CAEDE6AA0ACDC5A0 /* PartGrouping.swift */; };
 		4671B617995AEB38015B2608 /* NotesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D4E0A9194472104B818A2C /* NotesTests.swift */; };
 		49B0D03FE11C4AFCF5689BBF /* MusicFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11E71A1975CE6270736A016C /* MusicFile.swift */; };
 		4B55282274225FC6D37EF85D /* EngravingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 619AF0CC40BEA89874498859 /* EngravingTests.swift */; };
@@ -56,6 +58,7 @@
 		5D4398DB6237BF0C8894E4B0 /* PrintPDFTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB41C6EB583607D0DD582121 /* PrintPDFTests.swift */; };
 		639AC1738B8401F1F7E70728 /* MacRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21B1CEF4BA95A0ABF58C2A9B /* MacRootView.swift */; };
 		659443519657608587F93A74 /* Instrument.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA85E7EC7BA49D7783A97C54 /* Instrument.swift */; };
+		6B90F54600CF0C6AA0B845B1 /* PartGrouping.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20D419A6CAEDE6AA0ACDC5A0 /* PartGrouping.swift */; };
 		6C5230809976AF506D9F3CBE /* DemoScoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD0A5935BC4C624F27CA3BDA /* DemoScoreTests.swift */; };
 		738FAD10B2525F8836A552DB /* VerovioToolkit in Frameworks */ = {isa = PBXBuildFile; productRef = 3F9F90EFBA6CFA73B63470F0 /* VerovioToolkit */; };
 		76AD9A017D1D1A64A7FEB8D4 /* ConversionQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = C692B1C61581D8F2849703B4 /* ConversionQueue.swift */; };
@@ -119,6 +122,7 @@
 		ED294601DA4AD99B5FA233A5 /* evening-air.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = F30C6972272BBECB99A21250 /* evening-air.musicxml */; };
 		ED36E8C42664F67CD5A64492 /* OneLineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1D3303123FA0EFEE896F2F4 /* OneLineTests.swift */; };
 		ED8007C867238E04F562809D /* converted-by-audiveris.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 0D3C8381AA93F40B9C09CF5B /* converted-by-audiveris.pdf */; };
+		EF62910A740D07457E05CAAD /* PartGroupingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88ACEEDF74014D845BEC1403 /* PartGroupingTests.swift */; };
 		F3E795E99A2605B6D9385CF9 /* ZipReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F8F166C31D3BB62BA66B3B9 /* ZipReader.swift */; };
 		FA379FE0D2838E71017A5D01 /* TextAndFillTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F6192D965D015D4432C9E71 /* TextAndFillTests.swift */; };
 		FA5AF9ED6A3C5BAEB3764FB4 /* ReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93DCD83E23A8A9966544EF13 /* ReaderTests.swift */; };
@@ -154,6 +158,7 @@
 		17268AD31FC953CCF78E7F0A /* LibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryView.swift; sourceTree = "<group>"; };
 		1BF548960A3CA05B90F91F05 /* MusicPane.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicPane.swift; sourceTree = "<group>"; };
 		1F8F166C31D3BB62BA66B3B9 /* ZipReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZipReader.swift; sourceTree = "<group>"; };
+		20D419A6CAEDE6AA0ACDC5A0 /* PartGrouping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PartGrouping.swift; sourceTree = "<group>"; };
 		2135B1AA56EFBB86D0F3C587 /* ImportSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportSheet.swift; sourceTree = "<group>"; };
 		21B1CEF4BA95A0ABF58C2A9B /* MacRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacRootView.swift; sourceTree = "<group>"; };
 		21FCDEC6F400623C55EC368B /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
@@ -189,6 +194,7 @@
 		7D45E730900A18783D457D9A /* evening-air-quartet.musicxml */ = {isa = PBXFileReference; path = "evening-air-quartet.musicxml"; sourceTree = "<group>"; };
 		86C0F5F1A0FE25C6907142DD /* FixSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixSession.swift; sourceTree = "<group>"; };
 		86F011439BA621309C700329 /* CloudSchema.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSchema.swift; sourceTree = "<group>"; };
+		88ACEEDF74014D845BEC1403 /* PartGroupingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PartGroupingTests.swift; sourceTree = "<group>"; };
 		88BC77D691F165C1D798BE95 /* Style.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Style.swift; sourceTree = "<group>"; };
 		8A52E6CE0252C886FD197F00 /* evening-air-quartet.mxl */ = {isa = PBXFileReference; path = "evening-air-quartet.mxl"; sourceTree = "<group>"; };
 		8B25E071C77C2ABEC446CA45 /* LargeScore.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LargeScore.entitlements; sourceTree = "<group>"; };
@@ -384,6 +390,7 @@
 				67BE2F6AC6FD73DD22EB2E8B /* MarkRenderTests.swift */,
 				09D4E0A9194472104B818A2C /* NotesTests.swift */,
 				D1D3303123FA0EFEE896F2F4 /* OneLineTests.swift */,
+				88ACEEDF74014D845BEC1403 /* PartGroupingTests.swift */,
 				E4763C4EC8AF8DB02A8D6407 /* PieceSettingsTests.swift */,
 				50DB4AA515AAB0B8A6BDB07A /* PlayingOrderTests.swift */,
 				CB41C6EB583607D0DD582121 /* PrintPDFTests.swift */,
@@ -497,6 +504,7 @@
 			isa = PBXGroup;
 			children = (
 				17268AD31FC953CCF78E7F0A /* LibraryView.swift */,
+				20D419A6CAEDE6AA0ACDC5A0 /* PartGrouping.swift */,
 				CD2D31054F1C86BBA279800C /* PieceFacts.swift */,
 				BC28BC7AB931DB55F6791614 /* Score.swift */,
 			);
@@ -732,6 +740,7 @@
 				D24D2E3EF301948729023D3F /* OnboardingView.swift in Sources */,
 				5B22D0267645D2CAE06D9E00 /* OneLine.swift in Sources */,
 				2BDABFE1171DE6A0406AC014 /* PageTurner.swift in Sources */,
+				4447840498A744250AF7CF67 /* PartGrouping.swift in Sources */,
 				7D1319FD90D71337F5CBCAD0 /* PartSplitter.swift in Sources */,
 				825D968F2F1B7C63E5D32624 /* PieceFacts.swift in Sources */,
 				3FDD5D05C6B5B9CACE5AEBCB /* Programme.swift in Sources */,
@@ -768,6 +777,7 @@
 				89244E49AF388360EB828EDB /* MusicFile.swift in Sources */,
 				778EEB4E613A3BE1D60FBF08 /* MusicPane.swift in Sources */,
 				A384EF4DF67A6D604A77835F /* MusicXMLEdit.swift in Sources */,
+				2CD3BFF544A9D99D7CE0B060 /* PartGrouping.swift in Sources */,
 				C24222E5EAA038B3348676B1 /* PartSplitter.swift in Sources */,
 				2DEDE391E35D16EBBA52F02C /* PieceView.swift in Sources */,
 				B26F8AEC33352795B03C35F4 /* SVGScene.swift in Sources */,
@@ -793,6 +803,7 @@
 				E422F63B834BAB8E2B6F9CA5 /* MusicFile.swift in Sources */,
 				8DCF6815395DC126C4F96D72 /* MusicPane.swift in Sources */,
 				9225DECDC9833092A78693DD /* MusicXMLEdit.swift in Sources */,
+				6B90F54600CF0C6AA0B845B1 /* PartGrouping.swift in Sources */,
 				8B57F622BE909A22CD1878D1 /* PartSplitter.swift in Sources */,
 				37AF23477CC445D553752F08 /* PieceView.swift in Sources */,
 				51906094D63115B5F5345562 /* SVGScene.swift in Sources */,
@@ -816,6 +827,7 @@
 				B861C91F1E7EB4A9FF927E23 /* MarkRenderTests.swift in Sources */,
 				4671B617995AEB38015B2608 /* NotesTests.swift in Sources */,
 				ED36E8C42664F67CD5A64492 /* OneLineTests.swift in Sources */,
+				EF62910A740D07457E05CAAD /* PartGroupingTests.swift in Sources */,
 				CEF2C315B4FD4098B9F2BA4B /* PieceSettingsTests.swift in Sources */,
 				D4EA78D91D66A2367A7FD132 /* PlayingOrderTests.swift in Sources */,
 				5D4398DB6237BF0C8894E4B0 /* PrintPDFTests.swift in Sources */,
