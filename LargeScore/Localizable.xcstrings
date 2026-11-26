@@ -1972,6 +1972,16 @@
         }
       }
     },
+    "No key signature was read. Check the key against the PDF.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Er is geen voortekening gelezen. Controleer de toonaard met de pdf."
+          }
+        }
+      }
+    },
     "No music yet": {
       "localizations": {
         "nl": {
@@ -2008,6 +2018,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Geen voortekens"
+          }
+        }
+      }
+    },
+    "No time signature was read. Click the first bar to set it.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Er is geen maatsoort gelezen. Klik op de eerste maat om die in te stellen."
           }
         }
       }
@@ -2536,6 +2556,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "De vorige versie van %@ terugzetten?"
+          }
+        }
+      }
+    },
+    "Set Key": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toonaard instellen"
           }
         }
       }

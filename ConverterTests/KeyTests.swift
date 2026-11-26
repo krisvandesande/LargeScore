@@ -80,4 +80,13 @@ nonisolated final class KeyTests: XCTestCase {
         edit.transpose(toKey: 2, up: true)
         XCTAssertTrue(edit.xml.contains("<root><root-step>C</root-step></root>"))
     }
+
+    @MainActor func testAMissingKeyIsPointedOut() throws {
+        let model = FixModel(xml: Self.bar.replacingOccurrences(of: "<key><fifths>0</fifths></key>", with: ""))
+        XCTAssertTrue(model.keyMissing)
+        XCTAssertFalse(model.timeMissing)
+        model.setKey(-2, fromStart: true)
+        XCTAssertFalse(model.keyMissing)
+        XCTAssertEqual(model.edit.firstKey, -2)
+    }
 }

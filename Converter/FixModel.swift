@@ -91,6 +91,12 @@ final class FixModel: ObservableObject {
         }
     }
 
+    /// No key signature was read: about a quarter of Audiveris's conversions, and
+    /// the notes then lack the key's sharps or flats until it is set.
+    var keyMissing: Bool { !edit.xml.contains("<fifths>") }
+    /// No time signature was read.
+    var timeMissing: Bool { !edit.xml.contains("<beats>") }
+
     /// The key at the selected bar, or at the start when no bar is selected.
     var currentKey: Int { selectedBar.map { edit.key(atBar: $0) } ?? edit.firstKey }
 

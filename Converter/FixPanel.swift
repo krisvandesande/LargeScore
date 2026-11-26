@@ -18,7 +18,7 @@ struct FixPanel: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
-                if model.problem != nil || !model.wrongBars.isEmpty {
+                if model.problem != nil || !model.wrongBars.isEmpty || model.keyMissing || model.timeMissing {
                     warnings
                     Divider()
                 }
@@ -59,6 +59,32 @@ struct FixPanel: View {
             if let problem = model.problem {
                 Label(problem, systemImage: "exclamationmark.triangle.fill")
                     .foregroundColor(.orange)
+            }
+            if model.keyMissing {
+                Label {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("No key signature was read. Check the key against the PDF.")
+                            .foregroundColor(.primary)
+                        Menu {
+                            ForEach(MusicXMLEdit.keys.reversed(), id: \.self) { fifths in
+                                Button(KeyName.name(fifths)) { model.setKey(fifths, fromStart: true) }
+                            }
+                        } label: {
+                            Text("Set Key")
+                        }
+                        .fixedSize()
+                        .controlSize(.large)
+                    }
+                } icon: {
+                    Image(systemName: "exclamationmark.triangle.fill").foregroundColor(.orange)
+                }
+            }
+            if model.timeMissing {
+                Label {
+                    Text("No time signature was read. Click the first bar to set it.").foregroundColor(.primary)
+                } icon: {
+                    Image(systemName: "exclamationmark.triangle.fill").foregroundColor(.orange)
+                }
             }
             if !model.wrongBars.isEmpty {
                 Label {

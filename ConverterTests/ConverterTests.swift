@@ -154,6 +154,8 @@ nonisolated final class ConverterTests: XCTestCase, @unchecked Sendable {
         try await Task.sleep(nanoseconds: 3_000_000_000)
         save(window, name: "window-piece")
         picture(TransposeSheet(from: 0, done: { _, _ in }, cancel: {}), size: CGSize(width: 460, height: 260), name: "transpose-sheet")
+        let noKey = FixModel(xml: KeyTests.bar.replacingOccurrences(of: "<key><fifths>0</fifths></key>", with: ""))
+        picture(FixPanel(model: noKey).frame(width: 300, height: 260), size: CGSize(width: 300, height: 260), name: "no-key")
     }
 
     // MARK: Helpers
