@@ -156,6 +156,34 @@ nonisolated final class ConverterTests: XCTestCase, @unchecked Sendable {
         picture(FixPanel(model: model).frame(width: 320, height: 760), size: CGSize(width: 320, height: 760), name: "fix-panel")
     }
 
+    /// Dragging a note says what it will become before the change is made, and the
+    /// note's tools sit around it on the page.
+    @MainActor func testDragPreviewAndNoteTools() async throws {
+        let xml = try String(contentsOf: Self.samples.appendingPathComponent("evening-air.musicxml"), encoding: .utf8)
+        let model = FixModel(xml: xml)
+        let ids = try NSRegularExpression(pattern: #"<note\b[^>]*\bid="([^"]+)""#)
+            .matches(in: model.xml, range: NSRange(model.xml.startIndex..., in: model.xml))
+            .compactMap { Range($0.range(at: 1), in: model.xml).map { String(model.xml[$0]) } }
+        let pitched = ids.filter { id in
+            model.edit.elementRange("note", id: id).map { model.xml[$0].contains("<pitch>") } ?? false
+        }
+        let id = try XCTUnwrap(pitched.dropFirst(6).first)
+        model.selectedNote = id
+        let before = try XCTUnwrap(model.selectedSummary)
+        let up = try XCTUnwrap(model.preview(.step(1)))
+        XCTAssertNotEqual(up, before)
+        XCTAssertEqual(model.xml, model.edit.xml, "a preview changes nothing")
+        XCTAssertFalse(model.canUndo)
+        model.apply(.step(1))
+        XCTAssertEqual(model.selectedSummary, up, "the change is what the preview said")
+        XCTAssertEqual(model.preview(.length(.whole))?.hasSuffix(FixModel.name(.whole)), true)
+
+        let pane = MusicPane(model: model).frame(width: 820, height: 700)
+        let window = host(pane, size: CGSize(width: 820, height: 700))
+        try await Task.sleep(nanoseconds: 3_000_000_000)
+        save(window, name: "note-tools")
+    }
+
     /// The window as it looks, drawn off screen: the list and a piece being fixed.
     @MainActor func testWindowPictures() async throws {
         let queue = ConversionQueue()

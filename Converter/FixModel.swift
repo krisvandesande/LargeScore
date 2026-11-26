@@ -215,9 +215,19 @@ final class FixModel: ObservableObject {
     }
 
     /// The selected note as a musician would say it ("B flat, quarter"), or "Rest, half".
-    var selectedSummary: String? {
-        guard let note = selectedXML else { return nil }
-        let length = selectedLength.map(Self.name)
+    var selectedSummary: String? { selectedXML.flatMap { Self.summary(of: $0) } }
+
+    /// What the selected note would become with a change, said as `selectedSummary`
+    /// says it: shown while a note is dragged, before the change is made.
+    func preview(_ change: MusicXMLEdit.NoteChange) -> String? {
+        guard let id = selectedNote else { return nil }
+        var copy = edit
+        guard (try? copy.edit(note: id, change)) != nil, let range = copy.elementRange("note", id: id) else { return nil }
+        return Self.summary(of: String(copy.xml[range]))
+    }
+
+    static func summary(of note: String) -> String? {
+        let length = note.firstMatch(#"<type>([^<]*)</type>"#).flatMap(MusicXMLEdit.Length.init).map(Self.name)
         if note.contains("<rest") {
             return [String(localized: "Rest"), length].compactMap { $0 }.joined(separator: ", ")
         }
