@@ -340,6 +340,14 @@ private struct LibraryGrid: View {
                 if let composer = score.composer, !composer.isEmpty {
                     Text(composer).font(.title3).foregroundStyle(.secondary)
                 }
+                // The player's own note on the piece: what to remember before playing it.
+                let note = score.note.trimmingCharacters(in: .whitespacesAndNewlines)
+                if !note.isEmpty {
+                    Text(note)
+                        .font(.title3.italic())
+                        .foregroundStyle(Palette.notes)
+                        .lineLimit(2)
+                }
                 if score.needsCheck {
                     Text("Check against the PDF")
                         .font(.headline)
