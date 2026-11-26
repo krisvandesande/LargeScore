@@ -17,25 +17,25 @@ struct FixPanel: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                if let problem = model.problem {
-                    Text(problem)
-                        .font(.headline)
-                        .foregroundColor(.orange)
+            VStack(alignment: .leading, spacing: 0) {
+                if model.problem != nil || !model.wrongBars.isEmpty {
+                    warnings
+                    Divider()
                 }
-                if !model.wrongBars.isEmpty {
-                    Text(wrongBarsText)
-                        .font(.body)
-                }
-                if model.selectedNote != nil { noteButtons }
-                if model.selectedBar != nil { barButtons }
                 if model.selectedNote == nil && model.selectedBar == nil {
                     Text("Click a note or a bar to fix it.")
                         .font(.body)
                         .foregroundColor(.secondary)
+                        .padding(Self.inset)
+                }
+                if model.selectedNote != nil {
+                    noteSection
+                    Divider()
+                }
+                if model.selectedBar != nil {
+                    barSection
                 }
             }
-            .padding(16)
             .frame(maxWidth: .infinity, alignment: .leading)
         }
         .sheet(item: $asking) { question in
@@ -49,6 +49,30 @@ struct FixPanel: View {
         }
     }
 
+    static let inset: CGFloat = 16
+
+    // MARK: Sections
+
+    /// What's wrong: the last change that couldn't be made, and bars that don't add up.
+    private var warnings: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            if let problem = model.problem {
+                Label(problem, systemImage: "exclamationmark.triangle.fill")
+                    .foregroundColor(.orange)
+            }
+            if !model.wrongBars.isEmpty {
+                Label {
+                    Text(wrongBarsText).foregroundColor(.primary)
+                } icon: {
+                    Image(systemName: "exclamationmark.triangle.fill").foregroundColor(.orange)
+                }
+            }
+        }
+        .font(.body)
+        .fixedSize(horizontal: false, vertical: true)
+        .padding(Self.inset)
+    }
+
     private var wrongBarsText: String {
         let numbers = model.wrongBars.compactMap { model.barNumbers[$0] }.sorted().map(String.init)
         let list = numbers.prefix(8).joined(separator: ", ")
@@ -57,77 +81,85 @@ struct FixPanel: View {
             : String(localized: "Bars \(list) don't add up to their time signature.")
     }
 
-    private var noteButtons: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            if let summary = model.selectedSummary {
-                Text(summary).font(.title3.weight(.semibold))
-            }
-            // Pitch, length, then the note itself: one row each, every button its own width.
+    private var noteSection: some View {
+        section(title: model.selectedIsRest ? Text("Rest") : Text("Note"), detail: model.selectedSummary) {
             if !model.selectedIsRest {
-                row {
-                    fixButton("Higher") { model.apply(.step(1)) }.keyboardShortcut(.upArrow, modifiers: [])
-                    fixButton("Lower") { model.apply(.step(-1)) }.keyboardShortcut(.downArrow, modifiers: [])
-                    fixButton("Sharp") { model.apply(.accidental(.sharp)) }
-                    fixButton("Flat") { model.apply(.accidental(.flat)) }
-                    fixButton("Natural") { model.apply(.accidental(.natural)) }
+                field("Pitch") {
+                    HStack(spacing: 8) {
+                        Button { model.apply(.step(-1)) } label: { Label("Lower", systemImage: "arrow.down") }
+                            .keyboardShortcut(.downArrow, modifiers: [])
+                            .help("A step lower (↓)")
+                        Button { model.apply(.step(1)) } label: { Label("Higher", systemImage: "arrow.up") }
+                            .keyboardShortcut(.upArrow, modifiers: [])
+                            .help("A step higher (↑)")
+                    }
+                }
+                field("Sharp or Flat") {
+                    Picker("Sharp or Flat", selection: Binding(
+                        get: { model.selectedAccidental },
+                        set: { if let accidental = $0 { model.apply(.accidental(accidental)) } })) {
+                        Text("♯ Sharp").tag(Optional(MusicXMLEdit.Accidental.sharp))
+                        Text("♭ Flat").tag(Optional(MusicXMLEdit.Accidental.flat))
+                        Text("♮ Natural").tag(Optional(MusicXMLEdit.Accidental.natural))
+                    }
+                    .pickerStyle(.segmented)
+                    .labelsHidden()
                 }
             }
-            row {
-                Menu {
-                    ForEach(MusicXMLEdit.Length.allCases, id: \.self) { length in
-                        Button(FixModel.name(length) + (length == model.selectedLength ? " ✓" : "")) {
-                            model.apply(.length(length))
+            field("Length") {
+                HStack(spacing: 8) {
+                    Picker("Length", selection: Binding(
+                        get: { model.selectedLength ?? .quarter },
+                        set: { model.apply(.length($0)) })) {
+                        ForEach(MusicXMLEdit.Length.allCases, id: \.self) { length in
+                            Text(FixModel.name(length)).tag(length)
                         }
                     }
-                } label: {
-                    Text("Length")
-                }
-                .fixedSize()
-                .accessibilityValue(Text(model.selectedLength.map(FixModel.name) ?? ""))
-                fixButton(model.selectedHasDot ? "Remove Dot" : "Dot") { model.apply(.toggleDot) }
-                if !model.selectedIsRest {
-                    fixButton(model.selectedIsTied ? "Remove Tie" : "Tie to Next") { model.apply(.toggleTie) }
+                    .labelsHidden()
+                    .fixedSize()
+                    toggle("Dot", isOn: model.selectedHasDot) { model.apply(.toggleDot) }
+                    if !model.selectedIsRest {
+                        toggle("Tie to Next", isOn: model.selectedIsTied) { model.apply(.toggleTie) }
+                    }
                 }
             }
-            row {
-                fixButton(model.selectedIsRest ? "Make Note" : "Make Rest") { model.apply(.toggleRest) }
-                fixButton("Add Note After") { model.addNote() }
-                fixButton("Delete Note") { model.deleteNote() }.keyboardShortcut(.delete, modifiers: [])
+            field("Note") {
+                HStack(spacing: 8) {
+                    toggle("Rest", isOn: model.selectedIsRest) { model.apply(.toggleRest) }
+                    Button("Add After") { model.addNote() }
+                        .help("Add a note after this one")
+                    Button("Delete") { model.deleteNote() }
+                        .keyboardShortcut(.delete, modifiers: [])
+                        .help("Delete this note (⌫)")
+                        .accessibilityLabel(Text("Delete Note"))
+                }
             }
         }
     }
 
-    private var barButtons: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            if let bar = model.selectedBar, let number = model.barNumbers[bar] {
-                Text("Bar \(number)").font(.title3.weight(.semibold))
-            }
-            row {
-                fixButton("Rehearsal Mark") { words = ""; asking = .rehearsal }
-                fixButton("Tempo") { words = ""; asking = .tempo }
-                fixButton("Fermata") { model.add(.fermata) }
-                Menu {
-                    ForEach(MusicXMLEdit.dynamics, id: \.self) { mark in
-                        Button(mark) { model.addDynamic(mark) }
-                    }
-                } label: {
-                    Text("Dynamic")
-                }
-                .fixedSize()
+    private var barSection: some View {
+        let number = model.selectedBar.flatMap { model.barNumbers[$0] }
+        return section(title: number.map { Text("Bar \($0)") } ?? Text("Bar"), detail: nil) {
+            field("Time Signature") {
                 Menu {
                     ForEach(0..<Self.times.count, id: \.self) { index in
                         let time = Self.times[index]
-                        Button("\(time.0)/\(time.1)") { model.setTime(beats: time.0, beatType: time.1) }
+                        let name = "\(time.0)/\(time.1)"
+                        Button { model.setTime(beats: time.0, beatType: time.1) } label: {
+                            if name == model.currentTime { Label(name, systemImage: "checkmark") } else { Text(name) }
+                        }
                     }
                 } label: {
-                    Text("Time Signature")
+                    Text(model.currentTime)
                 }
                 .fixedSize()
+                .accessibilityLabel(Text("Time Signature"))
+                .accessibilityValue(Text(model.currentTime))
+            }
+            field("Key Signature") {
                 Menu {
                     ForEach(MusicXMLEdit.keys.reversed(), id: \.self) { fifths in
-                        Button {
-                            model.setKey(fifths)
-                        } label: {
+                        Button { model.setKey(fifths) } label: {
                             if fifths == model.currentKey {
                                 Label(KeyName.name(fifths), systemImage: "checkmark")
                             } else {
@@ -136,43 +168,95 @@ struct FixPanel: View {
                         }
                     }
                 } label: {
-                    Text("Key Signature")
+                    Text(KeyName.signature(model.currentKey))
                 }
                 .fixedSize()
                 .help("Set the key from this bar on. Notes without their own sharp or flat follow it.")
+                .accessibilityLabel(Text("Key Signature"))
+                .accessibilityValue(Text(KeyName.name(model.currentKey)))
             }
-            if model.selectedNote == nil || model.selectedBarIsRest {
-                row {
-                    if model.selectedNote == nil {
-                        fixButton("Add Note") { model.addNote() }
+            field("Add") {
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack(spacing: 8) {
+                        Button("Rehearsal Mark…") { words = ""; asking = .rehearsal }
+                        Button("Tempo…") { words = ""; asking = .tempo }
                     }
-                    if model.selectedBarIsRest {
-                        fixButton("Bars of Rest") { words = "\(model.selectedRestBars)"; asking = .restBars }
-                            .accessibilityValue(Text("\(model.selectedRestBars)"))
+                    HStack(spacing: 8) {
+                        Button("Fermata") { model.add(.fermata) }
+                        Menu {
+                            ForEach(MusicXMLEdit.dynamics, id: \.self) { mark in
+                                Button(mark) { model.addDynamic(mark) }
+                            }
+                        } label: {
+                            Text("Dynamic")
+                        }
+                        .fixedSize()
                     }
                 }
             }
+            if model.selectedNote == nil {
+                field("") {
+                    Button("Add Note") { model.addNote() }
+                }
+            }
+            if model.selectedBarIsRest {
+                field("Bars of Rest") {
+                    Button("\(model.selectedRestBars)…") { words = "\(model.selectedRestBars)"; asking = .restBars }
+                        .accessibilityLabel(Text("Bars of Rest"))
+                        .accessibilityValue(Text("\(model.selectedRestBars)"))
+                }
+            }
             ForEach(model.selectedWords) { item in
-                HStack(spacing: 8) {
-                    Text(item.text).font(.headline)
-                    fixButton("Change") { words = item.text; asking = .change(item.index) }
-                        .accessibilityLabel(Text("Change \(item.text)"))
-                    fixButton("Delete") { model.setWords(at: item.index, to: "") }
-                        .accessibilityLabel(Text("Delete \(item.text)"))
+                field("Words") {
+                    HStack(spacing: 8) {
+                        Text(item.text).font(.body.weight(.semibold)).lineLimit(1)
+                        Button("Change…") { words = item.text; asking = .change(item.index) }
+                            .accessibilityLabel(Text("Change \(item.text)"))
+                        Button("Delete") { model.setWords(at: item.index, to: "") }
+                            .accessibilityLabel(Text("Delete \(item.text)"))
+                    }
                 }
             }
         }
     }
 
-    private func fixButton(_ title: LocalizedStringKey, action: @escaping () -> Void) -> some View {
-        Button(title, action: action)
+    // MARK: Building blocks
+
+    /// A titled group of fields, as a Mac inspector shows one.
+    private func section<Content: View>(title: Text, detail: String?, @ViewBuilder _ content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: 14) {
+            VStack(alignment: .leading, spacing: 2) {
+                title.font(.headline)
+                if let detail {
+                    Text(detail).font(.title3.weight(.semibold))
+                }
+            }
+            .accessibilityElement(children: .combine)
+            .accessibilityAddTraits(.isHeader)
+            content()
+        }
+        .controlSize(.large)
+        .padding(Self.inset)
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
-    /// Buttons side by side at their own widths.
-    private func row<Content: View>(@ViewBuilder _ content: () -> Content) -> some View {
-        HStack(spacing: 8) { content() }
-            .controlSize(.large)
-            .fixedSize()
+    /// A field: its name above, small, and the controls under it.
+    private func field<Content: View>(_ name: LocalizedStringKey, @ViewBuilder _ content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            if name != "" {
+                Text(name)
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                    .accessibilityHidden(true)
+            }
+            content()
+        }
+    }
+
+    /// A button that stays pressed while its state is on.
+    private func toggle(_ title: LocalizedStringKey, isOn: Bool, action: @escaping () -> Void) -> some View {
+        Toggle(title, isOn: Binding(get: { isOn }, set: { _ in action() }))
+            .toggleStyle(.button)
     }
 
     private func title(_ question: Question) -> LocalizedStringKey {

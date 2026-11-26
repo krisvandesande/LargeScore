@@ -74,6 +74,23 @@ final class FixModel: ObservableObject {
         perform(problem: String(localized: "This bar can't be changed that way.")) { try $0.setTime(beats: beats, beatType: beatType, bar: bar) }
     }
 
+    /// The time signature at the selected bar, written "3/4".
+    var currentTime: String {
+        guard let bar = selectedBar else { return "" }
+        let time = edit.time(atBar: bar)
+        return "\(time.beats)/\(time.beatType)"
+    }
+
+    /// The selected note's sharp, flat or natural, as it sounds.
+    var selectedAccidental: MusicXMLEdit.Accidental? {
+        guard let note = selectedXML, !note.contains("<rest") else { return nil }
+        switch note.firstMatch(#"<alter>(-?\d+)</alter>"#).flatMap(Int.init) ?? 0 {
+        case 1: return .sharp
+        case -1: return .flat
+        default: return .natural
+        }
+    }
+
     /// The key at the selected bar, or at the start when no bar is selected.
     var currentKey: Int { selectedBar.map { edit.key(atBar: $0) } ?? edit.firstKey }
 

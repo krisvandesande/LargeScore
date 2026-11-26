@@ -965,6 +965,14 @@ extension MusicXMLEdit {
         return Context(xml: xml, upTo: firstNote).fifths
     }
 
+    /// The time signature in force at the start of this bar, as beats and beat type.
+    func time(atBar id: String) -> (beats: Int, beatType: Int) {
+        guard let range = elementRange("measure", id: id) else { return (4, 4) }
+        let firstNote = xml.range(of: #"<note[\s>]"#, options: .regularExpression, range: range)?.lowerBound ?? range.upperBound
+        let context = Context(xml: xml, upTo: firstNote)
+        return (context.beats, context.beatType)
+    }
+
     /// Sets the key signature from this bar on, up to the next bar that changes to a
     /// different key, and spells the notes again by it: a note with no accidental of
     /// its own takes the key's sharp or flat (or the one printed earlier in its bar),

@@ -37,10 +37,14 @@ struct PieceView: View {
     }
 
     private func detailField(_ name: LocalizedStringKey, text: Binding<String>) -> some View {
-        HStack(spacing: 6) {
-            Text(name).accessibilityHidden(true)
+        VStack(alignment: .leading, spacing: 6) {
+            Text(name)
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+                .accessibilityHidden(true)
             TextField("", text: text)
                 .textFieldStyle(.roundedBorder)
+                .controlSize(.large)
                 .frame(maxWidth: .infinity)
                 .accessibilityLabel(Text(name))
         }
@@ -48,36 +52,32 @@ struct PieceView: View {
 
     var body: some View {
         HSplitView {
-            // The music takes the height; the buttons keep a fixed band under it.
+            // The music the full height, the tools beside it as a Mac inspector, then
+            // the PDF it came from.
+            MusicPane(model: model)
+                .frame(minWidth: 420)
             VStack(spacing: 0) {
-                MusicPane(model: model)
-                Divider()
                 FixPanel(model: model)
-                    .frame(height: 220)
                 Divider()
-                // The last step for a piece, under everything else: its name, then sending.
-                VStack(alignment: .leading, spacing: 10) {
-                    HStack(spacing: 16) {
-                        detailField("Title", text: $title)
-                        detailField("Composer", text: $composer)
+                // The last step for a piece, at the foot: its name, then sending.
+                VStack(alignment: .leading, spacing: 12) {
+                    detailField("Title", text: $title)
+                    detailField("Composer", text: $composer)
+                    Toggle("Checked Against the PDF", isOn: $checked)
+                        .toggleStyle(.checkbox)
+                        .help("Ticked, the iPad no longer marks the piece Check Against the PDF")
+                    Button(action: send) {
+                        Text("Send to Library").frame(maxWidth: .infinity)
                     }
-                    HStack(spacing: 16) {
-                        Toggle("Checked Against the PDF", isOn: $checked)
-                            .toggleStyle(.checkbox)
-                            .fixedSize()
-                            .help("Ticked, the iPad no longer marks the piece Check Against the PDF")
-                        Spacer()
-                        Button("Send to Library", action: send)
-                            .keyboardShortcut(.return, modifiers: .command)
-                            .controlSize(.large)
-                            .buttonStyle(.borderedProminent)
-                            .help("Put the music and the PDF in iCloud Drive for the iPad (⌘Return)")
-                    }
+                    .keyboardShortcut(.return, modifiers: .command)
+                    .controlSize(.large)
+                    .buttonStyle(.borderedProminent)
+                    .help("Put the music and the PDF in iCloud Drive for the iPad (⌘Return)")
                 }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 12)
+                .padding(FixPanel.inset)
             }
-            .frame(minWidth: 480)
+            .frame(minWidth: 290, idealWidth: 300, maxWidth: 320)
+            .background(Color(nsColor: .windowBackgroundColor))
             VStack(spacing: 0) {
                 PDFZoomBar(zoom: pdfZoom)
                 Divider()
