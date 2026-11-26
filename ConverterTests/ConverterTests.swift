@@ -81,6 +81,31 @@ nonisolated final class ConverterTests: XCTestCase, @unchecked Sendable {
         XCTAssertEqual(again.jobs.map(\.id), [job.id])
     }
 
+    /// A send under a new title replaces the old files and keeps the id; a second
+    /// piece with the same title gets a name of its own instead of overwriting.
+    @MainActor func testRenamedAndSameNamedPieces() async throws {
+        let queue = ConversionQueue()
+        let pdf = Self.samples.appendingPathComponent("converted-by-audiveris.pdf")
+        queue.add([pdf])
+        let job = try XCTUnwrap(queue.jobs.first)
+        try await waitFor { queue.jobs.first?.state == .ready }
+        let xml = try String(contentsOf: queue.music(of: job), encoding: .utf8)
+        let folder = ConversionQueue.libraryFolder
+        XCTAssertNil(queue.send(job, xml: xml, checked: false))
+
+        queue.update(job.id) { $0.title = "Alte Kameraden" }
+        XCTAssertNil(queue.send(try XCTUnwrap(queue.jobs.first), xml: xml, checked: false))
+        let names = try FileManager.default.contentsOfDirectory(atPath: folder.path).sorted()
+        XCTAssertEqual(names, ["Alte Kameraden.musicxml", "Alte Kameraden.pdf"])
+        let sent = try String(contentsOf: folder.appendingPathComponent("Alte Kameraden.musicxml"), encoding: .utf8)
+        XCTAssertEqual(MusicXMLEdit.libraryID(in: sent), job.id.uuidString)
+
+        // Another piece of the same name.
+        var other = Job(title: "Alte Kameraden")
+        other.state = .ready
+        XCTAssertEqual(ConversionQueue.freeName(for: other, in: folder), "Alte Kameraden 2")
+    }
+
     @MainActor func testFailedConversionSaysSo() async throws {
         let script = temp.appendingPathComponent("nothing.sh")
         try "#!/bin/bash\nexit 1\n".write(to: script, atomically: true, encoding: .utf8)
@@ -109,7 +134,7 @@ nonisolated final class ConverterTests: XCTestCase, @unchecked Sendable {
         model.selectedBar = scene.measure(at: CGPoint(x: box.midX, y: box.midY), reach: 2)
         draw(scene, selectedNote: id, selectedBar: model.selectedBar, name: "page-selected")
         // The fix buttons for that note and its bar, as the panel shows them.
-        picture(FixPanel(model: model).frame(width: 640, height: 300), size: CGSize(width: 640, height: 300), name: "fix-panel")
+        picture(FixPanel(model: model).frame(width: 320, height: 760), size: CGSize(width: 320, height: 760), name: "fix-panel")
     }
 
     /// The window as it looks, drawn off screen: the list and a piece being fixed.
@@ -128,6 +153,7 @@ nonisolated final class ConverterTests: XCTestCase, @unchecked Sendable {
         let window = host(view, size: CGSize(width: 1300, height: 860))
         try await Task.sleep(nanoseconds: 3_000_000_000)
         save(window, name: "window-piece")
+        picture(TransposeSheet(from: 0, done: { _, _ in }, cancel: {}), size: CGSize(width: 460, height: 260), name: "transpose-sheet")
     }
 
     // MARK: Helpers

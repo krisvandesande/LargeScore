@@ -13,6 +13,7 @@ struct PieceView: View {
     @State private var arranger = ""
     @State private var message: String?
     @StateObject private var pdfZoom = PDFZoom()
+    @State private var transposing = false
 
     init(job: Job, xml: String) {
         self.job = job
@@ -36,10 +37,14 @@ struct PieceView: View {
     }
 
     private func detailField(_ name: LocalizedStringKey, text: Binding<String>) -> some View {
-        HStack(spacing: 6) {
-            Text(name).accessibilityHidden(true)
+        VStack(alignment: .leading, spacing: 6) {
+            Text(name)
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+                .accessibilityHidden(true)
             TextField("", text: text)
                 .textFieldStyle(.roundedBorder)
+                .controlSize(.large)
                 .frame(maxWidth: .infinity)
                 .accessibilityLabel(Text(name))
         }
@@ -47,36 +52,32 @@ struct PieceView: View {
 
     var body: some View {
         HSplitView {
-            // The music takes the height; the buttons keep a fixed band under it.
+            // The music the full height, the tools beside it as a Mac inspector, then
+            // the PDF it came from.
+            MusicPane(model: model)
+                .frame(minWidth: 420)
             VStack(spacing: 0) {
-                MusicPane(model: model)
-                Divider()
                 FixPanel(model: model)
-                    .frame(height: 220)
                 Divider()
-                // The last step for a piece, under everything else: its name, then sending.
-                VStack(alignment: .leading, spacing: 10) {
-                    HStack(spacing: 16) {
-                        detailField("Title", text: $title)
-                        detailField("Composer", text: $composer)
+                // The last step for a piece, at the foot: its name, then sending.
+                VStack(alignment: .leading, spacing: 12) {
+                    detailField("Title", text: $title)
+                    detailField("Composer", text: $composer)
+                    Toggle("Checked Against the PDF", isOn: $checked)
+                        .toggleStyle(.checkbox)
+                        .help("Ticked, the iPad no longer marks the piece Check Against the PDF")
+                    Button(action: send) {
+                        Text("Send to Library").frame(maxWidth: .infinity)
                     }
-                    HStack(spacing: 16) {
-                        Toggle("Checked Against the PDF", isOn: $checked)
-                            .toggleStyle(.checkbox)
-                            .fixedSize()
-                            .help("Ticked, the iPad no longer marks the piece Check Against the PDF")
-                        Spacer()
-                        Button("Send to Library", action: send)
-                            .keyboardShortcut(.return, modifiers: .command)
-                            .controlSize(.large)
-                            .buttonStyle(.borderedProminent)
-                            .help("Put the music and the PDF in iCloud Drive for the iPad (⌘Return)")
-                    }
+                    .keyboardShortcut(.return, modifiers: .command)
+                    .controlSize(.large)
+                    .buttonStyle(.borderedProminent)
+                    .help("Put the music and the PDF in iCloud Drive for the iPad (⌘Return)")
                 }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 12)
+                .padding(FixPanel.inset)
             }
-            .frame(minWidth: 480)
+            .frame(minWidth: 290, idealWidth: 300, maxWidth: 320)
+            .background(Color(nsColor: .windowBackgroundColor))
             VStack(spacing: 0) {
                 PDFZoomBar(zoom: pdfZoom)
                 Divider()
@@ -85,6 +86,30 @@ struct PieceView: View {
             .frame(minWidth: 320)
         }
         .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                // The key of the whole piece: Audiveris often misses it, and the notes
+                // then lack its sharps or flats. Setting it spells them again.
+                Menu {
+                    ForEach(MusicXMLEdit.keys.reversed(), id: \.self) { fifths in
+                        Button {
+                            model.setKey(fifths, fromStart: true)
+                        } label: {
+                            if fifths == model.edit.firstKey {
+                                Label(KeyName.name(fifths), systemImage: "checkmark")
+                            } else {
+                                Text(KeyName.name(fifths))
+                            }
+                        }
+                    }
+                } label: {
+                    Text("Key: \(KeyName.signature(model.edit.firstKey))")
+                }
+                .help("Set the key of the piece. Notes without their own sharp or flat follow it.")
+            }
+            ToolbarItem(placement: .primaryAction) {
+                Button("Transpose…") { transposing = true }
+                    .help("Move all the music to another key")
+            }
             ToolbarItem(placement: .primaryAction) {
                 Button {
                     model.undo()
@@ -108,6 +133,14 @@ struct PieceView: View {
         .onChange(of: model.version) { _ in
             // Every fix is kept at once, so quitting loses nothing.
             queue.saveFixes(model.xml, for: job)
+        }
+        .sheet(isPresented: $transposing) {
+            TransposeSheet(from: model.edit.firstKey) { key, up in
+                model.transpose(toKey: key, up: up)
+                transposing = false
+            } cancel: {
+                transposing = false
+            }
         }
         .alert(message ?? "", isPresented: Binding(get: { message != nil }, set: { if !$0 { message = nil } })) {
             Button("OK") { message = nil }
@@ -176,5 +209,49 @@ struct PDFPane: NSViewRepresentable {
     func updateNSView(_ view: PDFView, context: Context) {
         if view.document?.documentURL != url { view.document = PDFDocument(url: url) }
         zoom?.view = view
+    }
+}
+
+/// Moves all the music to another key: the new key, and up or down to it.
+struct TransposeSheet: View {
+    let from: Int
+    let done: (Int, Bool) -> Void
+    let cancel: () -> Void
+    @State private var key: Int
+    @State private var up = true
+
+    init(from: Int, done: @escaping (Int, Bool) -> Void, cancel: @escaping () -> Void) {
+        self.from = from
+        self.done = done
+        self.cancel = cancel
+        _key = State(initialValue: from)
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Transpose").font(.title3.weight(.semibold))
+            Text("Now: \(KeyName.name(from))").foregroundStyle(.secondary)
+            Picker("New Key", selection: $key) {
+                ForEach(MusicXMLEdit.keys.reversed(), id: \.self) { fifths in
+                    Text(KeyName.name(fifths)).tag(fifths)
+                }
+            }
+            Picker("Direction", selection: $up) {
+                Text("Up").tag(true)
+                Text("Down").tag(false)
+            }
+            .pickerStyle(.radioGroup)
+            .horizontalRadioGroupLayout()
+            HStack {
+                Spacer()
+                Button("Cancel", action: cancel).keyboardShortcut(.cancelAction)
+                Button("Transpose") { done(key, up) }
+                    .keyboardShortcut(.defaultAction)
+                    .disabled(key == from)
+            }
+            .controlSize(.large)
+        }
+        .padding(24)
+        .frame(width: 460)
     }
 }

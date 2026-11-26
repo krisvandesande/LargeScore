@@ -69,6 +69,7 @@ Use one simulator at a time, "LS iPad Pro 13", for everyday test runs (Kris, 202
   - Fix Notes works in one pass over the file, never a context per bar (minutes on a long part); a change to a note's length moves the next `<backup>` in its bar; an edit Verovio can't engrave is taken back.
   - Bars added for a multi-bar rest are added to the shown part only: a full score then has parts of different lengths.
   - The music folder replaces a piece without asking only when exactly one piece has that title and composer.
+- **Sync between the Converter and the iPad (2026-11-26):** a piece is matched by the id the Converter writes into its MusicXML (`identification/miscellaneous`, field `large-score-id`, the job's UUID; `MusicXMLEdit.libraryID`), then by title and composer. Matching by title alone made a second copy whenever a piece was renamed on the Mac or the iPad. A send under a new title removes the files of the old name (`Job.sentName`); two pieces with the same title get "Title 2" rather than overwriting each other. Edits on the iPad (`settingDetails`) keep the id. Files iCloud hasn't downloaded are listed under their real names: never mark them seen until their contents are here (build 11 lost music that way).
 
 ## TestFlight
 

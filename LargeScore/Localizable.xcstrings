@@ -96,6 +96,16 @@
         }
       }
     },
+    "%lld flats": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld mollen"
+          }
+        }
+      }
+    },
     "%lld of %lld": {
       "localizations": {
         "en": {
@@ -108,6 +118,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "%1$lld van %2$lld"
+          }
+        }
+      }
+    },
+    "%lld sharps": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld kruisen"
           }
         }
       }
@@ -166,6 +186,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "1"
+          }
+        }
+      }
+    },
+    "1 flat": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 mol"
+          }
+        }
+      }
+    },
+    "1 sharp": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 kruis"
           }
         }
       }
@@ -1072,6 +1112,16 @@
         }
       }
     },
+    "Direction": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Richting"
+          }
+        }
+      }
+    },
     "Discard Fixes": {
       "localizations": {
         "nl": {
@@ -1118,6 +1168,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Contrabas"
+          }
+        }
+      }
+    },
+    "Down": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Omlaag"
           }
         }
       }
@@ -1522,6 +1582,26 @@
         }
       }
     },
+    "Key Signature": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voortekening"
+          }
+        }
+      }
+    },
+    "Key: %@": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toonaard: %@"
+          }
+        }
+      }
+    },
     "Language": {
       "localizations": {
         "nl": {
@@ -1692,6 +1772,16 @@
         }
       }
     },
+    "Move all the music to another key": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zet alle muziek in een andere toonaard"
+          }
+        }
+      }
+    },
     "Move Down": {
       "localizations": {
         "nl": {
@@ -1822,6 +1912,16 @@
         }
       }
     },
+    "New Key": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nieuwe toonaard"
+          }
+        }
+      }
+    },
     "New Programme": {
       "localizations": {
         "nl": {
@@ -1902,6 +2002,16 @@
         }
       }
     },
+    "No sharps or flats": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geen voortekens"
+          }
+        }
+      }
+    },
     "None": {
       "localizations": {
         "nl": {
@@ -1958,6 +2068,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Niets gevonden"
+          }
+        }
+      }
+    },
+    "Now: %@": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nu: %@"
           }
         }
       }
@@ -2420,6 +2540,26 @@
         }
       }
     },
+    "Set the key from this bar on. Notes without their own sharp or flat follow it.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stel de toonaard in vanaf deze maat. Noten zonder eigen kruis of mol volgen die."
+          }
+        }
+      }
+    },
+    "Set the key of the piece. Notes without their own sharp or flat follow it.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stel de toonaard van het stuk in. Noten zonder eigen kruis of mol volgen die."
+          }
+        }
+      }
+    },
     "SIL Open Font License 1.1": {
       "localizations": {
         "nl": {
@@ -2712,6 +2852,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "Die wijziging kon niet getoond worden en is ongedaan gemaakt."
+          }
+        }
+      }
+    },
+    "The key couldn't be set here.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De toonaard kon hier niet worden ingesteld."
+          }
+        }
+      }
+    },
+    "The music couldn't be transposed.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De muziek kon niet worden getransponeerd."
           }
         }
       }
@@ -3158,6 +3318,16 @@
         }
       }
     },
+    "Transpose…": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Transponeren…"
+          }
+        }
+      }
+    },
     "Trombone": {
       "localizations": {
         "nl": {
@@ -3214,6 +3384,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Maak de laatste verbetering ongedaan (⌘Z)"
+          }
+        }
+      }
+    },
+    "Up": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Omhoog"
           }
         }
       }

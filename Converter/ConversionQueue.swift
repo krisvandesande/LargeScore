@@ -15,6 +15,9 @@ struct Job: Identifiable, Codable, Equatable {
     var title: String
     var state: State = .waiting
     var added = Date()
+    /// The file name it was last sent under, so a send under a new title takes the
+    /// old files away instead of leaving a second copy for the iPad.
+    var sentName: String?
 
     var isConverted: Bool { state == .ready || state == .sent }
 }
@@ -214,10 +217,19 @@ final class ConversionQueue: ObservableObject {
         }
         do {
             try fm.createDirectory(at: Self.libraryFolder, withIntermediateDirectories: true)
-            let name = Self.fileName(job.title)
-            let text = checked ? Self.markChecked(xml) : xml
+            let name = Self.freeName(for: job, in: Self.libraryFolder)
+            // The job's id goes with the music: the iPad finds the piece by it, whatever
+            // the title has become on either side.
+            let marked = MusicXMLEdit.settingLibraryID(xml, id: job.id.uuidString)
+            let text = checked ? Self.markChecked(marked) : marked
             let musicURL = Self.libraryFolder.appendingPathComponent(name + ".musicxml")
             let pdfURL = Self.libraryFolder.appendingPathComponent(name + ".pdf")
+            if let old = job.sentName, old != name {
+                for kind in ["musicxml", "pdf"] {
+                    let url = Self.libraryFolder.appendingPathComponent(old + "." + kind)
+                    if fm.fileExists(atPath: url.path) { try? fm.removeItem(at: url) }
+                }
+            }
             // The PDF first: the iPad pairs a PDF that arrives with music already there.
             if fm.fileExists(atPath: pdfURL.path) { try fm.removeItem(at: pdfURL) }
             try fm.copyItem(at: pdf(of: job), to: pdfURL)
@@ -225,8 +237,25 @@ final class ConversionQueue: ObservableObject {
         } catch {
             return String(localized: "The music couldn't be put in iCloud Drive.")
         }
-        update(job.id) { $0.state = .sent }
+        update(job.id) { $0.state = .sent; $0.sentName = Self.freeName(for: job, in: Self.libraryFolder) }
         return nil
+    }
+
+    /// The title's file name, unless another piece was sent under it: then "Title 2",
+    /// "Title 3"… Two pieces of the same name never overwrite each other.
+    nonisolated static func freeName(for job: Job, in folder: URL) -> String {
+        let base = fileName(job.title)
+        var name = base
+        var number = 2
+        while true {
+            let url = folder.appendingPathComponent(name + ".musicxml")
+            guard let data = FileManager.default.contents(atPath: url.path) else { return name }
+            let owner = MusicXMLEdit.libraryID(in: String(decoding: data, as: UTF8.self))
+            // Ours, or a file from before ids were written (sent by this Mac as before).
+            if owner == nil || owner == job.id.uuidString { return name }
+            name = "\(base) \(number)"
+            number += 1
+        }
     }
 
     /// The file's own name for the piece: no characters iCloud Drive refuses.

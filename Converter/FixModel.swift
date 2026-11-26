@@ -74,6 +74,39 @@ final class FixModel: ObservableObject {
         perform(problem: String(localized: "This bar can't be changed that way.")) { try $0.setTime(beats: beats, beatType: beatType, bar: bar) }
     }
 
+    /// The time signature at the selected bar, written "3/4".
+    var currentTime: String {
+        guard let bar = selectedBar else { return "" }
+        let time = edit.time(atBar: bar)
+        return "\(time.beats)/\(time.beatType)"
+    }
+
+    /// The selected note's sharp, flat or natural, as it sounds.
+    var selectedAccidental: MusicXMLEdit.Accidental? {
+        guard let note = selectedXML, !note.contains("<rest") else { return nil }
+        switch note.firstMatch(#"<alter>(-?\d+)</alter>"#).flatMap(Int.init) ?? 0 {
+        case 1: return .sharp
+        case -1: return .flat
+        default: return .natural
+        }
+    }
+
+    /// The key at the selected bar, or at the start when no bar is selected.
+    var currentKey: Int { selectedBar.map { edit.key(atBar: $0) } ?? edit.firstKey }
+
+    /// Sets the key from the selected bar on (from the start when none is selected),
+    /// spelling the notes by it: for music Audiveris read with the wrong key or none.
+    func setKey(_ fifths: Int, fromStart: Bool = false) {
+        let bar = fromStart ? nil : selectedBar
+        guard let id = bar ?? edit.xml.firstMatch(#"<measure\b[^>]*\bid="([^"]+)""#) else { return }
+        perform(problem: String(localized: "The key couldn't be set here.")) { try $0.setKey(fifths, fromBar: id) }
+    }
+
+    /// Moves all the music to another key.
+    func transpose(toKey fifths: Int, up: Bool) {
+        perform(problem: String(localized: "The music couldn't be transposed.")) { $0.transpose(toKey: fifths, up: up) }
+    }
+
     var selectedBarIsRest: Bool {
         guard let bar = selectedBar, let range = edit.elementRange("measure", id: bar) else { return false }
         let xml = String(edit.xml[range])
