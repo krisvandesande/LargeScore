@@ -107,4 +107,16 @@ nonisolated final class KeyTests: XCTestCase {
         try edit.setClef(.bass, fromBar: "m1")
         XCTAssertEqual(pitch(edit.xml, "n4"), "E-1/3")   // back, with the key's flat again
     }
+
+    /// A trombone part in C, bass clef, rewritten for B flat in the treble clef: up a
+    /// ninth, two sharps more, treble clef, every note keeping its new pitch.
+    @MainActor func testRewritingForAnotherInstrument() {
+        var edit = MusicXMLEdit(xml: Self.bar)
+        edit.transpose(for: Transposition(from: .cBass, to: .bFlat))
+        XCTAssertEqual(edit.firstKey, 2)
+        XCTAssertEqual(edit.clef(atBar: "m1"), .treble)
+        XCTAssertEqual(pitch(edit.xml, "n1"), "C1/5")    // B3 up a ninth
+        XCTAssertEqual(pitch(edit.xml, "n4"), "F1/4")    // E3 up a ninth: F sharp, the key's
+        XCTAssertEqual(pitch(edit.xml, "n7"), "G1/4")    // F sharp 3: G sharp 4
+    }
 }

@@ -121,6 +121,11 @@ final class FixModel: ObservableObject {
         perform(problem: String(localized: "The clef couldn't be set here.")) { try $0.setClef(clef, fromBar: id) }
     }
 
+    /// Rewrites the part for another instrument: interval, key and clef.
+    func transpose(for transposition: Transposition) {
+        perform(problem: String(localized: "The music couldn't be transposed.")) { $0.transpose(for: transposition) }
+    }
+
     /// Moves all the music to another key.
     func transpose(toKey fifths: Int, up: Bool) {
         perform(problem: String(localized: "The music couldn't be transposed.")) { $0.transpose(toKey: fifths, up: up) }

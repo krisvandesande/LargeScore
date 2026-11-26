@@ -38,3 +38,16 @@ extension MusicXMLEdit.Clef {
         }
     }
 }
+
+extension WrittenFor {
+    /// For macOS 12, where the shared `title` isn't available.
+    var name: String {
+        switch self {
+        case .c: String(localized: "C (flute, oboe, violin)")
+        case .cBass: String(localized: "C, bass clef (trombone, euphonium, tuba)")
+        case .bFlat: String(localized: "B♭ (clarinet, trumpet, tenor sax, baritone)")
+        case .eFlat: String(localized: "E♭ (alto and baritone sax, E♭ horn)")
+        case .f: String(localized: "F (horn)")
+        }
+    }
+}

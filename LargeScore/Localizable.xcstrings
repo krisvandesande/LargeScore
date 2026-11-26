@@ -106,6 +106,26 @@
         }
       }
     },
+    "%lld octaves higher": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld octaven hoger"
+          }
+        }
+      }
+    },
+    "%lld octaves lower": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld octaven lager"
+          }
+        }
+      }
+    },
     "%lld of %lld": {
       "localizations": {
         "en": {
@@ -520,7 +540,27 @@
         }
       }
     },
+    "An octave higher": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Een octaaf hoger"
+          }
+        }
+      }
+    },
     "An Octave Lower": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Een octaaf lager"
+          }
+        }
+      }
+    },
+    "An octave lower": {
       "localizations": {
         "nl": {
           "stringUnit": {
@@ -1512,6 +1552,16 @@
         }
       }
     },
+    "For Another Instrument": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voor een ander instrument"
+          }
+        }
+      }
+    },
     "For example the rehearsal or concert it's for.": {
       "localizations": {
         "nl": {
@@ -2092,6 +2142,16 @@
         }
       }
     },
+    "No octave added": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geen octaaf erbij"
+          }
+        }
+      }
+    },
     "No pieces yet": {
       "localizations": {
         "nl": {
@@ -2506,6 +2566,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Kwart"
+          }
+        }
+      }
+    },
+    "Read By": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gelezen door"
           }
         }
       }
@@ -3444,6 +3514,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Titel of componist"
+          }
+        }
+      }
+    },
+    "To Another Key": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Naar een andere toonaard"
           }
         }
       }
