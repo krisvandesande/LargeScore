@@ -913,3 +913,38 @@ extension MusicXMLEdit {
         return out
     }
 }
+
+extension MusicXMLEdit {
+    /// The field the Converter writes its own id for a piece into, so a new version
+    /// finds its piece on the iPad even when the title has changed on either side.
+    nonisolated static let libraryIDField = "large-score-id"
+
+    /// The id written by `settingLibraryID`, if the file has one.
+    nonisolated static func libraryID(in xml: String) -> String? {
+        let pattern = #"<miscellaneous-field name="large-score-id">([^<]+)</miscellaneous-field>"#
+        guard let regex = try? NSRegularExpression(pattern: pattern),
+              let match = regex.firstMatch(in: xml, range: NSRange(xml.startIndex..., in: xml)),
+              let range = Range(match.range(at: 1), in: xml) else { return nil }
+        let id = xml[range].trimmingCharacters(in: .whitespacesAndNewlines)
+        return id.isEmpty ? nil : id
+    }
+
+    /// The file with `id` as its Large Score id, replacing any id it had. Kept in
+    /// `identification`'s `miscellaneous`, its last element as MusicXML orders them.
+    nonisolated static func settingLibraryID(_ xml: String, id: String) -> String {
+        let field = "<miscellaneous-field name=\"\(libraryIDField)\">\(id)</miscellaneous-field>"
+        var out = xml
+        if let old = out.range(of: #"<miscellaneous-field name="large-score-id">[^<]*</miscellaneous-field>"#, options: .regularExpression) {
+            out.replaceSubrange(old, with: field)
+            return out
+        }
+        if let misc = out.range(of: #"<miscellaneous\b[^>]*>"#, options: .regularExpression) {
+            out.insert(contentsOf: "\n      " + field, at: misc.upperBound)
+        } else if let end = out.range(of: "</identification>") {
+            out.insert(contentsOf: "  <miscellaneous>\n      \(field)\n    </miscellaneous>\n  ", at: end.lowerBound)
+        } else if let next = out.range(of: #"<(defaults|credit|part-list)\b"#, options: .regularExpression) {
+            out.insert(contentsOf: "<identification>\n    <miscellaneous>\n      \(field)\n    </miscellaneous>\n  </identification>\n  ", at: next.lowerBound)
+        }
+        return out
+    }
+}

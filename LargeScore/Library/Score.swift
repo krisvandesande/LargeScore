@@ -145,6 +145,14 @@ final class Score {
     }
 
     /// Same piece if the title and composer match, ignoring case and spacing.
+    /// Whether this piece's music carries the Converter's id `id`. Searched in the
+    /// stored bytes, without parsing: only asked when sent music arrives.
+    func hasLibraryID(_ id: String) -> Bool {
+        guard let musicXML else { return false }
+        let field = "<miscellaneous-field name=\"\(MusicXMLEdit.libraryIDField)\">\(id)</miscellaneous-field>"
+        return musicXML.range(of: Data(field.utf8)) != nil
+    }
+
     func isSamePiece(as file: MusicFile) -> Bool {
         Self.key(title, composer) == Self.key(file.title, file.composer)
     }

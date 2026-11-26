@@ -126,9 +126,14 @@ final class MusicFolder {
         for file in files {
             // Replaced without asking only when exactly one piece has that title and
             // composer: two "Ave Maria"s or two untitled scores go to the sheet instead.
-            let matches = library.filter { $0.isSamePiece(as: file) }
+            // Music sent from the Converter carries the piece's id: that finds it even
+            // when its title was changed on the Mac or here. Otherwise title and composer.
+            let byID = MusicXMLEdit.libraryID(in: file.xml).map { id in library.filter { $0.hasLibraryID(id) } } ?? []
+            let matches = byID.count == 1 ? byID : library.filter { $0.isSamePiece(as: file) }
             if matches.count == 1, let existing = matches.first {
                 existing.replaceMusic(with: file, parts: [])
+                // Renamed on the Mac: the piece takes the name it was sent under.
+                if byID.count == 1, !file.title.isEmpty { existing.title = file.title }
                 updated.append(file.title)
             } else if matches.count > 1 {
                 unplaced.append(file)
