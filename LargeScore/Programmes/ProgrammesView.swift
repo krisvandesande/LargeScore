@@ -225,13 +225,21 @@ struct ProgrammePieces: View {
                         openAt = OpenAt(index: index, pieces: programme.scores.map(\.piece))
                     } label: {
                         HStack(alignment: .firstTextBaseline, spacing: 20) {
-                            Text("\(index + 1)")
-                                .font(.title2.weight(.semibold))
-                                .monospacedDigit()
-                                .foregroundStyle(.secondary)
-                                .frame(minWidth: 36, alignment: .trailing)
+                            // Shows that a row can be held and dragged to a new place;
+                            // VoiceOver has Move Up and Move Down instead.
+                            HStack(alignment: .firstTextBaseline, spacing: 12) {
+                                Image(systemName: "line.3.horizontal")
+                                    .font(.title2.weight(.medium))
+                                    .foregroundStyle(.secondary)
+                                    .accessibilityHidden(true)
+                                Text("\(index + 1)")
+                                    .font(.title2.weight(.semibold))
+                                    .monospacedDigit()
+                                    .foregroundStyle(.secondary)
+                                    .frame(minWidth: 28, alignment: .trailing)
+                            }
                             VStack(alignment: .leading, spacing: 4) {
-                                Text(entry.score?.title ?? "")
+                                Text(PartGrouping.parse(entry.score?.title ?? "").name)
                                     .font(.title2.weight(.semibold))
                                     .foregroundStyle(.primary)
                                 if let composer = entry.score?.composer, !composer.isEmpty {
