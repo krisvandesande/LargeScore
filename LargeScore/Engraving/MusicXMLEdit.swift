@@ -1061,6 +1061,18 @@ extension MusicXMLEdit {
         transpose(steps: steps, semitones: semitones, keyChange: to - firstKey)
     }
 
+    /// How many fifths a key moves when the music moves this many semitones.
+    nonisolated static func keyChange(semitones s: Int) -> Int {
+        var change = ((s * 7) % 12 + 12) % 12
+        if change > 6 { change -= 12 }
+        return change
+    }
+
+    /// Up when the nearer way from one key to the other is up.
+    nonisolated static func nearerIsUp(from: Int, to: Int) -> Bool {
+        interval(from: from, to: to, up: true).semitones <= 6
+    }
+
     /// Moves all the music for another instrument: the interval between them, the key
     /// with it, and the clef between bass and treble where the two read different
     /// clefs (the notes keep their pitch in the new clef).
@@ -1071,9 +1083,7 @@ extension MusicXMLEdit {
             let numbers = [1, 2, 2, 3, 3, 4, 4, 5, 6, 6, 7, 7]
             let steps = (numbers[size % 12] - 1 + 7 * (size / 12)) * (s < 0 ? -1 : 1)
             // The key moves by the interval's fifths: up a second is two sharps more.
-            var change = ((s * 7) % 12 + 12) % 12
-            if change > 6 { change -= 12 }
-            transpose(steps: steps, semitones: s, keyChange: change)
+            transpose(steps: steps, semitones: s, keyChange: Self.keyChange(semitones: s))
         }
         xml = transposition.clefs(in: xml)
     }

@@ -149,11 +149,8 @@ struct PieceView: View {
             queue.saveFixes(model.xml, for: job)
         }
         .sheet(isPresented: $transposing) {
-            TransposeSheet(from: model.edit.firstKey, bassClef: model.edit.clef(atBar: firstBarID) == .bass) { key, up in
-                model.transpose(toKey: key, up: up)
-                transposing = false
-            } forInstrument: { transposition in
-                model.transpose(for: transposition)
+            TransposeSheet(from: model.edit.firstKey, bassClef: model.edit.clef(atBar: firstBarID) == .bass) { nowKey, transposition, toKey in
+                model.transpose(nowKey: nowKey, transposition: transposition, toKey: toKey)
                 transposing = false
             } cancel: {
                 transposing = false
@@ -229,89 +226,103 @@ struct PDFPane: NSViewRepresentable {
     }
 }
 
-/// Moves all the music: to another key, up or down; or for another instrument,
-/// such as a part in C in the bass clef rewritten for B♭ in the treble clef.
+/// Moves all the music: from the key and instrument it's in now (either can be put
+/// right first) to another instrument and key. The new key follows the instruments
+/// until it is chosen by hand.
 struct TransposeSheet: View {
     let from: Int
     var bassClef = false
-    let done: (Int, Bool) -> Void
-    var forInstrument: (Transposition) -> Void = { _ in }
+    let done: (_ nowKey: Int, _ transposition: Transposition, _ toKey: Int) -> Void
     let cancel: () -> Void
-    @State private var key: Int
-    @State private var up = true
-    @State private var mode = Mode.key
+    @State private var nowKey: Int
     @State private var writtenFor: WrittenFor
-    @State private var readBy: WrittenFor = .bFlat
+    @State private var readBy: WrittenFor
     @State private var octaves = 0
+    @State private var chosenKey: Int?
 
-    enum Mode { case key, instrument }
-
-    init(from: Int, bassClef: Bool = false, startWithInstrument: Bool = false, done: @escaping (Int, Bool) -> Void,
-         forInstrument: @escaping (Transposition) -> Void = { _ in }, cancel: @escaping () -> Void) {
-        _mode = State(initialValue: startWithInstrument ? .instrument : .key)
+    init(from: Int, bassClef: Bool = false, readBy: WrittenFor? = nil,
+         done: @escaping (_ nowKey: Int, _ transposition: Transposition, _ toKey: Int) -> Void, cancel: @escaping () -> Void) {
         self.from = from
         self.bassClef = bassClef
         self.done = done
-        self.forInstrument = forInstrument
         self.cancel = cancel
-        _key = State(initialValue: from)
-        _writtenFor = State(initialValue: bassClef ? .cBass : .bFlat)
+        let written: WrittenFor = bassClef ? .cBass : .bFlat
+        _nowKey = State(initialValue: from)
+        _writtenFor = State(initialValue: written)
+        _readBy = State(initialValue: readBy ?? written)
     }
 
     private var transposition: Transposition { Transposition(from: writtenFor, to: readBy, octaves: octaves) }
 
+    /// Where the instruments take the key; the new key unless one is chosen.
+    private var keyForInstrument: Int {
+        let key = nowKey + MusicXMLEdit.keyChange(semitones: transposition.semitones)
+        return key > 7 ? key - 12 : key < -7 ? key + 12 : key
+    }
+
+    private var toKey: Int { chosenKey ?? keyForInstrument }
+
+    /// The whole move in semitones: the instruments', then on to the chosen key.
+    private var totalSemitones: Int {
+        let extra = toKey == keyForInstrument ? 0 : {
+            let up = MusicXMLEdit.nearerIsUp(from: keyForInstrument, to: toKey)
+            return MusicXMLEdit.interval(from: keyForInstrument, to: toKey, up: up).semitones
+        }()
+        return transposition.semitones + extra
+    }
+
+    private var changesNothing: Bool { nowKey == from && totalSemitones == 0 && !transposition.changesClef }
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 18) {
             Text("Transpose").font(.title3.weight(.semibold))
-            Picker("Transpose", selection: $mode) {
-                Text("To Another Key").tag(Mode.key)
-                Text("For Another Instrument").tag(Mode.instrument)
-            }
-            .pickerStyle(.segmented)
-            .labelsHidden()
-            // A Form lines the names up on the Mac, colons and all.
+            // A Form lines the names up on the Mac.
             Form {
-            if mode == .key {
-                Text("Now: \(KeyName.name(from))").foregroundColor(.secondary)
-                Picker("New Key", selection: $key) {
-                    ForEach(MusicXMLEdit.keys.reversed(), id: \.self) { fifths in
-                        Text(KeyName.name(fifths)).tag(fifths)
+                Section {
+                    keyPicker("Key", selection: $nowKey)
+                    instrumentPicker("Instrument", selection: $writtenFor)
+                } header: {
+                    Text("Now").font(.headline)
+                }
+                Section {
+                    instrumentPicker("Instrument", selection: $readBy)
+                    keyPicker("Key", selection: Binding(get: { toKey }, set: { chosenKey = $0 }))
+                    Stepper(value: $octaves, in: -2...2) {
+                        Text(octaveText)
                     }
+                    .accessibilityLabel(Text("Octave"))
+                    .accessibilityValue(Text(octaveText))
+                } header: {
+                    Text("To").font(.headline).padding(.top, 8)
                 }
-                Picker("Direction", selection: $up) {
-                    Text("Up").tag(true)
-                    Text("Down").tag(false)
-                }
-                .pickerStyle(.radioGroup)
-                .horizontalRadioGroupLayout()
-            } else {
-                Picker("Written For", selection: $writtenFor) {
-                    ForEach(WrittenFor.allCases) { Text($0.name).tag($0) }
-                }
-                Picker("Read By", selection: $readBy) {
-                    ForEach(WrittenFor.allCases) { Text($0.name).tag($0) }
-                }
-                Stepper(value: $octaves, in: -2...2) {
-                    Text(octaveText)
-                }
-                .accessibilityLabel(Text("Octave"))
-                .accessibilityValue(Text(octaveText))
-                Text(resultText).foregroundColor(.secondary)
             }
-            }
+            Text(resultText)
+                .font(.body.weight(.semibold))
             HStack {
                 Spacer()
                 Button("Cancel", action: cancel).keyboardShortcut(.cancelAction)
-                Button("Transpose") {
-                    if mode == .key { done(key, up) } else { forInstrument(transposition) }
-                }
-                .keyboardShortcut(.defaultAction)
-                .disabled(mode == .key ? key == from : transposition.isNothing)
+                Button("Transpose") { done(nowKey, transposition, toKey) }
+                    .keyboardShortcut(.defaultAction)
+                    .disabled(changesNothing)
             }
             .controlSize(.large)
         }
         .padding(24)
-        .frame(width: 520)
+        .frame(width: 560)
+    }
+
+    private func keyPicker(_ title: LocalizedStringKey, selection: Binding<Int>) -> some View {
+        Picker(title, selection: selection) {
+            ForEach(MusicXMLEdit.keys.reversed(), id: \.self) { fifths in
+                Text(KeyName.name(fifths)).tag(fifths)
+            }
+        }
+    }
+
+    private func instrumentPicker(_ title: LocalizedStringKey, selection: Binding<WrittenFor>) -> some View {
+        Picker(title, selection: selection) {
+            ForEach(WrittenFor.allCases) { Text($0.name).tag($0) }
+        }
     }
 
     private var octaveText: String {
@@ -326,10 +337,12 @@ struct TransposeSheet: View {
 
     /// "Up a ninth, treble clef": what will happen, in words.
     private var resultText: String {
-        var text = transposition.description
+        var parts: [String] = []
+        if nowKey != from { parts.append(String(localized: "Key set to \(KeyName.signature(nowKey))")) }
+        if totalSemitones != 0 { parts.append(Transposition.words(totalSemitones)) }
         if transposition.changesClef {
-            text += ", " + (readBy.bassClef ? String(localized: "bass clef") : String(localized: "treble clef"))
+            parts.append(readBy.bassClef ? String(localized: "bass clef") : String(localized: "treble clef"))
         }
-        return text
+        return parts.isEmpty ? String(localized: "As written") : parts.joined(separator: ", ")
     }
 }

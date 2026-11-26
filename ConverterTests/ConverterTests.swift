@@ -172,9 +172,8 @@ nonisolated final class ConverterTests: XCTestCase, @unchecked Sendable {
         let window = host(view, size: CGSize(width: 1300, height: 860))
         try await Task.sleep(nanoseconds: 3_000_000_000)
         save(window, name: "window-piece")
-        picture(TransposeSheet(from: 0, done: { _, _ in }, cancel: {}), size: CGSize(width: 520, height: 300), name: "transpose-sheet")
-        picture(TransposeSheet(from: 0, bassClef: true, startWithInstrument: true, done: { _, _ in }, cancel: {}),
-                size: CGSize(width: 520, height: 360), name: "transpose-instrument")
+        picture(TransposeSheet(from: -2, bassClef: true, readBy: .bFlat, done: { _, _, _ in }, cancel: {}),
+                size: CGSize(width: 560, height: 420), name: "transpose-sheet")
         let noKey = FixModel(xml: KeyTests.bar.replacingOccurrences(of: "<key><fifths>0</fifths></key>", with: ""))
         picture(FixPanel(model: noKey).frame(width: 300, height: 260), size: CGSize(width: 300, height: 260), name: "no-key")
     }

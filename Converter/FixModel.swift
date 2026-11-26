@@ -121,6 +121,20 @@ final class FixModel: ObservableObject {
         perform(problem: String(localized: "The clef couldn't be set here.")) { try $0.setClef(clef, fromBar: id) }
     }
 
+    /// Transpose as one change (one Undo): the key it's in set first if it was read
+    /// wrongly, then moved for the other instrument, then on to the chosen key.
+    func transpose(nowKey: Int, transposition: Transposition, toKey: Int) {
+        let first = edit.xml.firstMatch(#"<measure\b[^>]*\bid="([^"]+)""#)
+        perform(problem: String(localized: "The music couldn't be transposed.")) { edit in
+            if nowKey != edit.firstKey, let first { try edit.setKey(nowKey, fromBar: first) }
+            if !transposition.isNothing { edit.transpose(for: transposition) }
+            let reached = edit.firstKey
+            if toKey != reached {
+                edit.transpose(toKey: toKey, up: MusicXMLEdit.nearerIsUp(from: reached, to: toKey))
+            }
+        }
+    }
+
     /// Rewrites the part for another instrument: interval, key and clef.
     func transpose(for transposition: Transposition) {
         perform(problem: String(localized: "The music couldn't be transposed.")) { $0.transpose(for: transposition) }

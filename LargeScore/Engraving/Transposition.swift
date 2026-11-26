@@ -71,8 +71,10 @@ nonisolated struct Transposition: Hashable, Sendable {
     }
 
     /// In words: "Up a fourth", "Down a second", "Up a ninth".
-    var description: String {
-        let s = semitones
+    var description: String { Self.words(semitones) }
+
+    /// An interval of this many semitones in words: "Up a fourth", "Down a second".
+    static func words(_ s: Int) -> String {
         guard s != 0 else { return String(localized: "As written") }
         let size = abs(s)
         let number = Self.simple[size % 12].number + 7 * (size / 12)

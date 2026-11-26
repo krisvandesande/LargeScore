@@ -1682,6 +1682,16 @@
         }
       }
     },
+    "Instrument": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Instrument"
+          }
+        }
+      }
+    },
     "Instruments": {
       "localizations": {
         "nl": {
@@ -1712,12 +1722,32 @@
         }
       }
     },
+    "Key": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toonaard"
+          }
+        }
+      }
+    },
     "Key Reminders": {
       "localizations": {
         "nl": {
           "stringUnit": {
             "state": "translated",
             "value": "Voortekenherinneringen"
+          }
+        }
+      }
+    },
+    "Key set to %@": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toonaard ingesteld op %@"
           }
         }
       }
@@ -2248,6 +2278,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Niets gevonden"
+          }
+        }
+      }
+    },
+    "Now": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nu"
           }
         }
       }
@@ -3514,6 +3554,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Titel of componist"
+          }
+        }
+      }
+    },
+    "To": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Naar"
           }
         }
       }

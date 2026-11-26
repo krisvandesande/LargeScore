@@ -119,4 +119,16 @@ nonisolated final class KeyTests: XCTestCase {
         XCTAssertEqual(pitch(edit.xml, "n4"), "F1/4")    // E3 up a ninth: F sharp, the key's
         XCTAssertEqual(pitch(edit.xml, "n7"), "G1/4")    // F sharp 3: G sharp 4
     }
+
+    /// One Transpose: the key put right, the part rewritten for B flat, then on to
+    /// a key chosen by hand, the nearer way.
+    @MainActor func testTransposeFromCorrectedKeyToChosenKey() {
+        let model = FixModel(xml: Self.bar)
+        model.transpose(nowKey: -2, transposition: Transposition(from: .cBass, to: .bFlat), toKey: 0)
+        XCTAssertEqual(model.edit.firstKey, 0)               // B flat major → C major for B flat, then to C
+        XCTAssertEqual(model.edit.clef(atBar: "m1"), .treble)
+        model.undo()
+        XCTAssertEqual(model.edit.firstKey, 0)
+        XCTAssertEqual(model.edit.clef(atBar: "m1"), .bass)  // one Undo takes it all back
+    }
 }
