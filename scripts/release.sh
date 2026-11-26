@@ -10,6 +10,7 @@
 #   scripts/release.sh --note "…"                 # iOS
 #   scripts/release.sh --note "…" --mac           # macOS as well
 #   scripts/release.sh --note "…" --no-submit     # add the groups, don't submit for review
+#   scripts/release.sh --note "…" --internal-only # internal testers only: no review, no groups
 #
 # --note is what testers read under What to Test. It is required, and it is text
 # other people read: agree the wording before running this.
@@ -51,6 +52,7 @@ while [ $# -gt 0 ]; do
   case "$1" in
     --mac) BUILD_MAC=yes ;;
     --no-submit) SUBMIT_FLAG="--no-submit" ;;
+    --internal-only) SUBMIT_FLAG="--internal-only" ;;
     --note) NOTE="${2:-}"; shift ;;
     *) echo "unknown option: $1" >&2; exit 1 ;;
   esac

@@ -8,6 +8,9 @@
             Button: Color Mode, Match iPad
             Text: Match iPad
             Text: Color Mode
+            Button: Page Turns, Scroll
+            Text: Scroll
+            Text: Page Turns
             Switch: Half-Page Turns = 0
             Text: Half-Page Turns
             Switch:  = 0
@@ -25,7 +28,12 @@
             Button: Instruments, Bassoon
             Text: Instruments
             Text: Instruments, Bassoon
-            Button: Language
+            Button: My Part, Part 1
+            Text: Part 1
+            Text: My Part
+            Button: Language, English = English
+            Text: Language
+            Text: English
             Text: Music Folder, None
             Text: Music Folder
             Button: Choose Folder

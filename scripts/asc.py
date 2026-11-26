@@ -214,7 +214,7 @@ def set_what_to_test(build_id, note, bearer, locale="en-US"):
     print("  What to Test set")
 
 
-def distribute(bundle_id, build_version, submit, note, platform="IOS"):
+def distribute(bundle_id, build_version, submit, note, platform="IOS", internal_only=False):
     bearer = token()
 
     app_id = find_app(bundle_id, bearer)
@@ -245,6 +245,11 @@ def distribute(bundle_id, build_version, submit, note, platform="IOS"):
             print("Submitted for Beta App Review.")
         except SystemExit:
             print("Not submitted for Beta App Review (see the reason above); submit it later.")
+
+    if internal_only:
+        # Internal testers get every build by themselves; nothing goes to the external groups.
+        print("Internal testers only: not submitted, no external groups.")
+        return
 
     groups = external_groups(app_id, bearer)
     if not groups:
@@ -284,6 +289,11 @@ if __name__ == "__main__":
         help="Add the tester groups but don't submit for beta review.",
     )
     parser.add_argument(
+        "--internal-only",
+        action="store_true",
+        help="Set What to Test only: no review, no external groups (internal testers get it anyway).",
+    )
+    parser.add_argument(
         "--note",
         required=True,
         help="What to Test, as testers will read it. Plain words, plain text.",
@@ -296,4 +306,5 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    distribute(args.bundle_id, args.build, submit=not args.no_submit, note=args.note, platform=args.platform)
+    distribute(args.bundle_id, args.build, submit=not (args.no_submit or args.internal_only), note=args.note,
+               platform=args.platform, internal_only=args.internal_only)

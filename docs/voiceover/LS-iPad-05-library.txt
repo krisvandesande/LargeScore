@@ -3,30 +3,24 @@
             Button: More [TopOverflowBarButtonItem]
             Button: Search
             Text: Library
+            Text: C
             Button: converted-by-audiveris, Check against the PDF
             Text: converted-by-audiveris
             Text: Check against the PDF
-            Text: Voice
-            Text: 16 bars
-            Text: Added 25 November
+            Text: E
             Button: Evening Air for Four, Test piece
             Text: Evening Air for Four
             Text: Test piece
-            Text: Fagot
-            Text: 16 bars
-            Text: Added 25 November
             Button: Evening Air for Four, Test piece
             Text: Evening Air for Four
             Text: Test piece
-            Text: Fagot
-            Text: 16 bars
-            Text: Added 25 November
+            Text: L
             Button: Long Evening Air, Test piece
             Text: Long Evening Air
             Text: Test piece
-            Text: Bassoon
-            Text: 160 bars
-            Text: Added 25 November
+            Button: Jump to C
+            Button: Jump to E
+            Button: Jump to L
             Button: Programmes [list.number]
             Button: Programmes [list.number]
             Button: Library [books.vertical]
