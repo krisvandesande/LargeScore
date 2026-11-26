@@ -19,3 +19,6 @@ scripts/asc.env
 ## The ensemble's own parts, for testing only (not ours to publish)
 Demo Scores/
 vendor/
+
+# The fetched Verovio, also when it is a link (a worktree points at the main checkout).
+Packages/VerovioKit/verovio
