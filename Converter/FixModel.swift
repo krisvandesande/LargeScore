@@ -74,6 +74,22 @@ final class FixModel: ObservableObject {
         perform(problem: String(localized: "This bar can't be changed that way.")) { try $0.setTime(beats: beats, beatType: beatType, bar: bar) }
     }
 
+    /// The key at the selected bar, or at the start when no bar is selected.
+    var currentKey: Int { selectedBar.map { edit.key(atBar: $0) } ?? edit.firstKey }
+
+    /// Sets the key from the selected bar on (from the start when none is selected),
+    /// spelling the notes by it: for music Audiveris read with the wrong key or none.
+    func setKey(_ fifths: Int, fromStart: Bool = false) {
+        let bar = fromStart ? nil : selectedBar
+        guard let id = bar ?? edit.xml.firstMatch(#"<measure\b[^>]*\bid="([^"]+)""#) else { return }
+        perform(problem: String(localized: "The key couldn't be set here.")) { try $0.setKey(fifths, fromBar: id) }
+    }
+
+    /// Moves all the music to another key.
+    func transpose(toKey fifths: Int, up: Bool) {
+        perform(problem: String(localized: "The music couldn't be transposed.")) { $0.transpose(toKey: fifths, up: up) }
+    }
+
     var selectedBarIsRest: Bool {
         guard let bar = selectedBar, let range = edit.elementRange("measure", id: bar) else { return false }
         let xml = String(edit.xml[range])

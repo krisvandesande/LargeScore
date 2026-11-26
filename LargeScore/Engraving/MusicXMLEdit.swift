@@ -948,3 +948,159 @@ extension MusicXMLEdit {
         return out
     }
 }
+
+// MARK: - Keys and transposing
+
+extension MusicXMLEdit {
+    /// Key signatures from seven flats to seven sharps, as `fifths`.
+    nonisolated static let keys = Array(-7...7)
+
+    /// The key written at the start of the music (sharps positive, flats negative).
+    var firstKey: Int { xml.firstMatch(#"<fifths>\s*(-?\d+)\s*</fifths>"#).flatMap(Int.init) ?? 0 }
+
+    /// The key in force at the start of this bar.
+    func key(atBar id: String) -> Int {
+        guard let range = elementRange("measure", id: id) else { return firstKey }
+        let firstNote = xml.range(of: #"<note[\s>]"#, options: .regularExpression, range: range)?.lowerBound ?? range.upperBound
+        return Context(xml: xml, upTo: firstNote).fifths
+    }
+
+    /// Sets the key signature from this bar on, up to the next bar that changes to a
+    /// different key, and spells the notes again by it: a note with no accidental of
+    /// its own takes the key's sharp or flat (or the one printed earlier in its bar),
+    /// so music read with the wrong key sounds right once the key is.
+    mutating func setKey(_ fifths: Int, fromBar id: String) throws {
+        guard Self.keys.contains(fifths), let start = elementRange("measure", id: id) else { throw Failure.notFound }
+        let old = key(atBar: id)
+        let partEnd = xml.range(of: "</part>", range: start.lowerBound..<xml.endIndex)?.lowerBound ?? xml.endIndex
+        let tail = String(xml[start.lowerBound..<partEnd])
+        var out = ""
+        var cursor = tail.startIndex
+        var first = true
+        var stopped = false
+        let keyElement = "<key><fifths>\(fifths)</fifths></key>"
+        while !stopped, let open = tail.range(of: "<measure", range: cursor..<tail.endIndex),
+              let close = tail.range(of: "</measure>", range: open.upperBound..<tail.endIndex) {
+            out += tail[cursor..<open.lowerBound]
+            var bar = String(tail[open.lowerBound..<close.upperBound])
+            let written = bar.firstMatch(#"<fifths>\s*(-?\d+)\s*</fifths>"#).flatMap(Int.init)
+            if !first, let written, written != old {
+                // A real change of key further on: it and what follows stay.
+                stopped = true
+                cursor = open.lowerBound
+                break
+            }
+            if written != nil {
+                bar = bar.replacingFirst(#"<fifths>\s*-?\d+\s*</fifths>"#, with: "<fifths>\(fifths)</fifths>")
+            } else if first {
+                bar = Self.addAttribute(keyElement, before: ["<time", "<staves", "<part-symbol", "<instruments", "<clef", "<staff-details", "<transpose", "<directive", "<measure-style"], to: bar)
+            }
+            bar = Self.spelled(bar, fifths: fifths)
+            out += bar
+            first = false
+            cursor = close.upperBound
+        }
+        out += tail[cursor..<tail.endIndex]
+        xml.replaceSubrange(start.lowerBound..<partEnd, with: out)
+    }
+
+    /// Each note without a printed accidental takes its alteration from the key, or
+    /// from an accidental printed earlier in the bar on the same line or space. A note
+    /// tied from the bar before keeps its own.
+    private static func spelled(_ bar: String, fifths: Int) -> String {
+        // In reading order: an accidental carries to the notes after it, not before.
+        var carried: [String: Int] = [:]
+        var out = ""
+        var cursor = bar.startIndex
+        while let open = bar.range(of: #"<note[\s>]"#, options: .regularExpression, range: cursor..<bar.endIndex),
+              let close = bar.range(of: "</note>", range: open.upperBound..<bar.endIndex) {
+            out += bar[cursor..<open.lowerBound]
+            var note = String(bar[open.lowerBound..<close.upperBound])
+            cursor = close.upperBound
+            if var pitch = Pitch(note) {
+                let place = "\(pitch.step)\(pitch.octave)"
+                if note.contains("<accidental") {
+                    carried[place] = pitch.alter
+                } else if !note.contains(#"<tie type="stop""#) {
+                    pitch.alter = carried[place] ?? Pitch.keyAlter(pitch.step, fifths: fifths)
+                    note = note.replacingFirst(#"<pitch>[\s\S]*?</pitch>"#, with: pitch.xml)
+                }
+            }
+            out += note
+        }
+        out += bar[cursor..<bar.endIndex]
+        return out
+    }
+
+    /// The interval from one key to another, up or down: scale steps and semitones.
+    /// From C to D up is a second (1 step, 2 semitones); down, a seventh lower.
+    nonisolated static func interval(from: Int, to: Int, up: Bool) -> (steps: Int, semitones: Int) {
+        let change = to - from
+        var semitones = ((change * 7) % 12 + 12) % 12
+        var steps = ((change * 4) % 7 + 7) % 7
+        if !up, semitones != 0 || steps != 0 {
+            semitones -= 12
+            steps -= 7
+        }
+        return (steps, semitones)
+    }
+
+    /// Moves all the music to the key `to`, up or down: every note, every key
+    /// signature and every chord name, with printed accidentals spelled for the new
+    /// notes. A key change further on moves by the same interval.
+    mutating func transpose(toKey to: Int, up: Bool) {
+        let from = firstKey
+        let (steps, semitones) = Self.interval(from: from, to: to, up: up)
+        guard steps != 0 || semitones != 0 else { return }
+        let change = to - from
+        var out = xml.replacingMatches(of: #"(<note\b[\s\S]*?</note>)"#) { note in
+            guard let pitch = Pitch(note) else { return note }
+            let moved = pitch.transposed(steps: steps, semitones: semitones)
+            var result = note.replacingFirst(#"<pitch>[\s\S]*?</pitch>"#, with: moved.xml)
+            if let name = Self.accidentalNames[moved.alter],
+               let open = result.range(of: #"<accidental\b[^>]*>"#, options: .regularExpression),
+               let close = result.range(of: "</accidental>", range: open.upperBound..<result.endIndex) {
+                result.replaceSubrange(open.upperBound..<close.lowerBound, with: name)
+            }
+            return result
+        }
+        out = out.replacingMatches(of: #"(<fifths>\s*-?\d+\s*</fifths>)"#) { element in
+            let value = element.firstMatch(#"(-?\d+)"#).flatMap(Int.init) ?? 0
+            return "<fifths>\(value + change)</fifths>"
+        }
+        // Chord names: the root and the bass.
+        for part in ["root", "bass"] {
+            out = out.replacingMatches(of: "(<\(part)>[\\s\\S]*?</\(part)>)") { element in
+                guard let step = element.firstMatch("<\(part)-step>\\s*([A-G])\\s*</\(part)-step>")?.first else { return element }
+                let alter = element.firstMatch("<\(part)-alter>\\s*(-?\\d+(?:\\.\\d+)?)\\s*</\(part)-alter>").flatMap(Double.init).map { Int($0.rounded()) } ?? 0
+                let moved = Pitch(step: step, alter: alter, octave: 4).transposed(steps: steps, semitones: semitones)
+                let alterXML = moved.alter != 0 ? "<\(part)-alter>\(moved.alter)</\(part)-alter>" : ""
+                // Anything else in it (text shown for the chord) stays.
+                let rest = element
+                    .replacingFirst("<\(part)-step\\b[^>]*>[\\s\\S]*?</\(part)-step>", with: "")
+                    .replacingFirst("<\(part)-alter\\b[^>]*>[\\s\\S]*?</\(part)-alter>", with: "")
+                    .replacingFirst("^<\(part)>", with: "")
+                    .replacingFirst("</\(part)>$", with: "")
+                return "<\(part)><\(part)-step>\(moved.step)</\(part)-step>\(alterXML)\(rest)</\(part)>"
+            }
+        }
+        xml = out
+    }
+
+    private static let accidentalNames: [Int: String] = [-2: "flat-flat", -1: "flat", 0: "natural", 1: "sharp", 2: "double-sharp"]
+}
+
+extension Pitch {
+    /// Moved by `steps` letter names and `semitones` together: a transposition that
+    /// keeps each note spelled as the new key spells it.
+    func transposed(steps: Int, semitones: Int) -> Pitch {
+        let classes = [0, 2, 4, 5, 7, 9, 11]
+        let index = Pitch.steps.firstIndex(of: step)!
+        let sounding = octave * 12 + classes[index] + alter + semitones
+        let line = octave * 7 + index + steps
+        let newOctave = Int((Double(line) / 7).rounded(.down))
+        let newIndex = ((line % 7) + 7) % 7
+        let newAlter = sounding - (newOctave * 12 + classes[newIndex])
+        return Pitch(step: Pitch.steps[newIndex], alter: newAlter, octave: newOctave)
+    }
+}

@@ -123,6 +123,23 @@ struct FixPanel: View {
                     Text("Time Signature")
                 }
                 .fixedSize()
+                Menu {
+                    ForEach(MusicXMLEdit.keys.reversed(), id: \.self) { fifths in
+                        Button {
+                            model.setKey(fifths)
+                        } label: {
+                            if fifths == model.currentKey {
+                                Label(KeyName.name(fifths), systemImage: "checkmark")
+                            } else {
+                                Text(KeyName.name(fifths))
+                            }
+                        }
+                    }
+                } label: {
+                    Text("Key Signature")
+                }
+                .fixedSize()
+                .help("Set the key from this bar on. Notes without their own sharp or flat follow it.")
             }
             if model.selectedNote == nil || model.selectedBarIsRest {
                 row {
