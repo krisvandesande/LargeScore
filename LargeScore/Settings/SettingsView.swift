@@ -58,11 +58,27 @@ struct SettingsView: View {
                     FittingPicker(String(localized: "My Part"), value: String(localized: "Part \(settings.myPart)"), selection: $settings.myPart) {
                         ForEach(1...4, id: \.self) { Text("Part \($0)").tag($0) }
                     }
-                    Button("Language") {
+                    // A row like the others: it goes to Large Score's page in the
+                    // Settings app, where the language is chosen.
+                    Button {
                         if let url = URL(string: UIApplication.openSettingsURLString) {
                             UIApplication.shared.open(url)
                         }
+                    } label: {
+                        HStack {
+                            Text("Language")
+                            Spacer(minLength: 16)
+                            Text(Self.languageName).foregroundStyle(.secondary)
+                            // Placed where the system draws the chevrons of the rows above
+                            // (measured on the iPad: 2 pt further from the value, 1.5 pt in).
+                            ForwardChevron()
+                                .padding(.leading, 2)
+                                .padding(.trailing, 1.5)
+                        }
+                        .foregroundStyle(Color(uiColor: .label))
+                        .contentShape(Rectangle())
                     }
+                    .accessibilityValue(Text(Self.languageName))
                     .accessibilityHint("Opens Large Score in the Settings app, where the language is chosen.")
                 }
                 Section {
@@ -156,5 +172,14 @@ struct AboutView: View {
         }
         .font(.title3)
         .navigationTitle("About")
+    }
+}
+
+extension SettingsView {
+    /// The language the app shows itself in, named in that language ("English", "Nederlands").
+    static var languageName: String {
+        let code = Bundle.main.preferredLocalizations.first ?? "en"
+        let locale = Locale(identifier: code)
+        return locale.localizedString(forLanguageCode: code)?.localizedCapitalized ?? code
     }
 }

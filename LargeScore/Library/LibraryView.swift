@@ -250,7 +250,8 @@ private struct LibraryGrid: View {
                         if !section.key.isEmpty {
                             Text(verbatim: section.key)
                                 .font(.title2.weight(.bold))
-                                .foregroundStyle(.primary)
+                                // A list header dims its text; the letters are read, not decoration.
+                                .foregroundStyle(Color(uiColor: .label))
                                 .accessibilityAddTraits(.isHeader)
                         }
                     }
