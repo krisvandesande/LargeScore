@@ -44,6 +44,11 @@ struct ReaderView: View {
     /// The page after the last: says the piece has ended and, in a programme, which
     /// piece comes next, before the next turn opens it.
     @State private var showingEnd = false
+    /// Which piece the end page is for: it stays up, saying what comes next, while
+    /// that piece is laid out, and the first page then scrolls in like any page.
+    @State private var endedIndex = 0
+    /// Set from the end page's turn until the next piece's first page is ready.
+    @State private var advancing = false
     @State private var laidOutPieceID: String?
 
     private var piece: Piece { pieces[min(place.index, pieces.count - 1)] }
@@ -75,7 +80,7 @@ struct ReaderView: View {
                 // Each page its own view, so a turn can slide the next one in.
                 ZStack {
                     page(area: area, scheme: scheme)
-                        .id(PageKey(piece: showingEnd ? piece.id : laidOutPieceID, page: turner.page, halfway: turner.halfway, end: showingEnd))
+                        .id(PageKey(piece: showingEnd ? pieces[safe: endedIndex]?.id : laidOutPieceID, page: turner.page, halfway: turner.halfway, end: showingEnd))
                         .transition(.asymmetric(insertion: .move(edge: turnedForward ? .bottom : .top),
                                                 removal: .move(edge: turnedForward ? .top : .bottom)))
                 }
@@ -152,7 +157,8 @@ struct ReaderView: View {
     private func page(area: CGSize, scheme: ColorScheme) -> some View {
         let ink = settings.pageInk(system: systemScheme, piece: piece.id)
         if showingEnd {
-            EndOfPiece(title: PartGrouping.parse(piece.title).name, next: nextPiece, inProgramme: pieces.count > 1)
+            EndOfPiece(title: PartGrouping.parse((pieces[safe: endedIndex] ?? piece).title).name,
+                       next: pieces[safe: endedIndex + 1], inProgramme: pieces.count > 1)
                 .frame(width: area.width, height: area.height)
         } else if let laidOut, laidOut.pages.indices.contains(turner.page) {
             let current = laidOut.pages[turner.page]
@@ -300,11 +306,16 @@ struct ReaderView: View {
         let scroll = settings.bool(.scrollTurns, for: piece.id) && !reduceMotion
         let animation: Animation? = scroll ? .easeInOut(duration: 0.8) : nil
         if showingEnd {
+            // The next piece is on its way: a second press must not skip it.
+            guard !advancing else { return }
             turnedForward = forward
             if forward {
                 // Past the end of the last piece there is nothing more.
-                guard place.hasNext else { return }
-                goToNextPiece()
+                guard place.next() else { return }
+                // The end page stays until the first page is ready, then scrolls away.
+                advancing = true
+                startAtEnd = false
+                showPiece()
             } else {
                 withAnimation(animation) { showingEnd = false }
             }
@@ -320,12 +331,14 @@ struct ReaderView: View {
         }
         if forward {
             if !turned {
+                endedIndex = place.index
                 withAnimation(animation) { showingEnd = true }
                 UIAccessibility.post(notification: .announcement, argument: endAnnouncement)
             }
         } else if !turned, place.previous() {
             // Back from a first page: the end of the piece before, then its last page.
             startAtEnd = true
+            endedIndex = place.index
             showPiece(announce: false)
             withAnimation(animation) { showingEnd = true }
             UIAccessibility.post(notification: .announcement, argument: endAnnouncement)
@@ -348,6 +361,7 @@ struct ReaderView: View {
         guard place.next() else { return }
         startAtEnd = false
         showingEnd = false
+        advancing = false
         showPiece()
     }
 
@@ -383,8 +397,22 @@ struct ReaderView: View {
             } else {
                 page = startAtEnd ? result.pages.count - 1 : 0
             }
-            laidOut = result
-            laidOutPieceID = shown.id
+            let turnerNow = PageTurner(pageCount: result.pages.count, halfPageTurns: settings.bool(.halfPageTurns, for: shown.id) && !result.request.oneLine, page: page)
+            if advancing {
+                // From the end page: the first page scrolls in, as a turn does.
+                let scroll = settings.bool(.scrollTurns, for: shown.id) && !reduceMotion
+                withAnimation(scroll ? .easeInOut(duration: 0.8) : nil) {
+                    laidOut = result
+                    laidOutPieceID = shown.id
+                    turner = turnerNow
+                    showingEnd = false
+                }
+                advancing = false
+                showFirstBar()
+            } else {
+                laidOut = result
+                laidOutPieceID = shown.id
+            }
             loader.readerArea = area
             if place.hasNext {
                 // The rest of the programme laid out ahead, the next piece first, so
@@ -396,13 +424,17 @@ struct ReaderView: View {
                     await loader.layOutAhead(rest) { settings.layoutRequest(for: area, centred: true, piece: $0.id) }
                 }
             }
-            turner = PageTurner(pageCount: result.pages.count, halfPageTurns: settings.bool(.halfPageTurns, for: shown.id) && !result.request.oneLine, page: page)
+            turner = turnerNow
             failed = false
         } catch is CancellationError {
             return
         } catch {
             guard !Task.isCancelled else { return }
             failed = true
+            if advancing {
+                advancing = false
+                showingEnd = false
+            }
         }
     }
 }
@@ -674,6 +706,8 @@ struct ReaderStrip: View {
                 .font(.title3.weight(.semibold))
                 .monospacedDigit()
                 .fixedSize()
+                // Changes at once: a fade during a scroll showed "End" and "Page 1" together.
+                .transaction { $0.animation = nil }
                 .accessibilityHidden(true)
         }
     }
