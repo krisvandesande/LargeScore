@@ -225,8 +225,10 @@ private struct LibraryGrid: View {
 
     private func facts(_ score: Score) -> [PieceFacts.Fact] {
         let programmes = (score.entries ?? []).compactMap { $0.programme?.name }.sorted { $0.localizedStandardCompare($1) == .orderedAscending }
+        // A file of one part says nothing by naming it: recognition programs call it
+        // "Voice", or take a word from the page ("Trio").
         return PieceFacts.facts(PieceFacts.Input(
-            arranger: score.arranger, partName: score.partName, barCount: score.barCount,
+            arranger: score.arranger, partName: score.partCount > 1 ? score.partName : "", barCount: score.barCount,
             transposition: score.transposition?.description, programmes: programmes,
             ownSettings: settings.hasOwnSettings(score.id.uuidString),
             lastOpenedAt: score.lastOpenedAt, addedAt: score.addedAt))
