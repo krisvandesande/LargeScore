@@ -122,6 +122,16 @@
         }
       }
     },
+    "%lld pieces are in the library. The iPad shows them within a minute.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld stukken staan in de bibliotheek. De iPad toont ze binnen een minuut."
+          }
+        }
+      }
+    },
     "%lld sharps": {
       "localizations": {
         "nl": {
@@ -196,6 +206,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "1 mol"
+          }
+        }
+      }
+    },
+    "1 piece is in the library. The iPad shows it within a minute.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 stuk staat in de bibliotheek. De iPad toont het binnen een minuut."
           }
         }
       }
@@ -306,6 +326,36 @@
           "stringUnit": {
             "state": "translated",
             "value": "Voeg %lld stukken toe"
+          }
+        }
+      }
+    },
+    "Add %lld pieces to the library?": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld stukken aan de bibliotheek toevoegen?"
+          }
+        }
+      }
+    },
+    "Add 1 piece to the library?": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 stuk aan de bibliotheek toevoegen?"
+          }
+        }
+      }
+    },
+    "Add All to Library": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alles naar de bibliotheek"
           }
         }
       }
@@ -1542,6 +1592,16 @@
         }
       }
     },
+    "In the Library": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In de bibliotheek"
+          }
+        }
+      }
+    },
     "Instruments": {
       "localizations": {
         "nl": {
@@ -1908,6 +1968,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Dichtstbij"
+          }
+        }
+      }
+    },
+    "New": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nieuw"
           }
         }
       }
@@ -2560,6 +2630,16 @@
         }
       }
     },
+    "Send every piece under To Check to the library as it is": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stuur elk stuk onder Te controleren zoals het is naar de bibliotheek"
+          }
+        }
+      }
+    },
     "Set Key": {
       "localizations": {
         "nl": {
@@ -3062,6 +3142,16 @@
         }
       }
     },
+    "They go as they are, named after their PDFs. The iPad marks them to check against the PDF.": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ze gaan zoals ze zijn, genoemd naar hun pdf. De iPad markeert ze om met de pdf te controleren."
+          }
+        }
+      }
+    },
     "Thin": {
       "localizations": {
         "nl": {
@@ -3284,6 +3374,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Titel of componist"
+          }
+        }
+      }
+    },
+    "To Check": {
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Te controleren"
           }
         }
       }

@@ -7,6 +7,32 @@ struct ContentView: View {
     @EnvironmentObject private var queue: ConversionQueue
     @State private var selection: UUID?
     @State private var dropping = false
+    @State private var confirmingAll = false
+    @State private var sentMessage: String?
+
+    private enum Group: CaseIterable {
+        case new, toCheck, inLibrary
+    }
+
+    private func jobs(in group: Group) -> [Job] {
+        queue.jobs.filter { job in
+            switch (group, job.state) {
+            case (.toCheck, .ready), (.inLibrary, .sent): true
+            case (.new, .waiting), (.new, .converting), (.new, .failed): true
+            default: false
+            }
+        }
+    }
+
+    private func title(_ group: Group) -> Text {
+        switch group {
+        case .new: Text("New")
+        case .toCheck: Text("To Check")
+        case .inLibrary: Text("In the Library")
+        }
+    }
+
+    private var readyCount: Int { jobs(in: .toCheck).count }
 
     var body: some View {
         NavigationView {
@@ -17,18 +43,38 @@ struct ContentView: View {
                         .foregroundColor(.orange)
                         .padding(.vertical, 4)
                 }
-                ForEach(queue.jobs) { job in
-                    JobRow(job: job)
-                        .tag(job.id)
-                        .contextMenu {
-                            if case .failed = job.state {
-                                Button("Try Again") { queue.retry(job) }
+                // Where each piece is: being converted, waiting to be checked, or sent.
+                ForEach(Group.allCases, id: \.self) { group in
+                    let members = jobs(in: group)
+                    if !members.isEmpty {
+                        Section {
+                            ForEach(members) { job in
+                                JobRow(job: job)
+                                    .tag(job.id)
+                                    .contextMenu {
+                                        if case .failed = job.state {
+                                            Button("Try Again") { queue.retry(job) }
+                                        }
+                                        Button("Remove") {
+                                            if selection == job.id { selection = nil }
+                                            queue.remove(job)
+                                        }
+                                    }
                             }
-                            Button("Remove") {
-                                if selection == job.id { selection = nil }
-                                queue.remove(job)
+                        } header: {
+                            HStack {
+                                title(group)
+                                Spacer()
+                                Text(verbatim: "\(members.count)").monospacedDigit()
+                                    // As far in from the right as the title is from the left (14 pt).
+                                    .padding(.trailing, 11)
                             }
+                            .accessibilityElement(children: .ignore)
+                            .accessibilityLabel(title(group))
+                            .accessibilityValue(Text(verbatim: "\(members.count)"))
+                            .accessibilityAddTraits(.isHeader)
                         }
+                    }
                 }
             }
             .listStyle(.sidebar)
@@ -40,9 +86,28 @@ struct ContentView: View {
                     }
                     .help("Add PDFs to convert (⌘O)")
                 }
+                ToolbarItem {
+                    Button("Add All to Library") { confirmingAll = true }
+                        .disabled(readyCount == 0)
+                        .help("Send every piece under To Check to the library as it is")
+                }
             }
 
             detail
+        }
+        .confirmationDialog(Text(readyCount == 1 ? "Add 1 piece to the library?" : "Add \(readyCount) pieces to the library?"),
+                            isPresented: $confirmingAll) {
+            Button("Add All to Library") {
+                let result = queue.sendAllReady()
+                sentMessage = result.problem ?? (result.sent == 1
+                    ? String(localized: "1 piece is in the library. The iPad shows it within a minute.")
+                    : String(localized: "\(result.sent) pieces are in the library. The iPad shows them within a minute."))
+            }
+        } message: {
+            Text("They go as they are, named after their PDFs. The iPad marks them to check against the PDF.")
+        }
+        .alert(sentMessage ?? "", isPresented: Binding(get: { sentMessage != nil }, set: { if !$0 { sentMessage = nil } })) {
+            Button("OK") { sentMessage = nil }
         }
         .onDrop(of: [.fileURL], isTargeted: $dropping) { providers in
             Task { queue.add(await Self.urls(from: providers)) }
@@ -117,23 +182,25 @@ private struct JobRow: View {
             Text(job.title)
                 .font(.headline)
                 .lineLimit(2)
-            HStack(spacing: 6) {
-                if job.state == .converting { ProgressView().controlSize(.small) }
-                Text(status)
-                    .foregroundColor(.secondary)
+            // The section already says "To Check" or "In the Library"; new ones say how far along.
+            if let status {
+                HStack(spacing: 6) {
+                    if job.state == .converting { ProgressView().controlSize(.small) }
+                    Text(status)
+                        .foregroundColor(.secondary)
+                }
             }
         }
         .padding(.vertical, 4)
         .accessibilityElement(children: .combine)
     }
 
-    private var status: String {
+    private var status: String? {
         switch job.state {
         case .waiting: String(localized: "Waiting")
         case .converting: String(localized: "Converting")
-        case .ready: String(localized: "Ready to check")
         case .failed: String(localized: "Not converted")
-        case .sent: String(localized: "In the library")
+        case .ready, .sent: nil
         }
     }
 }

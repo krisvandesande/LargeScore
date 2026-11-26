@@ -258,6 +258,26 @@ final class ConversionQueue: ObservableObject {
         }
     }
 
+    /// Every converted piece not yet in the library, sent as it is: titled by its PDF's
+    /// name, with the composer and arranger Audiveris read. They arrive on the iPad
+    /// marked to check against the PDF. Returns how many went, and the first problem.
+    func sendAllReady() -> (sent: Int, problem: String?) {
+        var sent = 0
+        for job in jobs where job.state == .ready {
+            guard let data = try? Data(contentsOf: music(of: job)) else { continue }
+            let xml = String(decoding: data, as: UTF8.self)
+            let file = try? MusicFile.read(data, fileName: job.title + ".musicxml")
+            var sending = job
+            sending.title = PartGrouping.tidy(job.title)
+            update(job.id) { $0.title = sending.title }
+            let details = MusicXMLEdit.settingDetails(xml, title: sending.title, composer: file?.composer ?? "",
+                                                      arranger: file?.arranger ?? "")
+            if let problem = send(sending, xml: details, checked: false) { return (sent, problem) }
+            sent += 1
+        }
+        return (sent, nil)
+    }
+
     /// The file's own name for the piece: no characters iCloud Drive refuses.
     nonisolated static func fileName(_ title: String) -> String {
         let cleaned = title.components(separatedBy: CharacterSet(charactersIn: "/:\\")).joined(separator: "-")

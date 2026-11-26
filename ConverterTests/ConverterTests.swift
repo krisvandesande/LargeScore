@@ -106,6 +106,25 @@ nonisolated final class ConverterTests: XCTestCase, @unchecked Sendable {
         XCTAssertEqual(ConversionQueue.freeName(for: other, in: folder), "Alte Kameraden 2")
     }
 
+    /// Add All to Library sends what's waiting to be checked, named after the PDF.
+    @MainActor func testSendAllReady() async throws {
+        let queue = ConversionQueue()
+        queue.add([Self.samples.appendingPathComponent("converted-by-audiveris.pdf")])
+        try await waitFor { queue.jobs.first?.state == .ready }
+        let result = queue.sendAllReady()
+        XCTAssertEqual(result.sent, 1)
+        XCTAssertNil(result.problem)
+        XCTAssertEqual(queue.jobs.first?.state, .sent)
+        let sent = try String(contentsOf: ConversionQueue.libraryFolder.appendingPathComponent("converted-by-audiveris.musicxml"), encoding: .utf8)
+        XCTAssertTrue(sent.contains("<work-title>converted-by-audiveris</work-title>"))
+        XCTAssertEqual(queue.sendAllReady().sent, 0)
+        // Two more: one checked next, one still converting, for a picture of the sidebar.
+        queue.add([Self.samples.appendingPathComponent("converted-by-audiveris.pdf")])
+        try await waitFor { queue.jobs.count == 2 && queue.jobs[1].state == .ready }
+        queue.add([Self.samples.appendingPathComponent("converted-by-audiveris.pdf")])
+        picture(ContentView().environmentObject(queue), size: CGSize(width: 1100, height: 600), name: "sidebar-groups")
+    }
+
     @MainActor func testFailedConversionSaysSo() async throws {
         let script = temp.appendingPathComponent("nothing.sh")
         try "#!/bin/bash\nexit 1\n".write(to: script, atomically: true, encoding: .utf8)
